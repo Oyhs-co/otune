@@ -1,0 +1,5 @@
+# Ignore build artifacts and intermediate files
+/frontend/ios*
+/frontend/macos*
+/frontend/linux*
+/frontend/web*
