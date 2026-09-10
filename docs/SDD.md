@@ -465,7 +465,8 @@ Una feature está terminada cuando:
 - no viola límites DDD;
 - no introduce acoplamiento innecesario;
 - la SPEC refleja el comportamiento real;
-- las decisiones arquitectónicas nuevas tienen ADR cuando corresponde.
+- las decisiones arquitectónicas nuevas tienen ADR cuando corresponde;
+- los cambios están documentados en `CHANGELOG.md` bajo `[Unreleased]` siguiendo `docs/VERSIONING.md`.
 
 ## 18. Regla de simplicidad
 

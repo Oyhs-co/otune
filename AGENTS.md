@@ -199,7 +199,8 @@ Antes de modificar una parte sensible:
 4. revisar interfaces existentes;
 5. implementar el mínimo cambio necesario;
 6. ejecutar formatter, analyzer y tests relevantes;
-7. revisar que no se haya acoplado infraestructura al dominio.
+7. revisar que no se haya acoplado infraestructura al dominio;
+8. registrar el cambio en `CHANGELOG.md` bajo `[Unreleased]`.
 
 ## Comandos esperados
 
@@ -275,12 +276,32 @@ Reglas:
 - las pruebas deben poder relacionarse con criterios de aceptación;
 - las futuras features pueden documentarse como `Draft`/`Proposed` sin implementarse.
 
+## Versionado, Tags y Changelog
+
+Otune mantiene un sistema estricto de versionado y trazabilidad definido en `docs/VERSIONING.md`.
+
+### Versionado Semántico
+- Se sigue la convención SemVer adaptada a Flutter: `MAJOR.MINOR.PATCH+BUILD` (ej. `0.1.0+1`).
+- La única fuente de verdad para la versión es `frontend/pubspec.yaml`.
+- Nunca modificar manualmente archivos de plataforma nativa para alterar la versión.
+
+### Sistema de Tags Git
+- Formato: `vMAJOR.MINOR.PATCH[-PRERELEASE]` (ej. `v0.1.0`, `v0.1.0-alpha.1`).
+- **Solo tags anotados**: `git tag -a vX.Y.Z -m "Release vX.Y.Z: <resumen>"`.
+- Un tag solo se crea cuando los tests y el analyzer están limpios, `CHANGELOG.md` está cerrado para esa versión y el commit de bump está en `main`.
+
+### Changelog Obligatorio
+- Todo cambio notable (features, refactorizaciones, correcciones de errores, cambios de configuración relevantes) **debe** registrarse en `CHANGELOG.md` bajo la sección `## [Unreleased]` siguiendo el estándar *Keep a Changelog* (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`).
+- No cerrar una tarea o feature sin haber actualizado `CHANGELOG.md`.
+
 ### Artefactos mínimos
 
 ```text
+CHANGELOG.md
 docs/
 ├── SDD.md
 ├── DDD.md
+├── VERSIONING.md
 ├── architecture/
 │   └── ADR-*.md
 └── specs/
@@ -295,7 +316,16 @@ docs/
 Cuando una tarea corresponda a una feature no trivial, el agente debe trabajar con esta secuencia:
 
 ```text
-SPEC → Review → Plan → Code → Test → Verify → Document
+SPEC → Review → Plan → Code → Test → Verify → Changelog → Document
 ```
+
+1. **SPEC:** Localizar o redactar la especificación.
+2. **Review:** Revisar ADRs y DDD aplicables.
+3. **Plan:** Trazar el plan mínimo de cambios.
+4. **Code:** Implementar manteniendo desacoplado el dominio.
+5. **Test:** Ejecutar pruebas unitarias/widgets y asegurar que pasen.
+6. **Verify:** Validar formalmente los criterios de aceptación (AC) de la SPEC.
+7. **Changelog:** Documentar los cambios en `CHANGELOG.md` bajo `[Unreleased]`.
+8. **Document:** Actualizar tablas de verificación y estado en la SPEC y cerrar la tarea.
 
 No comenzar por crear archivos o clases sin localizar primero el comportamiento que debe cumplirse.

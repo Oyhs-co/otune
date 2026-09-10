@@ -1,0 +1,41 @@
+# Changelog
+
+Todos los cambios notables en este proyecto serán documentados en este archivo.
+
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
+y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
+
+---
+
+## [Unreleased]
+
+### Added
+- Especificación formal de versionado semántico y política de tags Git en [`docs/VERSIONING.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/VERSIONING.md).
+- Documentación de arquitectura fundacional y gobernanza:
+  - Contrato de agentes y directrices técnicas en [`AGENTS.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/AGENTS.md).
+  - Propuesta del proyecto y alcance MVP en [`docs/PROJECT_PROPOSAL.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/PROJECT_PROPOSAL.md).
+  - Pautas tecnológicas e investigación del stack en [`docs/STACK.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/STACK.md).
+  - Diseño guiado por el dominio pragmático en [`docs/DDD.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/DDD.md).
+  - Metodología de desarrollo guiado por especificaciones en [`docs/SDD.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/SDD.md).
+- Registros de Decisiones de Arquitectura (ADRs):
+  - `ADR-001`: Uso de Flutter como framework multiplataforma.
+  - `ADR-002`: Selección de `media_kit` como motor de audio.
+  - `ADR-003`: Desacoplamiento mediante abstracción de dominio `AudioEngine`.
+  - `ADR-004`: Uso de Riverpod para inyección de dependencias y estado reactivo.
+  - `ADR-005`: Uso de Drift/SQLite para persistencia local.
+  - `ADR-006`: Navegación centralizada con `go_router`.
+  - `ADR-007`: Metodología SDD y DDD para gobernanza técnica.
+- Requisitos funcionales y no funcionales en `docs/requirements/` para Library, Playback, Lyrics y Personalization.
+- Especificaciones de comportamiento (SPECs) en `docs/specs/`:
+  - `library/scan-library.md` y `library/search-library.md`.
+  - `playback/play-track.md`, `playback/queue.md`, `playback/repeat.md` y `playback/shuffle.md`.
+  - `lyrics/read-lrc.md`.
+  - `personalization/basic-theme.md`.
+- Inicialización del proyecto base Flutter en `frontend/` para plataformas móviles y desktop.
+
+---
+
+## [0.1.0-alpha.0] - 2026-09-10
+
+### Added
+- Creación del repositorio inicial del proyecto Otune.
