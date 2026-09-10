@@ -32,6 +32,16 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - `lyrics/read-lrc.md`.
   - `personalization/basic-theme.md`.
 - Inicialización del proyecto base Flutter en `frontend/` para plataformas móviles y desktop.
+- Scaffolding de arquitectura modular en `frontend/lib/` (`app/`, `core/`, `features/playback/`, `features/library/`, `features/lyrics/`, `features/settings/`).
+- Abstracción de dominio puro [`AudioEngine`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/playback/domain/services/audio_engine.dart).
+- Entidades y modelos de dominio: [`TrackRef`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/playback/domain/entities/track_ref.dart), [`PlaybackState`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/playback/domain/entities/playback_state.dart), [`Track`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/library/domain/entities/track.dart), [`Lyrics`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/lyrics/domain/entities/lyrics.dart) y [`AppSettings`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/settings/domain/entities/app_settings.dart).
+- Implementación de infraestructura [`MediaKitAudioEngine`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/lib/features/playback/data/services/media_kit_audio_engine.dart) desacoplada de la UI.
+- Implementación de [`FakeAudioEngine`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/test/fakes/fake_audio_engine.dart) y suite de pruebas unitarias para el contrato de reproducción.
+- Configuración de dependencias base (`media_kit`, `flutter_riverpod`, `go_router`, `logger`, `path_provider`, `dynamic_color`, `uuid`, `file_picker`, `mocktail`, `very_good_analysis`).
+- Configuración estricta de análisis estático con `very_good_analysis` en [`analysis_options.yaml`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/frontend/analysis_options.yaml).
+
+### Changed
+- Renombrado del paquete Dart en `pubspec.yaml` a `otune` con versión `0.1.0-alpha.0+1`.
 
 ---
 
