@@ -1,7 +1,7 @@
 # SPEC: Play Track
 
 ## Status
-Proposed
+Implemented
 
 ## Context
 The user needs to be able to load a local audio file and control its playback (play, pause, seek) within the application. This is the fundamental capability of the entire music player.
@@ -71,15 +71,24 @@ And playback continues (if it was playing)
 - Interrupted playback (e.g., system call): Engine should update state to `paused` or `stopped`.
 
 ## Acceptance criteria
-- [ ] AC-PLAY-001: A local file can be loaded and played successfully.
-- [ ] AC-PLAY-002: Pause and Play functions correctly toggle the audio stream.
-- [ ] AC-PLAY-003: Seeking changes the playback position accurately.
-- [ ] AC-PLAY-004: The UI can observe and reflect the current position and state.
+- [x] AC-PLAY-001: A local file can be loaded and played successfully.
+- [x] AC-PLAY-002: Pause and Play functions correctly toggle the audio stream.
+- [x] AC-PLAY-003: Seeking changes the playback position accurately.
+- [x] AC-PLAY-004: The UI can observe and reflect the current position and state.
 
 ## Testing strategy
 - **Unit**: Test `PlaybackSession` logic and `AudioEngine` interface mocks.
 - **Integration**: Test `MediaKitAudioEngine` with real local files on target platforms.
 - **Widget**: Test that the Play/Pause buttons trigger the correct application services.
+
+## Verification
+
+| Acceptance Criterion | Evidence / Test | Status |
+|---|---|---|
+| AC-PLAY-001 | `test/features/playback/application/playback_controller_test.dart` | ✅ |
+| AC-PLAY-002 | `test/features/playback/presentation/player_widget_test.dart` | ✅ |
+| AC-PLAY-003 | `test/features/playback/domain/audio_engine_test.dart` | ✅ |
+| AC-PLAY-004 | `test/features/playback/presentation/player_widget_test.dart`, `test/widget_test.dart` | ✅ |
 
 ## Dependencies
 - `media_kit`

@@ -1,12 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/app/app.dart';
+import 'package:otune/features/playback/application/playback_providers.dart';
+
+import 'fakes/fake_audio_engine.dart';
 
 void main() {
   testWidgets('OtuneApp renders home page smoke test', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: OtuneApp()));
+    final fakeEngine = FakeAudioEngine();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+        child: const OtuneApp(),
+      ),
+    );
 
     expect(find.text('Otune'), findsWidgets);
-    expect(find.text('Bienvenido a Otune'), findsOneWidget);
+    expect(find.text('Abrir archivo de audio'), findsOneWidget);
   });
 }
