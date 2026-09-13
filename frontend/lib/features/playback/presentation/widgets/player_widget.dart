@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
+import 'package:otune/features/playback/domain/entities/playback_modes.dart';
+import 'package:otune/features/playback/presentation/widgets/queue_sheet.dart';
 
 /// Widget visual para visualización y control de la reproducción en curso.
 class PlayerWidget extends ConsumerWidget {
@@ -20,15 +22,15 @@ class PlayerWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final playbackState = ref.watch(playbackControllerProvider);
+    final session = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
 
-    final track = playbackState.currentTrack;
+    final track = session.currentTrack;
     final title = track?.title ?? 'Sin pista seleccionada';
     final artist = track?.artist ?? 'Carga un archivo de audio para comenzar';
 
-    final position = playbackState.position;
-    final duration = playbackState.duration;
+    final position = session.position;
+    final duration = session.duration;
 
     final maxDurationMs = duration.inMilliseconds > 0
         ? duration.inMilliseconds.toDouble()
@@ -36,6 +38,9 @@ class PlayerWidget extends ConsumerWidget {
     final currentPosMs = position.inMilliseconds
         .clamp(0, maxDurationMs.toInt())
         .toDouble();
+
+    final isShuffle = session.isShuffle;
+    final repeatMode = session.repeatMode;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -117,51 +122,88 @@ class PlayerWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
 
-          // Controles principales
+          // Controles: Shuffle, Previous, Play, Next, Repeat
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
+                icon: Icon(
+                  Icons.shuffle_rounded,
+                  color: isShuffle
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.4,
+                        ),
+                ),
+                tooltip: isShuffle ? 'Aleatorio activado' : 'Modo aleatorio',
+                onPressed: controller.toggleShuffle,
+              ),
+              IconButton(
                 icon: const Icon(Icons.skip_previous_rounded),
-                iconSize: 32,
+                iconSize: 36,
                 tooltip: 'Pista anterior',
                 onPressed: () {
-                  unawaited(controller.seek(Duration.zero));
+                  unawaited(controller.skipPrevious());
                 },
               ),
-              const SizedBox(width: 16),
               IconButton.filled(
                 icon: Icon(
-                  playbackState.isPlaying
+                  session.isPlaying
                       ? Icons.pause_rounded
                       : Icons.play_arrow_rounded,
                 ),
                 iconSize: 42,
-                tooltip: playbackState.isPlaying ? 'Pausar' : 'Reproducir',
+                tooltip: session.isPlaying ? 'Pausar' : 'Reproducir',
                 onPressed: () {
                   unawaited(controller.togglePlayPause());
                 },
               ),
-              const SizedBox(width: 16),
               IconButton(
-                icon: const Icon(Icons.stop_rounded),
-                iconSize: 32,
-                tooltip: 'Detener',
+                icon: const Icon(Icons.skip_next_rounded),
+                iconSize: 36,
+                tooltip: 'Siguiente pista',
                 onPressed: () {
-                  unawaited(controller.stop());
+                  unawaited(controller.skipNext());
                 },
+              ),
+              IconButton(
+                icon: Icon(
+                  repeatMode == RepeatMode.one
+                      ? Icons.repeat_one_rounded
+                      : Icons.repeat_rounded,
+                  color: repeatMode != RepeatMode.off
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.4,
+                        ),
+                ),
+                tooltip: 'Repetir: ${repeatMode.name}',
+                onPressed: controller.cycleRepeatMode,
               ),
             ],
           ),
           const SizedBox(height: 24),
 
-          // Botón para seleccionar pista local
-          FilledButton.tonalIcon(
-            icon: const Icon(Icons.audio_file_rounded),
-            label: const Text('Abrir archivo de audio'),
-            onPressed: () {
-              unawaited(controller.pickAndPlay());
-            },
+          // Acciones secundarias: Cargar archivo y Ver cola
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FilledButton.tonalIcon(
+                icon: const Icon(Icons.audio_file_rounded),
+                label: const Text('Cargar audio'),
+                onPressed: () {
+                  unawaited(controller.pickAndPlay());
+                },
+              ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.queue_music_rounded),
+                label: Text('Cola (${session.queueItems.length})'),
+                onPressed: () {
+                  QueueSheet.show(context);
+                },
+              ),
+            ],
           ),
         ],
       ),

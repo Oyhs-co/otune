@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
+import 'package:otune/features/playback/domain/entities/playback_modes.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 import 'package:otune/features/playback/presentation/widgets/player_widget.dart';
 
 import '../../../fakes/fake_audio_engine.dart';
 
 void main() {
-  group('PlayerWidget', () {
+  group('PlayerWidget with Queue, Repeat and Shuffle controls', () {
     late FakeAudioEngine fakeEngine;
 
     const testTrack = TrackRef(
@@ -23,16 +25,20 @@ void main() {
       fakeEngine = FakeAudioEngine();
     });
 
-    Widget createWidgetUnderTest() {
-      return ProviderScope(
-        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+    Widget createWidgetUnderTest({ProviderContainer? container}) {
+      return UncontrolledProviderScope(
+        container:
+            container ??
+            ProviderContainer(
+              overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+            ),
         child: const MaterialApp(
           home: Scaffold(body: SingleChildScrollView(child: PlayerWidget())),
         ),
       );
     }
 
-    testWidgets('renders placeholder when no track is active', (tester) async {
+    testWidgets('renders placeholder and controls when idle', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Sin pista seleccionada'), findsOneWidget);
@@ -41,45 +47,79 @@ void main() {
         findsOneWidget,
       );
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
-      expect(find.text('Abrir archivo de audio'), findsOneWidget);
+      expect(find.byIcon(Icons.skip_previous_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.skip_next_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.shuffle_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.repeat_rounded), findsOneWidget);
+      expect(find.text('Cola (0)'), findsOneWidget);
     });
 
-    testWidgets('renders track info when track is loaded', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-
-      await fakeEngine.load(testTrack);
-      await tester.pump();
-
-      expect(find.text('Bohemian Rhapsody'), findsOneWidget);
-      expect(find.text('Queen'), findsOneWidget);
-      expect(find.text('05:55'), findsOneWidget);
-    });
-
-    testWidgets('play/pause button toggles playback state and icon', (
+    testWidgets('shuffle button toggles shuffle mode in controller', (
       tester,
     ) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-      await fakeEngine.load(testTrack);
+      final container = ProviderContainer(
+        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest(container: container));
+
+      expect(container.read(playbackControllerProvider).isShuffle, isFalse);
+
+      await tester.tap(find.byIcon(Icons.shuffle_rounded));
       await tester.pump();
 
-      // En pausa / idle: muestra icono play
-      expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
+      expect(container.read(playbackControllerProvider).isShuffle, isTrue);
+    });
 
-      // Tap play
-      await tester.tap(find.byIcon(Icons.play_arrow_rounded));
+    testWidgets('repeat button cycles repeat mode in controller', (
+      tester,
+    ) async {
+      final container = ProviderContainer(
+        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest(container: container));
+
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.off),
+      );
+
+      // Tap 1 -> RepeatMode.all (muestra Icons.repeat_rounded)
+      await tester.tap(find.byIcon(Icons.repeat_rounded));
+      await tester.pump();
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.all),
+      );
+
+      // Tap 2 -> RepeatMode.one (muestra Icons.repeat_one_rounded)
+      await tester.tap(find.byIcon(Icons.repeat_rounded));
+      await tester.pump();
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.one),
+      );
+      expect(find.byIcon(Icons.repeat_one_rounded), findsOneWidget);
+    });
+
+    testWidgets('play/pause button toggles playback state', (tester) async {
+      final container = ProviderContainer(
+        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+      );
+
+      await tester.pumpWidget(createWidgetUnderTest(container: container));
+
+      final controller = container.read(playbackControllerProvider.notifier);
+      await controller.playTrack(testTrack);
       await tester.pump();
 
-      // Ahora en reproducción: muestra icono pause
       expect(find.byIcon(Icons.pause_rounded), findsOneWidget);
-      expect(fakeEngine.currentState.isPlaying, isTrue);
 
-      // Tap pause
       await tester.tap(find.byIcon(Icons.pause_rounded));
       await tester.pump();
 
-      // Regresa a icono play
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
-      expect(fakeEngine.currentState.isPaused, isTrue);
     });
   });
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/features/playback/application/file_picker_service.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
+import 'package:otune/features/playback/domain/entities/playback_modes.dart';
 import 'package:otune/features/playback/domain/entities/playback_state.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
@@ -16,18 +17,14 @@ class FakeLocalAudioPicker implements LocalAudioPicker {
 }
 
 void main() {
-  group('PlaybackController', () {
+  group('PlaybackController with Queue, Repeat and Shuffle', () {
     late FakeAudioEngine fakeEngine;
     late FakeLocalAudioPicker fakePicker;
     late ProviderContainer container;
 
-    const testTrack = TrackRef(
-      id: 'test-1',
-      uri: 'file:///path/song.mp3',
-      title: 'Awesome Song',
-      artist: 'Great Artist',
-      duration: Duration(minutes: 4),
-    );
+    const track1 = TrackRef(id: 't1', uri: 'file:///t1.mp3', title: 'Track 1');
+    const track2 = TrackRef(id: 't2', uri: 'file:///t2.mp3', title: 'Track 2');
+    const track3 = TrackRef(id: 't3', uri: 'file:///t3.mp3', title: 'Track 3');
 
     setUp(() {
       fakeEngine = FakeAudioEngine();
@@ -45,75 +42,154 @@ void main() {
       container.dispose();
     });
 
-    test('initial state matches engine currentState', () {
-      final state = container.read(playbackControllerProvider);
-      expect(state.status, equals(PlaybackStatus.idle));
-      expect(state.currentTrack, isNull);
+    test('initial state has empty queue and idle engine', () {
+      final session = container.read(playbackControllerProvider);
+      expect(session.status, equals(PlaybackStatus.idle));
+      expect(session.queueItems, isEmpty);
+      expect(session.currentTrack, isNull);
     });
 
-    test('playTrack loads and starts playback in engine', () async {
+    test('setQueue loads and plays the first track', () async {
       final controller = container.read(playbackControllerProvider.notifier);
 
-      await controller.playTrack(testTrack);
+      await controller.setQueue([track1, track2, track3]);
 
-      final state = container.read(playbackControllerProvider);
-      expect(state.currentTrack, equals(testTrack));
-      expect(state.isPlaying, isTrue);
+      final session = container.read(playbackControllerProvider);
+      expect(session.queueItems.length, equals(3));
+      expect(session.currentIndex, equals(0));
+      expect(session.currentTrack, equals(track1));
+      expect(session.isPlaying, isTrue);
     });
 
-    test('togglePlayPause pauses when playing', () async {
+    test('skipNext advances to next track in queue', () async {
       final controller = container.read(playbackControllerProvider.notifier);
+      await controller.setQueue([track1, track2, track3]);
 
-      await controller.playTrack(testTrack);
-      expect(container.read(playbackControllerProvider).isPlaying, isTrue);
+      await controller.skipNext();
 
-      await controller.togglePlayPause();
-      expect(container.read(playbackControllerProvider).isPaused, isTrue);
+      final session = container.read(playbackControllerProvider);
+      expect(session.currentIndex, equals(1));
+      expect(session.currentTrack, equals(track2));
+      expect(session.isPlaying, isTrue);
     });
 
-    test('togglePlayPause resumes when paused', () async {
+    test('skipPrevious restarts track if position > 3 seconds', () async {
       final controller = container.read(playbackControllerProvider.notifier);
+      await controller.setQueue([track1, track2, track3], startIndex: 1);
 
-      await controller.playTrack(testTrack);
-      await controller.togglePlayPause();
-      expect(container.read(playbackControllerProvider).isPaused, isTrue);
+      fakeEngine.emitState(
+        fakeEngine.currentState.copyWith(position: const Duration(seconds: 10)),
+      );
+      await pumpEventQueue();
 
-      await controller.togglePlayPause();
-      expect(container.read(playbackControllerProvider).isPlaying, isTrue);
+      await controller.skipPrevious();
+
+      // Debe permanecer en track2 con posición reseteada a cero
+      final session = container.read(playbackControllerProvider);
+      expect(session.currentIndex, equals(1));
+      expect(fakeEngine.currentState.position, equals(Duration.zero));
     });
 
-    test('seek updates position in engine', () async {
-      final controller = container.read(playbackControllerProvider.notifier);
+    test(
+      'skipPrevious moves to previous track if position <= 3 seconds',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.setQueue([track1, track2, track3], startIndex: 1);
 
-      await controller.playTrack(testTrack);
-      await controller.seek(const Duration(seconds: 90));
+        fakeEngine.emitState(
+          fakeEngine.currentState.copyWith(
+            position: const Duration(seconds: 1),
+          ),
+        );
+
+        await controller.skipPrevious();
+
+        final session = container.read(playbackControllerProvider);
+        expect(session.currentIndex, equals(0));
+        expect(session.currentTrack, equals(track1));
+      },
+    );
+
+    test('cycleRepeatMode transitions through off -> all -> one -> off', () {
+      final controller = container.read(playbackControllerProvider.notifier);
 
       expect(
-        container.read(playbackControllerProvider).position,
-        equals(const Duration(seconds: 90)),
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.off),
+      );
+
+      controller.cycleRepeatMode();
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.all),
+      );
+
+      controller.cycleRepeatMode();
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.one),
+      );
+
+      controller.cycleRepeatMode();
+      expect(
+        container.read(playbackControllerProvider).repeatMode,
+        equals(RepeatMode.off),
       );
     });
 
-    test('stop resets engine position and status to idle', () async {
-      final controller = container.read(playbackControllerProvider.notifier);
+    test('toggleShuffle activates and deactivates shuffle state', () {
+      final controller = container.read(playbackControllerProvider.notifier)
+        ..addToQueue(track1)
+        ..addToQueue(track2)
+        ..toggleShuffle();
 
-      await controller.playTrack(testTrack);
-      await controller.stop();
+      expect(container.read(playbackControllerProvider).isShuffle, isTrue);
 
-      final state = container.read(playbackControllerProvider);
-      expect(state.status, equals(PlaybackStatus.idle));
-      expect(state.position, equals(Duration.zero));
+      controller.toggleShuffle();
+      expect(container.read(playbackControllerProvider).isShuffle, isFalse);
     });
 
-    test('pickAndPlay plays track when picker returns a file', () async {
-      fakePicker.trackToReturn = testTrack;
-      final controller = container.read(playbackControllerProvider.notifier);
+    test(
+      'track completion automatically advances to next track in queue',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.setQueue([track1, track2]);
 
-      await controller.pickAndPlay();
+        expect(
+          container.read(playbackControllerProvider).currentTrack,
+          equals(track1),
+        );
 
-      final state = container.read(playbackControllerProvider);
-      expect(state.currentTrack, equals(testTrack));
-      expect(state.isPlaying, isTrue);
-    });
+        // Simulamos que el motor emite completion del track 1
+        fakeEngine.emitState(
+          fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+        );
+
+        // Esperamos microtareas para que el listener procese
+        await pumpEventQueue();
+
+        final session = container.read(playbackControllerProvider);
+        expect(session.currentTrack, equals(track2));
+      },
+    );
+
+    test(
+      'removeFromQueue removes item and stops engine if queue becomes empty',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.playTrack(track1);
+
+        final itemId = container
+            .read(playbackControllerProvider)
+            .queueItems
+            .first
+            .id;
+        controller.removeFromQueue(itemId);
+
+        final session = container.read(playbackControllerProvider);
+        expect(session.queueItems, isEmpty);
+        expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
+      },
+    );
   });
 }

@@ -17,6 +17,6 @@ void main() {
     );
 
     expect(find.text('Otune'), findsWidgets);
-    expect(find.text('Abrir archivo de audio'), findsOneWidget);
+    expect(find.text('Cargar audio'), findsOneWidget);
   });
 }

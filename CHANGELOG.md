@@ -46,7 +46,8 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Cumplimiento y verificación formal de todos los criterios de aceptación en [`docs/specs/playback/play-track.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/specs/playback/play-track.md).
 
 ### Changed
-- Renombrado del paquete Dart en `pubspec.yaml` a `otune` con versión `0.1.0-alpha.0+1`.
+- Renombrado del paquete Dart en `pubspec.yaml` a `otune` c
+- on versión `0.1.0-alpha.0+1`.
 
 ---
 
