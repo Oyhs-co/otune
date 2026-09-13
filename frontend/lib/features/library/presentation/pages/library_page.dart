@@ -1,67 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/library/application/library_providers.dart';
+import 'package:otune/features/library/application/state/library_scan_state.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
-import 'package:otune/features/library/domain/services/library_scanner.dart';
-import 'package:otune/features/library/data/services/file_system_library_scanner.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 import 'package:file_picker/file_picker.dart';
 
-class LibraryPage extends ConsumerStatefulWidget {
+class LibraryPage extends ConsumerWidget {
   const LibraryPage({super.key});
 
-  @override
-  ConsumerState<LibraryPage> createState() => _LibraryPageState();
-}
-
-class _LibraryPageState extends ConsumerState<LibraryPage> {
-  bool _isScanning = false;
-  String _scanStatus = 'No se ha realizado ningún escaneo';
-
-  Future<void> _handleScanFolder() async {
+  Future<void> _handleScanFolder(WidgetRef ref) async {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) return;
 
-    setState(() {
-      _isScanning = true;
-      _scanStatus = 'Escaneando...';
-    });
-
-    final db = ref.read(databaseProvider);
-    final scanner = FileSystemLibraryScanner(db);
-
-    await for (final event in scanner.scanDirectory(selectedDirectory)) {
-      if (event is ScanProgress) {
-        setState(() {
-          _scanStatus = 'Procesando: ${event.currentFile} (${event.filesProcessed}/${event.totalFilesFound})';
-        });
-      } else if (event is ScanComplete) {
-        setState(() {
-          _scanStatus = 'Escaneo completado. ${event.totalTracksIndexed} pistas indexadas.';
-          _isScanning = false;
-        });
-      } else if (event is ScanError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${event.message}')),
-        );
-      }
-    }
+    await ref.read(libraryScanProvider.notifier).scanDirectory(selectedDirectory);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final scanState = ref.watch(libraryScanProvider);
     
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Biblioteca'),
         actions: [
           IconButton(
-            icon: _isScanning 
+            icon: scanState.isScanning 
               ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
               : const Icon(Icons.folder_open),
-            onPressed: _isScanning ? null : _handleScanFolder,
+            onPressed: scanState.isScanning ? null : () => _handleScanFolder(ref),
             tooltip: 'Escanear carpeta',
           ),
         ],
@@ -71,7 +40,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              _scanStatus,
+              scanState.status,
               style: theme.textTheme.bodySmall,
               textAlign: TextAlign.center,
             ),
@@ -112,8 +81,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 );
               },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

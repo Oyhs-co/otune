@@ -8,8 +8,14 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ---
 
 ## [Unreleased]
-
+ 
 ### Added
+- Persistencia local implementada con Drift/SQLite para la gestión de pistas musicales.
+- Servicio de escaneo de directorios locales con extracción de metadatos mediante `audio_metadata_reader`.
+- Repositorio de biblioteca (`LibraryRepository`) para el acceso desacoplado a los datos de pistas.
+- Gestión de estado de la biblioteca y el proceso de escaneo mediante Riverpod Notifiers.
+- Pantalla de Biblioteca (`LibraryPage`) para la gestión y selección de canciones locales.
+- Suite de pruebas unitarias para la validación del repositorio de la biblioteca.
 - Especificación formal de versionado semántico y política de tags Git en [`docs/VERSIONING.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/docs/VERSIONING.md).
 - Documentación de arquitectura fundacional y gobernanza:
   - Contrato de agentes y directrices técnicas en [`AGENTS.md`](file:///C:/Users/ACER/Documents/Proyectos_ISCO/GitHub/otune/AGENTS.md).
