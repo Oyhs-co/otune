@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: Target environment
         required: true
-        default: 'debug'
         type: choice
+        default: debug
         options:
           - debug
           - staging
@@ -15,15 +15,22 @@ on:
 
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+          flutter-version: '3.47.3'
+          channel: stable
+          cache: true
+
+      - name: Show Flutter Version
+        run: flutter --version
 
       - name: Install Dependencies
         run: flutter pub get
@@ -33,29 +40,33 @@ jobs:
         run: dart run build_runner build --delete-conflicting-outputs
         working-directory: frontend
 
-      - name: Build APK
+      - name: Decode Keystore
+        if: inputs.environment != 'debug'
         run: |
-          if [ "${{ github.event.inputs.environment }}" == "debug" ]; then
-            flutter build apk --debug
-          elif [ "${{ github.event.inputs.environment }}" == "staging" ]; then
-            flutter build apk --release --flavor staging
-          else
-            flutter build apk --release --flavor prod
-          fi
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > frontend/android/app/upload-keystore.jks
+
+      - name: Build APK
         working-directory: frontend
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEYSTORE_PATH: upload-keystore.jks
-
-      - name: Decode Keystore (for Release/Staging)
-        if: github.event.inputs.environment != 'debug'
+          KEYSTORE_PATH: android/app/upload-keystore.jks
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > frontend/android/app/upload-keystore.jks
+          if [ "${{ inputs.environment }}" = "debug" ]; then
+            flutter build apk --debug
+          elif [ "${{ inputs.environment }}" = "staging" ]; then
+            flutter build apk --release --flavor staging
+          elif [ "${{ inputs.environment }}" = "prod" ]; then
+            flutter build apk --release --flavor prod
+          else
+            echo "Unknown environment: ${{ inputs.environment }}"
+            exit 1
+          fi
 
-      - name: Upload Artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: otune-apk-${{ github.event.inputs.environment }}
+          name: otune-apk-${{ inputs.environment }}
           path: frontend/build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error

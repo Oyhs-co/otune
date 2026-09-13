@@ -4,17 +4,16 @@ import 'package:otune/features/library/domain/services/library_scanner.dart';
 
 /// Estado del proceso de escaneo de la biblioteca.
 class LibraryScanState {
-  final bool isScanning;
-  final String status;
-  final int filesProcessed;
-  final int totalFilesFound;
-
-  const LibraryScanState({
+  const new({
     this.isScanning = false,
     this.status = 'No se ha realizado ningún escaneo',
     this.filesProcessed = 0,
     this.totalFilesFound = 0,
   });
+  final bool isScanning;
+  final String status;
+  final int filesProcessed;
+  final int totalFilesFound;
 
   LibraryScanState copyWith({
     bool? isScanning,
@@ -59,7 +58,8 @@ class LibraryScanNotifier extends Notifier<LibraryScanState> {
         state = state.copyWith(
           isScanning: false,
           status:
-              'Escaneo completado. ${event.totalTracksIndexed} pistas indexadas.',
+              'Escaneo completado. ${event.totalTracksIndexed}'
+              ' pistas indexadas.',
         );
       } else if (event is ScanError) {
         state = state.copyWith(

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 abstract final class AppTheme {
   static const _defaultSeedColor = Color(0xFF6750A4);
 
-  /// Construye el tema claro admitiendo paleta dinámica de la plataforma.
-  static ThemeData light([ColorScheme? dynamicColorScheme]) {
-    final colorScheme =
-        dynamicColorScheme ??
-        ColorScheme.fromSeed(seedColor: _defaultSeedColor);
+  /// Construye el tema claro con un color semilla dinámico de la plataforma.
+  static ThemeData light([Color? seedColor]) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor ?? _defaultSeedColor,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -17,14 +17,12 @@ abstract final class AppTheme {
     );
   }
 
-  /// Construye el tema oscuro admitiendo paleta dinámica de la plataforma.
-  static ThemeData dark([ColorScheme? dynamicColorScheme]) {
-    final colorScheme =
-        dynamicColorScheme ??
-        ColorScheme.fromSeed(
-          seedColor: _defaultSeedColor,
-          brightness: Brightness.dark,
-        );
+  /// Construye el tema oscuro con un color semilla dinámico de la plataforma.
+  static ThemeData dark([Color? seedColor]) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seedColor ?? _defaultSeedColor,
+      brightness: Brightness.dark,
+    );
 
     return ThemeData(
       useMaterial3: true,

@@ -4,9 +4,8 @@ import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/library/domain/repositories/library_repository.dart';
 
 class DriftLibraryRepository implements LibraryRepository {
+  new(this._db);
   final AppDatabase _db;
-
-  DriftLibraryRepository(this._db);
 
   @override
   Future<List<LibraryTrack>> getAllTracks() async {

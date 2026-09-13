@@ -2,7 +2,7 @@ name: otune
 description: "Reproductor musical multiplataforma, offline-first y orientado a bibliotecas locales."
 publish_to: 'none'
 
-version: 0.4.0-alpha.0+16
+version: 0.4.0-alpha.0+17
 
 environment:
   sdk: ^3.13.3
@@ -14,7 +14,11 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  audio_metadata_reader: ^1.8.0
   cupertino_icons: ^1.0.8
+  drift: ^2.20.0
+  dynamic_color: ^2.1.0
+  file_picker: ^12.3.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.4.3
@@ -22,23 +26,19 @@ dependencies:
   logger: ^2.8.0
   media_kit: ^1.2.6
   media_kit_libs_audio: ^1.0.7
-  path_provider: ^2.1.6
-  uuid: ^4.6.0
-  drift: ^2.20.0
-  path: ^1.9.0
-  audio_metadata_reader: ^1.8.0
-  dynamic_color: ^2.1.0
-  file_picker: ^12.3.0
-  sqlite3_flutter_libs: ^0.6.0+eol
   meta: ^1.19.0
+  path: ^1.9.0
+  path_provider: ^2.1.6
+  sqlite3_flutter_libs: ^0.6.0+eol
+  uuid: ^4.6.0
 
 dev_dependencies:
+  build_runner: ^2.4.9
+  drift_dev: ^2.20.0
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.5
   very_good_analysis: ^11.0.0
-  drift_dev: ^2.20.0
-  build_runner: ^2.4.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/lyrics/application/lyrics_sync_notifier.dart';
-import 'package:otune/features/lyrics/domain/entities/lyrics.dart';
 
 class LyricsWidget extends ConsumerWidget {
-  const LyricsWidget({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -35,13 +34,10 @@ class LyricsWidget extends ConsumerWidget {
             color: isActive
                 ? Theme.of(context).colorScheme.primary
                 : Theme.of(context).textTheme.bodyMedium?.color
-                      ?.withOpacity(0.6),
+                      ?.withValues(alpha: 0.6),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
-              horizontal: 16.0,
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             child: Text(line.text, textAlign: TextAlign.center),
           ),
         );

@@ -4,7 +4,7 @@ import 'package:otune/features/settings/application/settings_notifier.dart';
 import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
 class SettingsPage extends ConsumerWidget {
-  const SettingsPage({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

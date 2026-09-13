@@ -4,8 +4,8 @@ import 'package:otune/features/lyrics/domain/services/lrc_parser.dart';
 class LrcParserImpl implements LrcParser {
   @override
   Lyrics parse(String trackId, String content) {
-    final List<LyricLine> lines = [];
-    final RegExp timestampRegExp = RegExp(r'\[(\d{2}):(\d{2})\.(\d{2})\]');
+    final lines = <LyricLine>[];
+    final timestampRegExp = RegExp(r'\[(\d{2}):(\d{2})\.(\d{2})\]');
 
     for (final line in content.split('\n')) {
       final match = timestampRegExp.firstMatch(line);

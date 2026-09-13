@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import 'package:otune/features/library/domain/entities/track.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
@@ -25,7 +25,7 @@ class Tracks extends Table {
 
 @DriftDatabase(tables: [Tracks])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  new() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;

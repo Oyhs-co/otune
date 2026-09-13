@@ -3,10 +3,9 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
 /// Estado de la configuración de la aplicación.
 class SettingsState {
-  final AppSettings settings;
-
-  const SettingsState({AppSettings? settings})
+  const new({AppSettings? settings})
     : settings = settings ?? const AppSettings();
+  final AppSettings settings;
 
   SettingsState copyWith({AppSettings? settings}) {
     return SettingsState(settings: settings ?? this.settings);

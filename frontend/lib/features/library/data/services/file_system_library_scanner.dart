@@ -9,24 +9,23 @@ import 'package:otune/features/library/domain/services/library_scanner.dart';
 import 'package:path/path.dart' as p;
 
 class FileSystemLibraryScanner implements LibraryScanner {
+  new(this._db);
   final AppDatabase _db;
-
-  FileSystemLibraryScanner(this._db);
 
   static const _supportedExtensions = {'.mp3', '.flac', '.wav', '.m4a'};
 
   @override
   Stream<ScanEvent> scanDirectory(String path) async* {
     final directory = Directory(path);
-    if (!await directory.exists()) {
+    if (!directory.existsSync()) {
       yield ScanError(message: 'Directory does not exist', path: path);
       return;
     }
 
     try {
       final allFiles = await _findAllAudioFiles(directory);
-      int processed = 0;
-      int total = allFiles.length;
+      var processed = 0;
+      final total = allFiles.length;
 
       for (final file in allFiles) {
         processed++;
@@ -37,7 +36,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
         );
 
         try {
-          final metadata = await AudioMetadataReader.readMetadata(file.path);
+          final metadata = readMetadata(file);
 
           final track = LibraryTrack(
             id: file.path, // Path as unique ID for MVP
@@ -67,7 +66,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
           );
 
           yield ScanTrackFound(track);
-        } catch (e) {
+        } on Object catch (e) {
           yield ScanError(
             message: 'Failed to read metadata: $e',
             path: file.path,
@@ -76,7 +75,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
       }
 
       yield ScanComplete(total);
-    } catch (e) {
+    } on Object catch (e) {
       yield ScanError(message: 'Critical scan error: $e', path: path);
     }
   }

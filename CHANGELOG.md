@@ -7,7 +7,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
-## [0.4.0-alpha.0] - 2026-09-13
+## [0.4.0-alpha.0+17] - 2026-09-13
 
 ### Added
 
@@ -36,11 +36,23 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - `PlaybackController` para coordinación de reproducción.
   - Componente `PlayerWidget` con controles interactivos.
   - Suite de pruebas unitarias y de widget para el flujo de reproducción.
+- **Infraestructura de CI/CD**:
+  - Pipeline de calidad continua (`ci.yml`).
+  - Pipeline de releases automatizado para Android (`release.yml`) con soporte para entornos Debug, Staging y Prod.
+  - Guía de firma y despliegue en `docs/release-android.md`.
+
+### Fixed
+
+- Corregido error de tipo `ColorScheme` entre `dynamic_color` y Flutter al cambiar `AppTheme` para aceptar un color semilla (`Color?`) en lugar de `ColorScheme?`.
+- Corregido uso de `AudioMetadataReader` por la función `readMetadata` correcta del paquete `audio_metadata_reader`.
+- Corregid uso de `FilePicker.platform` por `FilePicker` estático para la versión 12.x de `file_picker`.
+- Corregidos errores de sintaxis y tipado en `PlaybackController` y `LyricsSyncNotifier`.
+- Corregidos todos los warnings y lints de `flutter analyze` (75 → 0 issues): orden de imports, nombres de constructores, lambdas innecesarios, variables finales, literales int, longitud de líneas, cláusulas catch con `on`, I/O síncrono, deprecaciones `withOpacity`, imports no usados, y orden de dependencias en `pubspec.yaml`.
 
 ### Changed
 
 - Renombrado del paquete Dart en `pubspec.yaml` a `otune`.
-- Actualización de la versión base a `0.1.0-alpha.0+1` durante la fase inicial.
+- Actualización de la versión base a `0.4.0-alpha.0+17`.
 
 ---
 

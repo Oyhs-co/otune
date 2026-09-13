@@ -17,8 +17,8 @@ class OtuneApp extends ConsumerWidget {
         return MaterialApp.router(
           title: 'Otune',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(lightDynamic),
-          darkTheme: AppTheme.dark(darkDynamic),
+          theme: AppTheme.light(lightDynamic?.primary),
+          darkTheme: AppTheme.dark(darkDynamic?.primary),
           routerConfig: router,
         );
       },

@@ -8,35 +8,31 @@ abstract interface class LibraryScanner {
 }
 
 /// Eventos emitidos durante el proceso de escaneo.
-sealed class ScanEvent {}
+sealed class ScanEvent;
 
 class ScanProgress extends ScanEvent {
-  final String currentFile;
-  final int filesProcessed;
-  final int totalFilesFound;
-
-  ScanProgress({
+  new({
     required this.currentFile,
     required this.filesProcessed,
     required this.totalFilesFound,
   });
+  final String currentFile;
+  final int filesProcessed;
+  final int totalFilesFound;
 }
 
 class ScanTrackFound extends ScanEvent {
+  new(this.track);
   final LibraryTrack track;
-
-  ScanTrackFound(this.track);
 }
 
 class ScanComplete extends ScanEvent {
+  new(this.totalTracksIndexed);
   final int totalTracksIndexed;
-
-  ScanComplete(this.totalTracksIndexed);
 }
 
 class ScanError extends ScanEvent {
+  new({required this.message, required this.path});
   final String message;
   final String path;
-
-  ScanError({required this.message, required this.path});
 }

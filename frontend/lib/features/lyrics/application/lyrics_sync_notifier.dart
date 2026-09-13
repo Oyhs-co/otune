@@ -1,17 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/lyrics/application/lyrics_providers.dart';
 import 'package:otune/features/lyrics/domain/entities/lyrics.dart';
-import 'package:otune/features/lyrics/domain/repositories/lyrics_repository.dart';
 
 /// Estado de la letra activa en la reproducción actual.
 class ActiveLyricsState {
-  final Lyrics? lyrics;
-  final int currentLineIndex;
-
-  const ActiveLyricsState({
+  const new({
     this.lyrics,
     this.currentLineIndex = -1,
   });
+
+  final Lyrics? lyrics;
+  final int currentLineIndex;
 
   ActiveLyricsState copyWith({
     Lyrics? lyrics,
@@ -34,15 +33,23 @@ class LyricsSyncNotifier extends Notifier<ActiveLyricsState> {
   Future<void> loadLyrics(String trackId, String filePath) async {
     final repository = ref.read(lyricsRepositoryProvider);
     final lyrics = await repository.getLyricsForTrack(trackId, filePath);
-    state = state.copyWith(lyrics: lyrics, currentLineIndex: -1);
+
+    if (!ref.mounted) return;
+
+    state = state.copyWith(
+      lyrics: lyrics,
+      currentLineIndex: -1,
+    );
   }
 
   void updatePosition(Duration position) {
     final lyrics = state.lyrics;
+
     if (lyrics == null || lyrics.isEmpty) return;
 
-    int index = -1;
-    for (int i = 0; i < lyrics.lines.length; i++) {
+    var index = -1;
+
+    for (var i = 0; i < lyrics.lines.length; i++) {
       if (lyrics.lines[i].timestamp <= position) {
         index = i;
       } else {
@@ -61,6 +68,7 @@ class LyricsSyncNotifier extends Notifier<ActiveLyricsState> {
 }
 
 /// Proveedor del sincronizador de letras.
-final lyricsSyncProvider = NotifierProvider<LyricsSyncNotifier, ActiveLyricsState>(() {
-  return LyricsSyncNotifier();
-});
+final lyricsSyncProvider =
+    NotifierProvider<LyricsSyncNotifier, ActiveLyricsState>(
+  LyricsSyncNotifier.new,
+);

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/library/application/library_providers.dart';
@@ -5,13 +6,12 @@ import 'package:otune/features/library/application/state/library_scan_state.dart
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
-import 'package:file_picker/file_picker.dart';
 
 class LibraryPage extends ConsumerWidget {
-  const LibraryPage({super.key});
+  const new({super.key});
 
   Future<void> _handleScanFolder(WidgetRef ref) async {
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    final selectedDirectory = await FilePicker.getDirectoryPath();
     if (selectedDirectory == null) return;
 
     await ref
@@ -46,7 +46,7 @@ class LibraryPage extends ConsumerWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Text(
               scanState.status,
               style: theme.textTheme.bodySmall,
@@ -78,17 +78,18 @@ class LibraryPage extends ConsumerWidget {
 
                 return ListView.separated(
                   itemCount: list.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  separatorBuilder: (_, _) => const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final track = list[index];
                     return ListTile(
                       title: Text(track.title),
                       subtitle: Text(
-                        '${track.artist ?? 'Artista desconocido'} • ${track.album ?? 'Álbum desconocido'}',
+                        '${track.artist ?? 'Artista desconocido'}'
+                        ' • ${track.album ?? 'Álbum desconocido'}',
                       ),
                       trailing: const Icon(Icons.play_arrow_rounded),
-                      onTap: () {
-                        ref
+                      onTap: () async {
+                        await ref
                             .read(playbackControllerProvider.notifier)
                             .playTrack(
                               TrackRef(
