@@ -13,7 +13,7 @@ class LrcParserImpl implements LrcParser {
         final minutes = int.parse(match.group(1)!);
         final seconds = int.parse(match.group(2)!);
         final centiseconds = int.parse(match.group(3)!);
-        
+
         final timestamp = Duration(
           minutes: minutes,
           seconds: seconds,

@@ -38,7 +38,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
 
         try {
           final metadata = await AudioMetadataReader.readMetadata(file.path);
-          
+
           final track = LibraryTrack(
             id: file.path, // Path as unique ID for MVP
             title: metadata.title ?? p.basenameWithoutExtension(file.path),
@@ -68,7 +68,10 @@ class FileSystemLibraryScanner implements LibraryScanner {
 
           yield ScanTrackFound(track);
         } catch (e) {
-          yield ScanError(message: 'Failed to read metadata: $e', path: file.path);
+          yield ScanError(
+            message: 'Failed to read metadata: $e',
+            path: file.path,
+          );
         }
       }
 

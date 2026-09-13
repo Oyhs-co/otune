@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -39,34 +40,43 @@ class AppDatabase extends _$AppDatabase {
         album: row.album,
         albumArtist: row.albumArtist,
         trackNumber: row.trackNumber,
-        duration: row.durationMs != null ? Duration(milliseconds: row.durationMs!) : null,
+        duration: row.durationMs != null
+            ? Duration(milliseconds: row.durationMs!)
+            : null,
         fileFormat: row.fileFormat,
       );
     }).get();
   }
-  
-  Future<int> upsertTrack(TracksCompanion companion) => 
+
+  Future<int> upsertTrack(TracksCompanion companion) =>
       into(tracks).insert(companion, mode: InsertMode.insertOrReplace);
-      
-  Future<int> deleteTrack(String id) => 
+
+  Future<int> deleteTrack(String id) =>
       (delete(tracks)..where((t) => t.id.equals(id))).go();
 
   Future<List<LibraryTrack>> searchTracks(String query) {
-    return (select(tracks)..where((t) => 
-      t.title.like('%$query%') | t.artist.like('%$query%') | t.album.like('%$query%')
-    )).map((row) {
-      return LibraryTrack(
-        id: row.id,
-        title: row.title,
-        path: row.path,
-        artist: row.artist,
-        album: row.album,
-        albumArtist: row.albumArtist,
-        trackNumber: row.trackNumber,
-        duration: row.durationMs != null ? Duration(milliseconds: row.durationMs!) : null,
-        fileFormat: row.fileFormat,
-      );
-    }).get();
+    return (select(tracks)..where(
+          (t) =>
+              t.title.like('%$query%') |
+              t.artist.like('%$query%') |
+              t.album.like('%$query%'),
+        ))
+        .map((row) {
+          return LibraryTrack(
+            id: row.id,
+            title: row.title,
+            path: row.path,
+            artist: row.artist,
+            album: row.album,
+            albumArtist: row.albumArtist,
+            trackNumber: row.trackNumber,
+            duration: row.durationMs != null
+                ? Duration(milliseconds: row.durationMs!)
+                : null,
+            fileFormat: row.fileFormat,
+          );
+        })
+        .get();
   }
 }
 

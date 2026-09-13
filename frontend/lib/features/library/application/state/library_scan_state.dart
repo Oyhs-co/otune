@@ -58,7 +58,8 @@ class LibraryScanNotifier extends Notifier<LibraryScanState> {
       } else if (event is ScanComplete) {
         state = state.copyWith(
           isScanning: false,
-          status: 'Escaneo completado. ${event.totalTracksIndexed} pistas indexadas.',
+          status:
+              'Escaneo completado. ${event.totalTracksIndexed} pistas indexadas.',
         );
       } else if (event is ScanError) {
         state = state.copyWith(
@@ -71,6 +72,7 @@ class LibraryScanNotifier extends Notifier<LibraryScanState> {
 }
 
 /// Proveedor del estado del escaneo.
-final libraryScanProvider = NotifierProvider<LibraryScanNotifier, LibraryScanState>(() {
-  return LibraryScanNotifier();
-});
+final libraryScanProvider =
+    NotifierProvider<LibraryScanNotifier, LibraryScanState>(() {
+      return LibraryScanNotifier();
+    });

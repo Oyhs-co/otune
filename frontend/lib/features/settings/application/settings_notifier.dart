@@ -5,14 +5,11 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 class SettingsState {
   final AppSettings settings;
 
-  const SettingsState({
-    AppSettings? settings,
-  }) : settings = settings ?? const AppSettings();
+  const SettingsState({AppSettings? settings})
+    : settings = settings ?? const AppSettings();
 
   SettingsState copyWith({AppSettings? settings}) {
-    return SettingsState(
-      settings: settings ?? this.settings,
-    );
+    return SettingsState(settings: settings ?? this.settings);
   }
 }
 

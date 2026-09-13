@@ -32,14 +32,17 @@ class LyricsWidget extends ConsumerWidget {
           style: TextStyle(
             fontSize: isActive ? 24 : 18,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6),
+            color: isActive
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).textTheme.bodyMedium?.color
+                      ?.withOpacity(0.6),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Text(
-              line.text,
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 16.0,
             ),
+            child: Text(line.text, textAlign: TextAlign.center),
           ),
         );
       },

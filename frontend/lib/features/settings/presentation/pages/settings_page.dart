@@ -12,9 +12,7 @@ class SettingsPage extends ConsumerWidget {
     final themePref = state.settings.themePreference;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Ajustes'),
-      ),
+      appBar: AppBar(title: const Text('Ajustes')),
       body: ListView(
         children: [
           ListTile(
@@ -42,9 +40,12 @@ class SettingsPage extends ConsumerWidget {
 
   String _getThemeText(ThemePreference pref) {
     switch (pref) {
-      case ThemePreference.system: return 'Sistema';
-      case ThemePreference.light: return 'Claro';
-      case ThemePreference.dark: return 'Oscuro';
+      case ThemePreference.system:
+        return 'Sistema';
+      case ThemePreference.light:
+        return 'Claro';
+      case ThemePreference.dark:
+        return 'Oscuro';
     }
   }
 }

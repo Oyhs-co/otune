@@ -18,14 +18,8 @@ void main() {
 
   group('DriftLibraryRepository', () {
     test('getAllTracks should call database getAllTracks', () async {
-      final tracks = [
-        LibraryTrack(
-          id: '1',
-          title: 'Song 1',
-          path: '/path/1',
-        ),
-      ];
-      
+      final tracks = [LibraryTrack(id: '1', title: 'Song 1', path: '/path/1')];
+
       when(() => mockDb.getAllTracks()).thenAnswer((_) async => tracks);
 
       final result = await repository.getAllTracks();
@@ -37,11 +31,7 @@ void main() {
     test('searchTracks should call database searchTracks', () async {
       final query = 'test';
       final tracks = [
-        LibraryTrack(
-          id: '1',
-          title: 'Test Song',
-          path: '/path/1',
-        ),
+        LibraryTrack(id: '1', title: 'Test Song', path: '/path/1'),
       ];
 
       when(() => mockDb.searchTracks(query)).thenAnswer((_) async => tracks);

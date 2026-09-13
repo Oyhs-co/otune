@@ -14,23 +14,31 @@ class LibraryPage extends ConsumerWidget {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) return;
 
-    await ref.read(libraryScanProvider.notifier).scanDirectory(selectedDirectory);
+    await ref
+        .read(libraryScanProvider.notifier)
+        .scanDirectory(selectedDirectory);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final scanState = ref.watch(libraryScanProvider);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Biblioteca'),
         actions: [
           IconButton(
-            icon: scanState.isScanning 
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-              : const Icon(Icons.folder_open),
-            onPressed: scanState.isScanning ? null : () => _handleScanFolder(ref),
+            icon: scanState.isScanning
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.folder_open),
+            onPressed: scanState.isScanning
+                ? null
+                : () => _handleScanFolder(ref),
             tooltip: 'Escanear carpeta',
           ),
         ],
@@ -53,12 +61,18 @@ class LibraryPage extends ConsumerWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text('Error al cargar la biblioteca: ${snapshot.error}'));
+                  return Center(
+                    child: Text(
+                      'Error al cargar la biblioteca: ${snapshot.error}',
+                    ),
+                  );
                 }
                 final list = snapshot.data ?? [];
                 if (list.isEmpty) {
                   return const Center(
-                    child: Text('No hay canciones. ¡Escanea una carpeta para empezar!'),
+                    child: Text(
+                      'No hay canciones. ¡Escanea una carpeta para empezar!',
+                    ),
                   );
                 }
 
@@ -69,12 +83,20 @@ class LibraryPage extends ConsumerWidget {
                     final track = list[index];
                     return ListTile(
                       title: Text(track.title),
-                      subtitle: Text('${track.artist ?? 'Artista desconocido'} • ${track.album ?? 'Álbum desconocido'}'),
+                      subtitle: Text(
+                        '${track.artist ?? 'Artista desconocido'} • ${track.album ?? 'Álbum desconocido'}',
+                      ),
                       trailing: const Icon(Icons.play_arrow_rounded),
                       onTap: () {
-                        ref.read(playbackControllerProvider.notifier).playTrack(
-                          TrackRef(id: track.id, uri: 'file://${track.path}', title: track.title),
-                        );
+                        ref
+                            .read(playbackControllerProvider.notifier)
+                            .playTrack(
+                              TrackRef(
+                                id: track.id,
+                                uri: 'file://${track.path}',
+                                title: track.title,
+                              ),
+                            );
                       },
                     );
                   },

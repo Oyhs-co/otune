@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:path/path.dart' as p;
 import 'package:otune/features/lyrics/domain/entities/lyrics.dart';
 import 'package:otune/features/lyrics/domain/repositories/lyrics_repository.dart';
@@ -14,8 +15,8 @@ class LocalLyricsRepository implements LyricsRepository {
     try {
       // 1. Try to find .lrc file with same name as audio file in the same directory
       final lrcPath = p.join(
-        p.dirname(filePath), 
-        '${p.basenameWithoutExtension(filePath)}.lrc'
+        p.dirname(filePath),
+        '${p.basenameWithoutExtension(filePath)}.lrc',
       );
 
       final lrcFile = File(lrcPath);
