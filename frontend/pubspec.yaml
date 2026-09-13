@@ -2,7 +2,7 @@ name: otune
 description: "Reproductor musical multiplataforma, offline-first y orientado a bibliotecas locales."
 publish_to: 'none'
 
-version: 0.1.0-alpha.0+1
+version: 0.4.0-alpha.0+16
 
 environment:
   sdk: ^3.13.3
@@ -15,8 +15,6 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   cupertino_icons: ^1.0.8
-  dynamic_color: ^1.7.0
-  file_picker: ^12.2.0
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.4.3
@@ -24,13 +22,15 @@ dependencies:
   logger: ^2.8.0
   media_kit: ^1.2.6
   media_kit_libs_audio: ^1.0.7
-  meta: ^1.15.0
   path_provider: ^2.1.6
   uuid: ^4.6.0
   drift: ^2.20.0
-  sqlite3_flutter_libs: ^0.5.24
   path: ^1.9.0
   audio_metadata_reader: ^1.8.0
+  dynamic_color: ^2.1.0
+  file_picker: ^12.3.0
+  sqlite3_flutter_libs: ^0.6.0+eol
+  meta: ^1.19.0
 
 dev_dependencies:
   flutter_test:
