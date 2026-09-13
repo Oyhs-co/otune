@@ -8,6 +8,15 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TracksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -92,6 +101,7 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
   );
   @override
   List<GeneratedColumn> get $columns => [
+    id,
     title,
     path,
     artist,
@@ -113,6 +123,11 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
     if (data.containsKey('title')) {
       context.handle(
         _titleMeta,
@@ -175,11 +190,15 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Track map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Track(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
       title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}title'],
@@ -222,6 +241,7 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
 }
 
 class Track extends DataClass implements Insertable<Track> {
+  final String id;
   final String title;
   final String path;
   final String? artist;
@@ -231,6 +251,7 @@ class Track extends DataClass implements Insertable<Track> {
   final int? durationMs;
   final String? fileFormat;
   const Track({
+    required this.id,
     required this.title,
     required this.path,
     this.artist,
@@ -243,6 +264,7 @@ class Track extends DataClass implements Insertable<Track> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
     map['title'] = Variable<String>(title);
     map['path'] = Variable<String>(path);
     if (!nullToAbsent || artist != null) {
@@ -268,6 +290,7 @@ class Track extends DataClass implements Insertable<Track> {
 
   TracksCompanion toCompanion(bool nullToAbsent) {
     return TracksCompanion(
+      id: Value(id),
       title: Value(title),
       path: Value(path),
       artist: artist == null && nullToAbsent
@@ -297,6 +320,7 @@ class Track extends DataClass implements Insertable<Track> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Track(
+      id: serializer.fromJson<String>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       path: serializer.fromJson<String>(json['path']),
       artist: serializer.fromJson<String?>(json['artist']),
@@ -311,6 +335,7 @@ class Track extends DataClass implements Insertable<Track> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
       'title': serializer.toJson<String>(title),
       'path': serializer.toJson<String>(path),
       'artist': serializer.toJson<String?>(artist),
@@ -323,6 +348,7 @@ class Track extends DataClass implements Insertable<Track> {
   }
 
   Track copyWith({
+    String? id,
     String? title,
     String? path,
     Value<String?> artist = const Value.absent(),
@@ -332,6 +358,7 @@ class Track extends DataClass implements Insertable<Track> {
     Value<int?> durationMs = const Value.absent(),
     Value<String?> fileFormat = const Value.absent(),
   }) => Track(
+    id: id ?? this.id,
     title: title ?? this.title,
     path: path ?? this.path,
     artist: artist.present ? artist.value : this.artist,
@@ -343,6 +370,7 @@ class Track extends DataClass implements Insertable<Track> {
   );
   Track copyWithCompanion(TracksCompanion data) {
     return Track(
+      id: data.id.present ? data.id.value : this.id,
       title: data.title.present ? data.title.value : this.title,
       path: data.path.present ? data.path.value : this.path,
       artist: data.artist.present ? data.artist.value : this.artist,
@@ -365,6 +393,7 @@ class Track extends DataClass implements Insertable<Track> {
   @override
   String toString() {
     return (StringBuffer('Track(')
+          ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('path: $path, ')
           ..write('artist: $artist, ')
@@ -379,6 +408,7 @@ class Track extends DataClass implements Insertable<Track> {
 
   @override
   int get hashCode => Object.hash(
+    id,
     title,
     path,
     artist,
@@ -392,6 +422,7 @@ class Track extends DataClass implements Insertable<Track> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Track &&
+          other.id == this.id &&
           other.title == this.title &&
           other.path == this.path &&
           other.artist == this.artist &&
@@ -403,6 +434,7 @@ class Track extends DataClass implements Insertable<Track> {
 }
 
 class TracksCompanion extends UpdateCompanion<Track> {
+  final Value<String> id;
   final Value<String> title;
   final Value<String> path;
   final Value<String?> artist;
@@ -413,6 +445,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
   final Value<String?> fileFormat;
   final Value<int> rowid;
   const TracksCompanion({
+    this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.path = const Value.absent(),
     this.artist = const Value.absent(),
@@ -424,6 +457,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.rowid = const Value.absent(),
   });
   TracksCompanion.insert({
+    required String id,
     required String title,
     required String path,
     this.artist = const Value.absent(),
@@ -433,9 +467,11 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.durationMs = const Value.absent(),
     this.fileFormat = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : title = Value(title),
+  }) : id = Value(id),
+       title = Value(title),
        path = Value(path);
   static Insertable<Track> custom({
+    Expression<String>? id,
     Expression<String>? title,
     Expression<String>? path,
     Expression<String>? artist,
@@ -447,6 +483,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (path != null) 'path': path,
       if (artist != null) 'artist': artist,
@@ -460,6 +497,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
   }
 
   TracksCompanion copyWith({
+    Value<String>? id,
     Value<String>? title,
     Value<String>? path,
     Value<String?>? artist,
@@ -471,6 +509,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     Value<int>? rowid,
   }) {
     return TracksCompanion(
+      id: id ?? this.id,
       title: title ?? this.title,
       path: path ?? this.path,
       artist: artist ?? this.artist,
@@ -486,6 +525,9 @@ class TracksCompanion extends UpdateCompanion<Track> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
@@ -519,6 +561,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
   @override
   String toString() {
     return (StringBuffer('TracksCompanion(')
+          ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('path: $path, ')
           ..write('artist: $artist, ')
@@ -545,6 +588,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 }
 
 typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
+  required String id,
   required String title,
   required String path,
   Value<String?> artist,
@@ -556,6 +600,7 @@ typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
   Value<int> rowid,
 });
 typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
+  Value<String> id,
   Value<String> title,
   Value<String> path,
   Value<String?> artist,
@@ -576,6 +621,11 @@ class $$TracksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get title => $composableBuilder(
     column: $table.title,
     builder: (column) => ColumnFilters(column),
@@ -626,6 +676,11 @@ class $$TracksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get title => $composableBuilder(
     column: $table.title,
     builder: (column) => ColumnOrderings(column),
@@ -676,6 +731,9 @@ class $$TracksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
 
@@ -737,6 +795,7 @@ class $$TracksTableTableManager
               $$TracksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<String> id = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String> path = const Value.absent(),
                 Value<String?> artist = const Value.absent(),
@@ -747,6 +806,7 @@ class $$TracksTableTableManager
                 Value<String?> fileFormat = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TracksCompanion(
+                id: id,
                 title: title,
                 path: path,
                 artist: artist,
@@ -759,6 +819,7 @@ class $$TracksTableTableManager
               ),
           createCompanionCallback:
               ({
+                required String id,
                 required String title,
                 required String path,
                 Value<String?> artist = const Value.absent(),
@@ -769,6 +830,7 @@ class $$TracksTableTableManager
                 Value<String?> fileFormat = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TracksCompanion.insert(
+                id: id,
                 title: title,
                 path: path,
                 artist: artist,

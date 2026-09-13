@@ -19,19 +19,19 @@ class Tracks extends Table {
   TextColumn get fileFormat => text().nullable()();
 
   @override
-  List<String> get primaryKey => ['id'];
+  Set<Column> get primaryKey => {id};
 }
 
 @DriftDatabase(tables: [Tracks])
-class AppDatabase extends DriftDatabase {
+class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
 
-  Future<List<Track>> getAllTracks() {
+  Future<List<LibraryTrack>> getAllTracks() {
     return select(tracks).map((row) {
-      return Track(
+      return LibraryTrack(
         id: row.id,
         title: row.title,
         path: row.path,
@@ -45,17 +45,17 @@ class AppDatabase extends DriftDatabase {
     }).get();
   }
   
-  Future<bool> upsertTrack(TracksCompanion companion) => 
-      into(tracks).insert(companion, mode: InsertMode.insertOrReplace).inserted;
+  Future<int> upsertTrack(TracksCompanion companion) => 
+      into(tracks).insert(companion, mode: InsertMode.insertOrReplace);
       
   Future<int> deleteTrack(String id) => 
       (delete(tracks)..where((t) => t.id.equals(id))).go();
 
-  Future<List<Track>> searchTracks(String query) {
+  Future<List<LibraryTrack>> searchTracks(String query) {
     return (select(tracks)..where((t) => 
       t.title.like('%$query%') | t.artist.like('%$query%') | t.album.like('%$query%')
     )).map((row) {
-      return Track(
+      return LibraryTrack(
         id: row.id,
         title: row.title,
         path: row.path,
