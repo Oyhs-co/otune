@@ -22,6 +22,7 @@ class DriftLibraryRepository implements LibraryRepository {
   Future<void> upsertTrack(LibraryTrack track) async {
     await _db.upsertTrack(
       TracksCompanion.insert(
+        id: track.id,
         title: track.title,
         path: track.path,
         artist: Value(track.artist),
