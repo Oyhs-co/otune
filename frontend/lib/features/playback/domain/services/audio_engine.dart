@@ -22,6 +22,9 @@ abstract interface class AudioEngine {
   /// Detiene por completo la reproducción y restablece la posición.
   Future<void> stop();
 
+  /// Ajusta el volumen del motor (0.0 a 1.0).
+  Future<void> setVolume(double volume);
+
   /// Libera los recursos nativos del motor de reproducción.
   Future<void> dispose();
 

@@ -190,9 +190,19 @@ class PlaybackController extends Notifier<PlaybackSession> {
     await _engine.seek(position);
   }
 
+  /// Silencia el audio durante el scrubbing.
+  Future<void> setMuted({required bool muted}) async {
+    await _engine.setVolume(muted ? 0.0 : 1.0);
+  }
+
   /// Detiene la reproducción y reinicia la posición.
   Future<void> stop() async {
     await _engine.stop();
+  }
+
+  /// Mueve un elemento de la cola de una posición a otra.
+  void moveQueueItem(int from, int to) {
+    state = state.copyWith(queue: state.queue.moveItem(from, to));
   }
 
   /// Abre el explorador del sistema para cargar y reproducir una pista local.

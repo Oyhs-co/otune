@@ -192,6 +192,37 @@ class PlaybackQueue {
     );
   }
 
+  /// Mueve un elemento de la cola de una posición a otra.
+  PlaybackQueue moveItem(int from, int to) {
+    if (from < 0 || from >= items.length || to < 0 || to >= items.length) {
+      return this;
+    }
+    if (from == to) return this;
+
+    final newItems = List<QueueItem>.from(items);
+    final item = newItems.removeAt(from);
+    newItems.insert(to, item);
+
+    var newCurrentIndex = currentIndex;
+    if (from < currentIndex && to >= currentIndex) {
+      newCurrentIndex--;
+    } else if (from >= currentIndex && to < currentIndex) {
+      newCurrentIndex++;
+    } else if (from == currentIndex) {
+      newCurrentIndex = to;
+    }
+
+    final newShuffle = isShuffle
+        ? _recalculateShuffle(newItems.length, newCurrentIndex)
+        : const <int>[];
+
+    return copyWith(
+      items: List.unmodifiable(newItems),
+      currentIndex: newCurrentIndex,
+      shuffleIndices: newShuffle,
+    );
+  }
+
   /// Alterna el modo aleatorio manteniendo la pista actual en reproducción.
   PlaybackQueue toggleShuffle([Random? random]) {
     final newIsShuffle = !isShuffle;

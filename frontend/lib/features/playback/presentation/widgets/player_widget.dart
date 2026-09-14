@@ -98,7 +98,11 @@ class PlayerWidget extends ConsumerWidget {
             value: currentPosMs,
             max: maxDurationMs,
             onChanged: (newMs) {
+              unawaited(controller.setMuted(muted: true));
               unawaited(controller.seek(Duration(milliseconds: newMs.toInt())));
+            },
+            onChangeEnd: (newMs) {
+              unawaited(controller.setMuted(muted: false));
             },
           ),
           Padding(
@@ -189,14 +193,6 @@ class PlayerWidget extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FilledButton.tonalIcon(
-                icon: const Icon(Icons.audio_file_rounded),
-                label: const Text('Cargar audio'),
-                onPressed: () {
-                  unawaited(controller.pickAndPlay());
-                },
-              ),
-              const SizedBox(width: 12),
               OutlinedButton.icon(
                 icon: const Icon(Icons.queue_music_rounded),
                 label: Text('Cola (${session.queueItems.length})'),

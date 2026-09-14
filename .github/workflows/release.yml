@@ -1,6 +1,9 @@
 name: CD - Android Releases
 
 on:
+  push:
+    tags:
+      - 'v[0-9]*.[0-9]*.[0-9]*' # Se activa automáticamente con tags tipo v0.1.0, v1.0.0-rc.1, etc.
   workflow_dispatch:
     inputs:
       environment:
@@ -13,14 +16,26 @@ on:
           - staging
           - prod
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    name: Build Android APK
+    name: Build Android App
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -29,23 +44,55 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Show Flutter Version
-        run: flutter --version
-
       - name: Install Dependencies
-        run: flutter pub get
         working-directory: frontend
+        run: flutter pub get
 
       - name: Generate Code
-        run: dart run build_runner build --delete-conflicting-outputs
         working-directory: frontend
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # Determinar el Tag y Nombre según el tipo de evento (Automatic vs Manual)
+      - name: Resolve Version and Release Info
+        id: release_info
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # Evento automático por Tag: Extraer tag del ref de Git
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            RELEASE_NAME="Otune ${TAG_NAME}"
+            IS_PRERELEASE="false"
+            # Si el tag contiene sufijos como -alpha, -beta, -rc lo marcamos pre-release
+            if [[ "$TAG_NAME" =~ - ]]; then
+              IS_PRERELEASE="true"
+            fi
+            ENV_BUILD="prod"
+          else
+            # Evento manual (workflow_dispatch): Leer versión desde pubspec.yaml
+            RAW_VERSION=$(grep 'version:' frontend/pubspec.yaml | sed 's/version: //' | cut -d '+' -f 1 | tr -d '[:space:]')
+            ENV_BUILD="${{ inputs.environment }}"
+            
+            # Diferenciador para ejecuciones manuales
+            TAG_NAME="v${RAW_VERSION}-manual-${ENV_BUILD}"
+            RELEASE_NAME="Otune v${RAW_VERSION} [Manual Build - ${ENV_BUILD^^}]"
+            
+            if [ "$ENV_BUILD" != "prod" ]; then
+              IS_PRERELEASE="true"
+            else
+              IS_PRERELEASE="false"
+            fi
+          fi
+
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "release_name=${RELEASE_NAME}" >> $GITHUB_OUTPUT
+          echo "is_prerelease=${IS_PRERELEASE}" >> $GITHUB_OUTPUT
+          echo "env_build=${ENV_BUILD}" >> $GITHUB_OUTPUT
 
       - name: Decode Keystore
-        if: inputs.environment != 'debug'
+        if: steps.release_info.outputs.env_build != 'debug'
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > frontend/android/app/upload-keystore.jks
 
-      - name: Build APK
+      - name: Build Application
         working-directory: frontend
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -53,20 +100,30 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_PATH: android/app/upload-keystore.jks
         run: |
-          if [ "${{ inputs.environment }}" = "debug" ]; then
+          TARGET_ENV="${{ steps.release_info.outputs.env_build }}"
+          if [ "$TARGET_ENV" = "debug" ]; then
             flutter build apk --debug
-          elif [ "${{ inputs.environment }}" = "staging" ]; then
+          elif [ "$TARGET_ENV" = "staging" ]; then
             flutter build apk --release --flavor staging
-          elif [ "${{ inputs.environment }}" = "prod" ]; then
+          elif [ "$TARGET_ENV" = "prod" ]; then
             flutter build apk --release --flavor prod
-          else
-            echo "Unknown environment: ${{ inputs.environment }}"
-            exit 1
+            flutter build appbundle --release --flavor prod
           fi
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Clean Keystore
+        if: always() && steps.release_info.outputs.env_build != 'debug'
+        run: rm -f frontend/android/app/upload-keystore.jks
+
+      # Crea o actualiza la Release en GitHub con las notas automáticas
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: otune-apk-${{ inputs.environment }}
-          path: frontend/build/app/outputs/flutter-apk/*.apk
-          if-no-files-found: error
+          tag_name: ${{ steps.release_info.outputs.tag_name }}
+          name: ${{ steps.release_info.outputs.release_name }}
+          prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
+          generate_release_notes: true
+          files: |
+            frontend/build/app/outputs/flutter-apk/*.apk
+            frontend/build/app/outputs/bundle/*/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

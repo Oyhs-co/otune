@@ -109,6 +109,11 @@ class MediaKitAudioEngine implements AudioEngine {
   }
 
   @override
+  Future<void> setVolume(double volume) async {
+    await _player.setVolume(volume);
+  }
+
+  @override
   Future<void> dispose() async {
     for (final sub in _subscriptions) {
       await sub.cancel();

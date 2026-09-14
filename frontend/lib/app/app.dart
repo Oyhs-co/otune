@@ -3,20 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/app/router/app_router.dart';
 import 'package:otune/app/theme/app_theme.dart';
+import 'package:otune/features/settings/application/settings_notifier.dart';
+import 'package:otune/features/settings/domain/entities/app_settings.dart';
+ 
+ /// Widget raíz de la aplicación Otune.
+ class OtuneApp extends ConsumerWidget {
 
-/// Widget raíz de la aplicación Otune.
-class OtuneApp extends ConsumerWidget {
   const new({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
-
+    final settings = ref.watch(settingsProvider);
+ 
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         return MaterialApp.router(
           title: 'Otune',
           debugShowCheckedModeBanner: false,
+          themeMode: settings.settings.themePreference == ThemePreference.system
+              ? ThemeMode.system
+              : settings.settings.themePreference == ThemePreference.dark
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
           theme: AppTheme.light(lightDynamic?.primary),
           darkTheme: AppTheme.dark(darkDynamic?.primary),
           routerConfig: router,
@@ -24,4 +33,5 @@ class OtuneApp extends ConsumerWidget {
       },
     );
   }
+
 }

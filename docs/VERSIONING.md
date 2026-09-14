@@ -2,7 +2,7 @@
 
 ## 1. Propósito
 
-Este documento define la política oficial de versionado, gestión de identificadores de compilación (*build numbers*) y sistema de tags Git para el proyecto Otune. El objetivo es garantizar coherencia, trazabilidad y reproducibilidad en todos los lanzamientos multiplataforma (Android, Windows, Linux, macOS, iOS y Web).
+Este documento define la política oficial de versionado, gestión de identificadores de compilación (_build numbers_) y sistema de tags Git para el proyecto Otune. El objetivo es garantizar coherencia, trazabilidad y reproducibilidad en todos los lanzamientos multiplataforma (Android, Windows, Linux, macOS, iOS y Web).
 
 ---
 
@@ -18,32 +18,35 @@ Ejemplo: `0.1.0+1`, `1.2.3+45`
 
 ### 2.1 Componentes de la Versión
 
-| Componente | Cuándo se incrementa | Ejemplo |
-|---|---|---|
-| **MAJOR** | Cambios incompatibles (breaking changes) en el dominio, migraciones destructivas de base de datos sin compatibilidad retroactiva, cambios radicales de arquitectura o rediseños completos de contratos públicos. | `0.x.y` → `1.0.0` |
-| **MINOR** | Nuevas funcionalidades completas y estables que no rompen compatibilidad (ej. implementación de nueva SPEC como soporte de letras LRC, gestor de cola, escáner de biblioteca). | `0.1.0` → `0.2.0` |
-| **PATCH** | Correcciones de errores (*bug fixes*), mejoras internas de rendimiento, refactorizaciones que no alteran el comportamiento externo o ajustes de documentación/configuración. | `0.1.0` → `0.1.1` |
-| **BUILD** | Número entero estrictamente incremental (`1, 2, 3, ...`). Se incrementa en cada compilación para distribución o release interno. Requerido para tiendas y sistemas operativos (ej. Android `versionCode`, iOS `CFBundleVersion`). **Nunca debe decrementarse**. | `+1` → `+2` |
+| Componente | Cuándo se incrementa                                                                                                                                                                                                                                            | Ejemplo           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| **MAJOR**  | Cambios incompatibles (breaking changes) en el dominio, migraciones destructivas de base de datos sin compatibilidad retroactiva, cambios radicales de arquitectura o rediseños completos de contratos públicos.                                                | `0.x.y` → `1.0.0` |
+| **MINOR**  | Nuevas funcionalidades completas y estables que no rompen compatibilidad (ej. implementación de nueva SPEC como soporte de letras LRC, gestor de cola, escáner de biblioteca).                                                                                  | `0.1.0` → `0.2.0` |
+| **PATCH**  | Correcciones de errores (_bug fixes_), mejoras internas de rendimiento, refactorizaciones que no alteran el comportamiento externo o ajustes de documentación/configuración.                                                                                    | `0.1.0` → `0.1.1` |
+| **BUILD**  | Número entero estrictamente incremental (`1, 2, 3, ...`). Se incrementa en cada compilación para distribución o release interno. Requerido para tiendas y sistemas operativos (ej. Android `versionCode`, iOS `CFBundleVersion`). **Nunca debe decrementarse**. | `+1` → `+2`       |
 
 ### 2.2 Sufijos de Pre-lanzamiento (Pre-releases)
 
-Para versiones en desarrollo activo, pruebas alfa/beta o candidatos a lanzamiento (*Release Candidates*), se añade un identificador alfanumérico antes del build number:
+Para versiones en desarrollo activo, pruebas alfa/beta o candidatos a lanzamiento (_Release Candidates_), se añade un identificador alfanumérico antes del build number:
 
 ```text
 MAJOR.MINOR.PATCH-<canal>.<iteracion>+BUILD
 ```
 
 Canales permitidos:
+
 - **`alpha`**: Versiones de trabajo en progreso con funcionalidades experimentales o parcialmente completadas (ej. `0.1.0-alpha.1+1`).
 - **`beta`**: Versiones donde todas las funcionalidades planificadas para el hito están presentes pero requieren estabilización y pruebas (ej. `0.1.0-beta.1+4`).
-- **`rc`** (*Release Candidate*): Versión congelada, candidata directa a convertirse en versión estable final si no se detectan fallos críticos (ej. `0.1.0-rc.1+8`).
+- **`rc`** (_Release Candidate_): Versión congelada, candidata directa a convertirse en versión estable final si no se detectan fallos críticos (ej. `0.1.0-rc.1+8`).
 
 ---
 
 ## 3. Hoja de Ruta de Versionado (Fases del Ciclo de Vida)
 
 ### 3.1 Fase Pre-1.0 (MVP y Construcción Inicial)
+
 Durante la fase `0.x.y`, la API y los contratos internos pueden sufrir cambios evolutivos frecuentes mientras se consolida el núcleo arquitectónico:
+
 - `0.1.0`: Core de reproducción local (`AudioEngine` + `media_kit` básico).
 - `0.2.0`: Control de cola (`Queue`), `shuffle` y `repeat`.
 - `0.3.0`: Biblioteca local y persistencia con Drift/SQLite.
@@ -52,6 +55,7 @@ Durante la fase `0.x.y`, la API y los contratos internos pueden sufrir cambios e
 - `1.0.0`: Primer release público oficial con el MVP completo y estable.
 
 ### 3.2 Fase Post-1.0 (Estabilidad y Extensibilidad)
+
 A partir de `1.0.0`, cualquier cambio incompatible requiere incremento de versión `MAJOR`. Las extensiones (karaoke, visualizadores, workspaces) se introducen como incrementos `MINOR` tras su respectivo ADR y SPEC aprobados.
 
 ---
@@ -65,13 +69,15 @@ frontend/pubspec.yaml
 ```
 
 En la línea:
+
 ```yaml
-version: 0.1.0+1
+version: 0.4.0-alpha.1+19
 ```
 
 ### 4.1 Sincronización con Plataformas Nativas
 
 Flutter propaga automáticamente el valor `version` de `pubspec.yaml` a las distintas plataformas soportadas durante el build:
+
 - **Android:**
   - `versionName` ← `0.1.0` (o `0.1.0-alpha.1`)
   - `versionCode` ← `1` (el entero tras el `+`)
@@ -101,6 +107,7 @@ vMAJOR.MINOR.PATCH[-PRERELEASE]
 ```
 
 Ejemplos:
+
 - Versión estable: `v1.0.0`
 - Versión de desarrollo inicial: `v0.1.0`
 - Patch fix: `v0.1.1`
@@ -112,10 +119,12 @@ Ejemplos:
 ### 5.2 Reglas de Etiquetado
 
 1. **Solo Tags Anotados (`annotated tags`):**
-   Nunca usar tags ligeros (*lightweight*). Los tags deben crearse siempre con `-a` para incluir autor, fecha y mensaje descriptivo de la versión.
+   Nunca usar tags ligeros (_lightweight_). Los tags deben crearse siempre con `-a` para incluir autor, fecha y mensaje descriptivo de la versión.,
+
    ```bash
    git tag -a v0.1.0 -m "Release v0.1.0: Reproducción de audio local y AudioEngine base"
    ```
+
 2. **Criterios para crear un Tag:**
    Un tag solo puede crearse si se cumplen TODAS las siguientes condiciones:
    - Los tests relevantes pasan sin errores (`flutter test`).
@@ -128,7 +137,7 @@ Ejemplos:
 
 ## 6. Integración con CHANGELOG y Flujo de Trabajo
 
-Cada versión etiquetada debe contar con su correspondiente bloque en `CHANGELOG.md` siguiendo el estándar *Keep a Changelog*.
+Cada versión etiquetada debe contar con su correspondiente bloque en `CHANGELOG.md` siguiendo el estándar _Keep a Changelog_.
 
 ### 6.1 Secuencia para Lanzar una Versión (Release Flow)
 

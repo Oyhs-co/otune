@@ -7,12 +7,40 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-### Fixed
+_Sin cambios todavía._
+
+## [0.4.0-alpha.1+19] - 2026-09-14
+
+### Added
+
+- Añadida la visualización de biblioteca en lista, cuadrícula y modo detallado.
+- Añadidos búsqueda de biblioteca y modos de visualización para biblioteca y
+  cola.
+- Añadido escaneo recursivo de audio y vídeo con persistencia de metadatos en
+  Drift/SQLite.
+- Añadidas pruebas de persistencia de pistas y del widget de cola.
+
+### Changed
 
 - Sustituido el lector de metadata por `media_metadata`, con soporte para
   etiquetas de audio y video y texto Unicode.
+- Actualizada la UI de la cola para la API vigente de Flutter y tipada con
+  entidades del dominio.
+- Actualizados los textos de versión de la aplicación a `0.4.0-alpha.1+19`.
+
+### Fixed
+
 - Protegidas las búsquedas de biblioteca frente a comodines de SQLite para
   conservar resultados correctos con títulos que contienen `%`, `_` o `\`.
+- Corregido el smoke test de la pantalla principal para reflejar la navegación
+  actual de la aplicación.
+- Corregidos todos los issues de `flutter analyze` y los fallos de compilación
+  de `flutter test`.
+
+### Verification
+
+- `flutter analyze`: sin issues.
+- `flutter test`: 39 tests aprobados.
 
 ## [0.4.0-alpha.0+18] - 2026-09-13
 

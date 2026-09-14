@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otune/core/permissions/permission_service.dart';
-import 'package:otune/features/library/application/library_providers.dart';
+import 'package:otune/features/library/application/library_search_provider.dart';
+import 'package:otune/features/library/application/library_view_provider.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
+import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
@@ -56,6 +58,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   @override
   Widget build(BuildContext context) {
     final scanState = ref.watch(libraryScanProvider);
+    final viewMode = ref.watch(libraryViewModeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,6 +68,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
           onPressed: () => context.pop(),
         ),
         actions: [
+          PopupMenuButton<LibraryViewMode>(
+            icon: const Icon(Icons.view_module),
+            onSelected: (mode) =>
+                ref.read(libraryViewModeProvider.notifier).mode = mode,
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: LibraryViewMode.list,
+                child: Text('Lista'),
+              ),
+              const PopupMenuItem(
+                value: LibraryViewMode.grid,
+                child: Text('Carátulas'),
+              ),
+              const PopupMenuItem(
+                value: LibraryViewMode.detailed,
+                child: Text('Detallado'),
+              ),
+            ],
+          ),
           IconButton(
             icon: scanState.isScanning
                 ? const SizedBox(
@@ -81,16 +103,24 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              scanState.status,
-              style: Theme.of(context).textTheme.bodySmall,
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Buscar canciones, artistas...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: EdgeInsets.zero,
+              ),
+              onChanged: (value) {
+                ref.read(librarySearchQueryProvider.notifier).query = value;
+              },
             ),
           ),
           Expanded(
             child: FutureBuilder<List<LibraryTrack>>(
-              future: ref.read(libraryRepositoryProvider).getAllTracks(),
+              future: ref.watch(filteredTracksProvider.future),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -106,8 +136,16 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 final tracks = snapshot.data ?? <LibraryTrack>[];
                 if (tracks.isEmpty) {
                   return const Center(
-                    child: Text(
-                      'No hay canciones. ¡Escanea una carpeta para empezar!',
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.music_note, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'No hay canciones que coincidan.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   );
                 }
@@ -115,6 +153,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 return LibraryTrackList(
                   tracks: tracks,
                   onTrackSelected: _playTrack,
+                  viewMode: viewMode,
                 );
               },
             ),

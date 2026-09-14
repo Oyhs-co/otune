@@ -21,6 +21,26 @@ class SettingsPage extends ConsumerWidget {
             preference: themePreference,
             onChanged: ref.read(settingsProvider.notifier).updateTheme,
           ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Información'),
+            subtitle: const Text('Versión 0.4.0-alpha.1+19'),
+            onTap: () {
+              showAboutDialog(
+                context: context,
+                applicationName: 'Otune',
+                applicationVersion: '0.4.0-alpha.1+19',
+                applicationLegalese: '© 2026 Otune Team',
+                children: [
+                  const Text(
+                    'Otune es un reproductor musical multiplataforma, '
+                    'offline-first y extensible.',
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );

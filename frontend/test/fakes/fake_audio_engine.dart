@@ -58,6 +58,11 @@ class FakeAudioEngine implements AudioEngine {
   }
 
   @override
+  Future<void> setVolume(double volume) async {
+    // No-op for fake
+  }
+
+  @override
   Future<void> dispose() async {
     await _stateController.close();
   }
