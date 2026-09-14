@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
   media_kit_libs_windows_audio
+  media_metadata
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

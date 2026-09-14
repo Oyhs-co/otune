@@ -26,6 +26,9 @@ class Tracks extends Table {
 @DriftDatabase(tables: [Tracks])
 class AppDatabase extends _$AppDatabase {
   new() : super(_openConnection());
+  // Keep the named constructor explicit because it is used as a test seam.
+  // ignore: unnecessary_type_name_in_constructor
+  AppDatabase.forTesting(super.e);
 
   @override
   int get schemaVersion => 1;
@@ -55,11 +58,14 @@ class AppDatabase extends _$AppDatabase {
       (delete(tracks)..where((t) => t.id.equals(id))).go();
 
   Future<List<LibraryTrack>> searchTracks(String query) {
+    final escapedQuery = _escapeLikePattern(query);
+    final pattern = '%$escapedQuery%';
+
     return (select(tracks)..where(
           (t) =>
-              t.title.like('%$query%') |
-              t.artist.like('%$query%') |
-              t.album.like('%$query%'),
+              t.title.like(pattern, escapeChar: r'\') |
+              t.artist.like(pattern, escapeChar: r'\') |
+              t.album.like(pattern, escapeChar: r'\'),
         ))
         .map((row) {
           return LibraryTrack(
@@ -78,6 +84,13 @@ class AppDatabase extends _$AppDatabase {
         })
         .get();
   }
+}
+
+String _escapeLikePattern(String value) {
+  return value
+      .replaceAll(r'\', r'\\')
+      .replaceAll('%', r'\%')
+      .replaceAll('_', r'\_');
 }
 
 LazyDatabase _openConnection() {

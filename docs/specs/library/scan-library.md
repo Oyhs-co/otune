@@ -4,14 +4,16 @@
 Proposed
 
 ## Context
-The user has music files scattered in local directories. To play them, the application must first find them, extract their metadata, and index them in a local database for fast access.
+The user has audio and video files scattered in local directories. To play them,
+the application must first find them, extract their metadata, and index them in
+a local database for fast access.
 
 ## Goal
 Implement a system that scans local directories, identifies supported audio files, and populates the library database.
 
 ## Scope
 - `LibraryScanner` port and `FileSystemLibraryScanner` adapter.
-- Metadata extraction (Title, Artist, Album, etc.) from files.
+- Metadata extraction (Title, Artist, Album, etc.) from audio and video files.
 - Persistence of discovered tracks using `Drift`.
 - Handling of folder permissions.
 - Basic deduplication based on file path.
@@ -28,12 +30,14 @@ Implement a system that scans local directories, identifies supported audio file
 ## Domain rules
 - A track is uniquely identified by its local path (or a generated `TrackIdentity`).
 - Scanning should be non-blocking (asynchronous).
-- Only supported file extensions (e.g., .mp3, .flac, .wav, .m4a) are indexed.
+- Only supported audio/video extensions (e.g., .mp3, .flac, .wav, .m4a,
+  .mp4, .mkv, .mov, .webm) are indexed.
 
 ## Functional requirements
 - FR-LIB-001: The system shall allow the user to select one or more directories for scanning.
 - FR-LIB-002: The system shall recursively scan selected directories for audio files.
-- FR-LIB-003: The system shall extract metadata (ID3, Vorbis, etc.) from each file.
+- FR-LIB-003: The system shall extract metadata (ID3, Vorbis, container tags,
+  etc.) from each file.
 - FR-LIB-004: The system shall store discovered tracks, albums, and artists in the local database.
 - FR-LIB-005: The system shall notify the user of the scanning progress (e.g., "Scanning file 10/100").
 - FR-LIB-006: The system shall avoid creating duplicate entries for the same file path.
@@ -71,7 +75,7 @@ And does not create duplicates
 
 ## Acceptance criteria
 - [ ] AC-LIB-001: Local folders can be selected and scanned.
-- [ ] AC-LIB-002: Audio files are correctly identified and filtered.
+- [ ] AC-LIB-002: Audio and video files are correctly identified and filtered.
 - [ ] AC-LIB-003: Metadata is correctly extracted and persisted in Drift.
 - [ ] AC-LIB-004: No duplicate tracks are created for the same path.
 
@@ -82,6 +86,7 @@ And does not create duplicates
 
 ## Dependencies
 - `drift`
+- `media_metadata`
 - `path_provider`
 - `file_picker`
 

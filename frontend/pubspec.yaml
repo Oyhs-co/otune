@@ -14,7 +14,6 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  audio_metadata_reader: ^1.8.0
   cupertino_icons: ^1.0.8
   drift: ^2.20.0
   dynamic_color: ^2.1.0
@@ -26,6 +25,7 @@ dependencies:
   logger: ^2.8.0
   media_kit: ^1.2.6
   media_kit_libs_audio: ^1.0.7
+  media_metadata: ^2.2.2
   meta: ^1.19.0
   path: ^1.9.0
   path_provider: ^2.1.6

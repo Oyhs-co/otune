@@ -5,6 +5,15 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### Fixed
+
+- Sustituido el lector de metadata por `media_metadata`, con soporte para
+  etiquetas de audio y video y texto Unicode.
+- Protegidas las búsquedas de biblioteca frente a comodines de SQLite para
+  conservar resultados correctos con títulos que contienen `%`, `_` o `\`.
+
 ## [0.4.0-alpha.0+18] - 2026-09-13
 
 ### Changed

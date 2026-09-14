@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'package:drift/drift.dart';
+import 'package:media_metadata/media_metadata.dart';
 import 'package:otune/core/database/app_database.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/library/domain/services/library_scanner.dart';
@@ -12,7 +11,20 @@ class FileSystemLibraryScanner implements LibraryScanner {
   new(this._db);
   final AppDatabase _db;
 
-  static const _supportedExtensions = {'.mp3', '.flac', '.wav', '.m4a'};
+  static const _supportedExtensions = {
+    '.aac',
+    '.flac',
+    '.m4a',
+    '.mkv',
+    '.mp3',
+    '.mp4',
+    '.mov',
+    '.ogg',
+    '.opus',
+    '.wav',
+    '.webm',
+    '.wma',
+  };
 
   @override
   Stream<ScanEvent> scanDirectory(String path) async* {
@@ -23,7 +35,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
     }
 
     try {
-      final allFiles = await _findAllAudioFiles(directory);
+      final allFiles = await _findAllMediaFiles(directory);
       var processed = 0;
       final total = allFiles.length;
 
@@ -36,17 +48,19 @@ class FileSystemLibraryScanner implements LibraryScanner {
         );
 
         try {
-          final metadata = readMetadata(file);
+          final metadata = await MediaMetadata.read(file.path);
 
           final track = LibraryTrack(
             id: file.path, // Path as unique ID for MVP
-            title: metadata.title ?? p.basenameWithoutExtension(file.path),
+            title:
+                _metadataText(metadata?.title) ??
+                p.basenameWithoutExtension(file.path),
             path: file.path,
-            artist: metadata.artist,
-            album: metadata.album,
-            albumArtist: metadata.albumArtist,
-            trackNumber: metadata.trackNumber,
-            duration: metadata.duration,
+            artist: _metadataText(metadata?.artist),
+            album: _metadataText(metadata?.album),
+            albumArtist: _metadataText(metadata?.albumArtist),
+            trackNumber: metadata?.trackNumber,
+            duration: metadata?.duration,
             fileFormat: p.extension(file.path),
           );
 
@@ -80,7 +94,12 @@ class FileSystemLibraryScanner implements LibraryScanner {
     }
   }
 
-  Future<List<File>> _findAllAudioFiles(Directory dir) async {
+  String? _metadataText(String? value) {
+    final trimmed = value?.trim();
+    return trimmed == null || trimmed.isEmpty ? null : trimmed;
+  }
+
+  Future<List<File>> _findAllMediaFiles(Directory dir) async {
     final files = <File>[];
     final entities = await dir.list(recursive: true).toList();
 
