@@ -9,6 +9,8 @@ import 'package:otune/features/playback/presentation/widgets/player_widget.dart'
 
 import '../../../fakes/fake_audio_engine.dart';
 
+void _noop() {}
+
 void main() {
   group('PlayerWidget with Queue, Repeat and Shuffle controls', () {
     late FakeAudioEngine fakeEngine;
@@ -33,7 +35,11 @@ void main() {
               overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
             ),
         child: const MaterialApp(
-          home: Scaffold(body: SingleChildScrollView(child: PlayerWidget())),
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: PlayerWidget(onQueuePressed: _noop),
+            ),
+          ),
         ),
       );
     }

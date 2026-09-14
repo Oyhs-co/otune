@@ -4,11 +4,12 @@ import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/playback_modes.dart';
-import 'package:otune/features/playback/presentation/widgets/queue_sheet.dart';
 
 /// Widget visual para visualización y control de la reproducción en curso.
 class PlayerWidget extends ConsumerWidget {
-  const new({super.key});
+  const new({required this.onQueuePressed, super.key});
+
+  final VoidCallback onQueuePressed;
 
   static String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -199,9 +200,7 @@ class PlayerWidget extends ConsumerWidget {
               OutlinedButton.icon(
                 icon: const Icon(Icons.queue_music_rounded),
                 label: Text('Cola (${session.queueItems.length})'),
-                onPressed: () {
-                  QueueSheet.show(context);
-                },
+                onPressed: onQueuePressed,
               ),
             ],
           ),

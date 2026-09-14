@@ -2,7 +2,7 @@
 
 Reproductor musical multiplataforma, offline-first y extensible, diseñado para usuarios que prefieren gestionar sus propias bibliotecas de audio locales.
 
-Version: 0.4.0-alpha.0
+Version: 0.4.0-alpha.0+18
 
 ## Caracteristicas del MVP
 - Biblioteca Local: Escaneo recursivo de directorios, extracción de metadatos y persistencia eficiente con SQLite/Drift.

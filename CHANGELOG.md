@@ -5,6 +5,24 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.4.0-alpha.0+18] - 2026-09-13
+
+### Changed
+
+- Reorganizados los widgets de Library y Settings bajo sus respectivas
+  carpetas `presentation/widgets`, dejando que las páginas los compongan.
+- Desacoplado `PlayerWidget` de `QueueSheet`; ahora `HomePage` compone ambos.
+- Añadida la implementación Android de permisos para audio y vídeo.
+- Añadido `PermissionService` para solicitar permisos multimedia desde Flutter
+  mediante el canal nativo `otune/permissions`.
+- Añadidas las rutas y accesos de navegación para Biblioteca y Ajustes desde la
+  pantalla principal.
+- Configurada la identidad Android de la aplicación con el identificador
+  `com.otune.app` y la etiqueta `Otune`.
+- Documentado el acceso a archivos `.lrc` mediante la carpeta seleccionada en
+  el selector del sistema.
+- Actualizada la versión de la aplicación a `0.4.0-alpha.0+18`.
+
 ---
 
 ## [0.4.0-alpha.0+17] - 2026-09-13
