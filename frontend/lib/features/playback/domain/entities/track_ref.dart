@@ -1,5 +1,7 @@
 import 'dart:typed_data';
+
 import 'package:meta/meta.dart';
+import 'package:otune/features/library/domain/entities/track.dart';
 
 /// Referencia inmutable a una pista de audio reproducible en el sistema.
 @immutable
@@ -10,9 +12,23 @@ class TrackRef {
     required this.title,
     this.artist,
     this.album,
+    this.albumArtist,
     this.duration,
     this.albumArt,
   });
+
+  factory TrackRef.fromLibraryTrack(LibraryTrack track) {
+    return TrackRef(
+      id: track.id,
+      uri: Uri.file(track.path).toString(),
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      albumArtist: track.albumArtist,
+      duration: track.duration,
+      albumArt: track.albumArt,
+    );
+  }
 
   /// Identificador único de la pista.
   final String id;
@@ -28,6 +44,9 @@ class TrackRef {
 
   /// Álbum al que pertenece la pista.
   final String? album;
+
+  /// Artista del álbum o intérprete principal.
+  final String? albumArtist;
 
   /// Duración total si ya se conoce.
   final Duration? duration;

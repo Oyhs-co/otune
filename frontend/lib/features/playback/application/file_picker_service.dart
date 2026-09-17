@@ -45,7 +45,11 @@ class SystemLocalAudioPicker implements LocalAudioPicker {
         ? fileName.substring(0, fileName.lastIndexOf('.'))
         : fileName;
 
-    return TrackRef(id: const Uuid().v4(), uri: path, title: title);
+    return TrackRef(
+      id: const Uuid().v4(),
+      uri: Uri.file(path).toString(),
+      title: title,
+    );
   }
 }
 

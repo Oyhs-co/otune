@@ -46,13 +46,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   Future<void> _playTrack(LibraryTrack track) async {
     await ref
         .read(playbackControllerProvider.notifier)
-        .playTrack(
-          TrackRef(
-            id: track.id,
-            uri: 'file://${track.path}',
-            title: track.title,
-          ),
-        );
+        .playTrack(TrackRef.fromLibraryTrack(track));
   }
 
   @override

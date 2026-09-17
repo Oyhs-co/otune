@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/playback/application/file_picker_service.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
@@ -47,6 +48,26 @@ void main() {
       expect(session.status, equals(PlaybackStatus.idle));
       expect(session.queueItems, isEmpty);
       expect(session.currentTrack, isNull);
+    });
+
+    test('TrackRef preserves metadata when created from a library track', () {
+      const libraryTrack = LibraryTrack(
+        id: 't1',
+        title: 'Night Drive',
+        path: '/music/night-drive.mp3',
+        artist: 'Nova Echo',
+        album: 'Afterglow',
+        duration: Duration(minutes: 4, seconds: 12),
+      );
+
+      final track = TrackRef.fromLibraryTrack(libraryTrack);
+
+      expect(track.id, equals('t1'));
+      expect(track.title, equals('Night Drive'));
+      expect(track.artist, equals('Nova Echo'));
+      expect(track.album, equals('Afterglow'));
+      expect(track.duration, equals(const Duration(minutes: 4, seconds: 12)));
+      expect(track.uri, equals(Uri.file('/music/night-drive.mp3').toString()));
     });
 
     test('setQueue loads and plays the first track', () async {

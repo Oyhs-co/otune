@@ -31,9 +31,12 @@ _Sin cambios todavía._
 
 ### Fixed
 
+- Corregido el flujo de metadatos de biblioteca a reproducción para conservar título, artista, álbum, duración y carátula del archivo seleccionado.
+- Normalizada la generación de URIs locales con `Uri.file()` para evitar rutas inválidas o sin formato `file://` en la reproducción.
 - Declarados los flavors Android `staging` y `prod` usados por la pipeline de
   releases.
 - Correccion en el release.yml y upgrade de las versionde de node.js y Java.
+- Corregido el seek del reproductor para que arrastrar la barra de progreso no deje el audio silenciado al soltarla o cambiar de pista.
 
 ## [0.4.0-alpha.1+19] - 2026-09-14
 

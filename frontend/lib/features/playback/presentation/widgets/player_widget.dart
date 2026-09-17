@@ -6,10 +6,18 @@ import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/playback_modes.dart';
 
 /// Widget visual para visualización y control de la reproducción en curso.
-class PlayerWidget extends ConsumerWidget {
+class PlayerWidget extends ConsumerStatefulWidget {
   const new({required this.onQueuePressed, super.key});
 
   final VoidCallback onQueuePressed;
+
+  @override
+  ConsumerState<PlayerWidget> createState() => _PlayerWidgetState();
+}
+
+class _PlayerWidgetState extends ConsumerState<PlayerWidget> {
+  double? _dragPositionMs;
+  String? _dragTrackId;
 
   static String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -21,7 +29,7 @@ class PlayerWidget extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final session = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
@@ -42,6 +50,9 @@ class PlayerWidget extends ConsumerWidget {
     final currentPosMs = position.inMilliseconds
         .clamp(0, maxDurationMs.toInt())
         .toDouble();
+    final sliderPositionMs = _dragTrackId == track?.id
+      ? (_dragPositionMs ?? currentPosMs)
+      : currentPosMs;
 
     final isShuffle = session.isShuffle;
     final repeatMode = session.repeatMode;
@@ -109,14 +120,18 @@ class PlayerWidget extends ConsumerWidget {
 
           // Barra de progreso y tiempos
           Slider(
-            value: currentPosMs,
+            value: sliderPositionMs.clamp(0, maxDurationMs),
             max: maxDurationMs,
             onChanged: (newMs) {
-              unawaited(controller.setMuted(muted: true));
-              unawaited(controller.seek(Duration(milliseconds: newMs.toInt())));
+              setState(() {
+                _dragTrackId = track?.id;
+                _dragPositionMs = newMs;
+              });
             },
             onChangeEnd: (newMs) {
-              unawaited(controller.setMuted(muted: false));
+              unawaited(
+                _commitSeek(controller, newMs, trackId: _dragTrackId),
+              );
             },
           ),
           Padding(
@@ -210,12 +225,26 @@ class PlayerWidget extends ConsumerWidget {
               OutlinedButton.icon(
                 icon: const Icon(Icons.queue_music_rounded),
                 label: Text('Cola (${session.queueItems.length})'),
-                onPressed: onQueuePressed,
+                onPressed: widget.onQueuePressed,
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _commitSeek(
+    PlaybackController controller,
+    double positionMs, {
+    required String? trackId,
+  }) async {
+    await controller.seek(Duration(milliseconds: positionMs.toInt()));
+    if (!mounted || _dragTrackId != trackId) return;
+
+    setState(() {
+      _dragPositionMs = null;
+      _dragTrackId = null;
+    });
   }
 }

@@ -70,30 +70,14 @@ class LibraryTrackList extends ConsumerWidget {
             onSelected: (value) {
               if (value == 'play_next') {
                 unawaited(
-                  ref.read(playbackControllerProvider.notifier).playNext(
-                    TrackRef(
-                      id: track.id,
-                      uri: track.path,
-                      title: track.title,
-                      artist: track.artist,
-                      album: track.album,
-                      duration: track.duration,
-                      albumArt: track.albumArt,
-                    ),
-                  ),
+                  ref
+                      .read(playbackControllerProvider.notifier)
+                      .playNext(TrackRef.fromLibraryTrack(track)),
                 );
               } else if (value == 'add_to_queue') {
-                ref.read(playbackControllerProvider.notifier).addToQueue(
-                  TrackRef(
-                    id: track.id,
-                    uri: track.path,
-                    title: track.title,
-                    artist: track.artist,
-                    album: track.album,
-                    duration: track.duration,
-                    albumArt: track.albumArt,
-                  ),
-                );
+                ref
+                    .read(playbackControllerProvider.notifier)
+                    .addToQueue(TrackRef.fromLibraryTrack(track));
               }
             },
             itemBuilder: (context) => [
@@ -161,30 +145,14 @@ class LibraryTrackList extends ConsumerWidget {
                 onSelected: (value) {
                   if (value == 'play_next') {
                     unawaited(
-                      ref.read(playbackControllerProvider.notifier).playNext(
-                        TrackRef(
-                          id: track.id,
-                          uri: track.path,
-                          title: track.title,
-                          artist: track.artist,
-                          album: track.album,
-                          duration: track.duration,
-                          albumArt: track.albumArt,
-                        ),
-                      ),
+                      ref
+                          .read(playbackControllerProvider.notifier)
+                          .playNext(TrackRef.fromLibraryTrack(track)),
                     );
                   } else if (value == 'add_to_queue') {
-                    ref.read(playbackControllerProvider.notifier).addToQueue(
-                      TrackRef(
-                        id: track.id,
-                        uri: track.path,
-                        title: track.title,
-                        artist: track.artist,
-                        album: track.album,
-                        duration: track.duration,
-                        albumArt: track.albumArt,
-                      ),
-                    );
+                    ref
+                        .read(playbackControllerProvider.notifier)
+                        .addToQueue(TrackRef.fromLibraryTrack(track));
                   }
                 },
                 itemBuilder: (context) => [
@@ -257,32 +225,12 @@ class LibraryTrackList extends ConsumerWidget {
                                   .read(
                                     playbackControllerProvider.notifier,
                                   )
-                                  .playNext(
-                                    TrackRef(
-                                      id: track.id,
-                                      uri: track.path,
-                                      title: track.title,
-                                      artist: track.artist,
-                                      album: track.album,
-                                      duration: track.duration,
-                                      albumArt: track.albumArt,
-                                    ),
-                                  ),
+                                  .playNext(TrackRef.fromLibraryTrack(track)),
                             );
                           } else if (value == 'add_to_queue') {
                             ref
                                 .read(playbackControllerProvider.notifier)
-                                .addToQueue(
-                                  TrackRef(
-                                    id: track.id,
-                                    uri: track.path,
-                                    title: track.title,
-                                    artist: track.artist,
-                                    album: track.album,
-                                    duration: track.duration,
-                                    albumArt: track.albumArt,
-                                  ),
-                                );
+                                .addToQueue(TrackRef.fromLibraryTrack(track));
                           }
                         },
                         itemBuilder: (context) => [
