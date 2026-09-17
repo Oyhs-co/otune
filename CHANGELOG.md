@@ -9,6 +9,26 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 _Sin cambios todavía._
 
+## [0.4.0-alpha.2+20] - 2026-09-17
+
+### Added
+
+- Añadida pantalla splash con navegación inicial hacia la pantalla principal.
+- Añadidas acciones para reproducir una pista a continuación o añadirla a la
+  cola desde las vistas de biblioteca.
+- Añadido resaltado visual de la pista que se está reproduciendo.
+- Añadido soporte para mostrar el icono de la aplicación y la firma `By
+  Oyhs-Co` en la información de Otune.
+
+### Changed
+
+- Actualizada la navegación para incluir las rutas de splash, biblioteca,
+  ajustes y pantalla principal.
+- Ampliado el modelo de referencia de pista para conservar la carátula del
+  álbum junto con sus metadatos.
+- Añadidos controles de silencio y ajustes de reproducción en el reproductor.
+- Actualizados los textos de versión de la aplicación a `0.4.0-alpha.2+20`.
+
 ## [0.4.0-alpha.1+19] - 2026-09-14
 
 ### Added

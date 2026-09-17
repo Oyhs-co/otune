@@ -13,6 +13,7 @@ import 'package:otune/features/playback/domain/services/audio_engine.dart';
 /// Controlador principal de la sesión de reproducción y cola musical.
 class PlaybackController extends Notifier<PlaybackSession> {
   late final AudioEngine _engine;
+  bool _isMuted = false;
 
   @override
   PlaybackSession build() {
@@ -98,13 +99,13 @@ class PlaybackController extends Notifier<PlaybackSession> {
   }
 
   /// Añade una pista para reproducirse a continuación ("Play Next").
-  void playNext(TrackRef track) {
+  Future<void> playNext(TrackRef track) async {
     final wasEmpty = state.queue.isEmpty;
     final newQueue = state.queue.addPlayNext(track);
     state = state.copyWith(queue: newQueue);
 
     if (wasEmpty) {
-      unawaited(_loadAndPlayCurrent());
+      await _loadAndPlayCurrent();
     }
   }
 
@@ -192,7 +193,8 @@ class PlaybackController extends Notifier<PlaybackSession> {
 
   /// Silencia el audio durante el scrubbing.
   Future<void> setMuted({required bool muted}) async {
-    await _engine.setVolume(muted ? 0.0 : 1.0);
+    _isMuted = muted;
+    await _engine.setVolume(_isMuted ? 0.0 : 1.0);
   }
 
   /// Detiene la reproducción y reinicia la posición.

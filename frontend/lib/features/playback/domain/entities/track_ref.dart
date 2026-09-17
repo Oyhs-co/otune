@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 /// Referencia inmutable a una pista de audio reproducible en el sistema.
@@ -10,6 +11,7 @@ class TrackRef {
     this.artist,
     this.album,
     this.duration,
+    this.albumArt,
   });
 
   /// Identificador único de la pista.
@@ -29,6 +31,7 @@ class TrackRef {
 
   /// Duración total si ya se conoce.
   final Duration? duration;
+  final Uint8List? albumArt;
 
   @override
   bool operator ==(Object other) =>

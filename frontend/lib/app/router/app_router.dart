@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:otune/app/presentation/pages/splash_page.dart';
 import 'package:otune/features/library/presentation/pages/library_page.dart';
 import 'package:otune/features/playback/presentation/pages/home_page.dart';
 import 'package:otune/features/settings/presentation/pages/settings_page.dart';
@@ -7,8 +8,13 @@ import 'package:otune/features/settings/presentation/pages/settings_page.dart';
 /// Proveedor del enrutador principal de la aplicación.
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     routes: [
+      GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashPage(),
+      ),
       GoRoute(
         path: '/',
         name: 'home',

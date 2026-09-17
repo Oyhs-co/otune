@@ -15,6 +15,8 @@ void main() {
         child: const OtuneApp(),
       ),
     );
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
     expect(find.text('Otune'), findsWidgets);
     expect(find.byTooltip('Biblioteca'), findsOneWidget);

@@ -2,7 +2,7 @@ name: otune
 description: "Reproductor musical multiplataforma, offline-first y orientado a bibliotecas locales."
 publish_to: 'none'
 
-version: 0.4.0-alpha.1+19
+version: 0.4.0-alpha.2+20
 
 environment:
   sdk: ^3.13.3
@@ -45,6 +45,9 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
+  assets:
+    - android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

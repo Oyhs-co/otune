@@ -153,26 +153,37 @@ class QueueSheet extends ConsumerWidget {
         final isCurrent = index == session.currentIndex;
         final key = ValueKey(item.id);
 
-        if (viewMode == QueueViewMode.detailed) {
-          return ListTile(
-            key: key,
-            leading: Icon(
-              isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
-              color: isCurrent
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
-            title: Text(
-              item.track.title,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-                color: isCurrent
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+         if (viewMode == QueueViewMode.detailed) {
+           return ListTile(
+             key: key,
+             leading: item.track.albumArt != null
+                 ? ClipRRect(
+                     borderRadius: BorderRadius.circular(4),
+                     child: Image.memory(
+                       item.track.albumArt!,
+                       width: 40,
+                       height: 40,
+                       fit: BoxFit.cover,
+                     ),
+                   )
+                 : Icon(
+                     isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
+                     color: isCurrent
+                         ? theme.colorScheme.primary
+                         : theme.colorScheme.onSurfaceVariant,
+                   ),
+             title: Text(
+               item.track.title,
+               style: theme.textTheme.bodyMedium?.copyWith(
+                 fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                 color: isCurrent
+                     ? theme.colorScheme.primary
+                     : theme.colorScheme.onSurface,
+               ),
+               maxLines: 1,
+               overflow: TextOverflow.ellipsis,
+             ),
+
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -196,12 +207,22 @@ class QueueSheet extends ConsumerWidget {
 
         return ListTile(
           key: key,
-          leading: Icon(
-            isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
-            color: isCurrent
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurfaceVariant,
-          ),
+          leading: item.track.albumArt != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.memory(
+                    item.track.albumArt!,
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : Icon(
+                  isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
+                  color: isCurrent
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
           title: Text(
             item.track.title,
             style: theme.textTheme.bodyMedium?.copyWith(
