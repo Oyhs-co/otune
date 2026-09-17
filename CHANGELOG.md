@@ -29,6 +29,12 @@ _Sin cambios todavía._
 - Añadidos controles de silencio y ajustes de reproducción en el reproductor.
 - Actualizados los textos de versión de la aplicación a `0.4.0-alpha.2+20`.
 
+### Fixed
+
+- Declarados los flavors Android `staging` y `prod` usados por la pipeline de
+  releases.
+- Correccion en el release.yml y upgrade de las versionde de node.js y Java.
+
 ## [0.4.0-alpha.1+19] - 2026-09-14
 
 ### Added

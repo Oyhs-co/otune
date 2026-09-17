@@ -39,7 +39,8 @@ class LibraryTrackList extends ConsumerWidget {
       separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final track = tracks[index];
-        final isPlaying = session.currentTrack?.id == track.id && session.isPlaying;
+        final isPlaying =
+          session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
           leading: track.albumArt != null
@@ -68,17 +69,19 @@ class LibraryTrackList extends ConsumerWidget {
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {
               if (value == 'play_next') {
-                unawaited(ref.read(playbackControllerProvider.notifier).playNext(
-                  TrackRef(
-                    id: track.id,
-                    uri: track.path,
-                    title: track.title,
-                    artist: track.artist,
-                    album: track.album,
-                    duration: track.duration,
-                    albumArt: track.albumArt,
+                unawaited(
+                  ref.read(playbackControllerProvider.notifier).playNext(
+                    TrackRef(
+                      id: track.id,
+                      uri: track.path,
+                      title: track.title,
+                      artist: track.artist,
+                      album: track.album,
+                      duration: track.duration,
+                      albumArt: track.albumArt,
+                    ),
                   ),
-                ));
+                );
               } else if (value == 'add_to_queue') {
                 ref.read(playbackControllerProvider.notifier).addToQueue(
                   TrackRef(
@@ -94,8 +97,14 @@ class LibraryTrackList extends ConsumerWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'play_next', child: Text('Reproducir a continuación')),
-              const PopupMenuItem(value: 'add_to_queue', child: Text('Añadir a la cola')),
+              const PopupMenuItem(
+                value: 'play_next',
+                child: Text('Reproducir a continuación'),
+              ),
+              const PopupMenuItem(
+                value: 'add_to_queue',
+                child: Text('Añadir a la cola'),
+              ),
             ],
           ),
           onTap: () => onTrackSelected(track),
@@ -110,7 +119,8 @@ class LibraryTrackList extends ConsumerWidget {
       separatorBuilder: (_, _) => const Divider(height: 1),
       itemBuilder: (context, index) {
         final track = tracks[index];
-        final isPlaying = session.currentTrack?.id == track.id && session.isPlaying;
+        final isPlaying =
+          session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
           leading: track.albumArt != null
@@ -150,17 +160,19 @@ class LibraryTrackList extends ConsumerWidget {
                 icon: const Icon(Icons.more_vert),
                 onSelected: (value) {
                   if (value == 'play_next') {
-                    unawaited(ref.read(playbackControllerProvider.notifier).playNext(
-                      TrackRef(
-                        id: track.id,
-                        uri: track.path,
-                        title: track.title,
-                        artist: track.artist,
-                        album: track.album,
-                        duration: track.duration,
-                        albumArt: track.albumArt,
+                    unawaited(
+                      ref.read(playbackControllerProvider.notifier).playNext(
+                        TrackRef(
+                          id: track.id,
+                          uri: track.path,
+                          title: track.title,
+                          artist: track.artist,
+                          album: track.album,
+                          duration: track.duration,
+                          albumArt: track.albumArt,
+                        ),
                       ),
-                    ));
+                    );
                   } else if (value == 'add_to_queue') {
                     ref.read(playbackControllerProvider.notifier).addToQueue(
                       TrackRef(
@@ -176,8 +188,14 @@ class LibraryTrackList extends ConsumerWidget {
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'play_next', child: Text('Reproducir a continuación')),
-                  const PopupMenuItem(value: 'add_to_queue', child: Text('Añadir a la cola')),
+                  const PopupMenuItem(
+                    value: 'play_next',
+                    child: Text('Reproducir a continuación'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'add_to_queue',
+                    child: Text('Añadir a la cola'),
+                  ),
                 ],
               ),
             ],
@@ -200,7 +218,8 @@ class LibraryTrackList extends ConsumerWidget {
       itemCount: tracks.length,
       itemBuilder: (context, index) {
         final track = tracks[index];
-        final isPlaying = session.currentTrack?.id == track.id && session.isPlaying;
+        final isPlaying =
+          session.currentTrack?.id == track.id && session.isPlaying;
 
         return GestureDetector(
           onTap: () => onTrackSelected(track),
@@ -233,34 +252,48 @@ class LibraryTrackList extends ConsumerWidget {
                         icon: const Icon(Icons.more_vert, size: 20),
                         onSelected: (value) {
                           if (value == 'play_next') {
-                            unawaited(ref.read(playbackControllerProvider.notifier).playNext(
-                              TrackRef(
-                                id: track.id,
-                                uri: track.path,
-                                title: track.title,
-                                artist: track.artist,
-                                album: track.album,
-                                duration: track.duration,
-                                albumArt: track.albumArt,
-                              ),
-                            ));
-                          } else if (value == 'add_to_queue') {
-                            ref.read(playbackControllerProvider.notifier).addToQueue(
-                              TrackRef(
-                                id: track.id,
-                                uri: track.path,
-                                title: track.title,
-                                artist: track.artist,
-                                album: track.album,
-                                duration: track.duration,
-                                albumArt: track.albumArt,
-                              ),
+                            unawaited(
+                              ref
+                                  .read(
+                                    playbackControllerProvider.notifier,
+                                  )
+                                  .playNext(
+                                    TrackRef(
+                                      id: track.id,
+                                      uri: track.path,
+                                      title: track.title,
+                                      artist: track.artist,
+                                      album: track.album,
+                                      duration: track.duration,
+                                      albumArt: track.albumArt,
+                                    ),
+                                  ),
                             );
+                          } else if (value == 'add_to_queue') {
+                            ref
+                                .read(playbackControllerProvider.notifier)
+                                .addToQueue(
+                                  TrackRef(
+                                    id: track.id,
+                                    uri: track.path,
+                                    title: track.title,
+                                    artist: track.artist,
+                                    album: track.album,
+                                    duration: track.duration,
+                                    albumArt: track.albumArt,
+                                  ),
+                                );
                           }
                         },
                         itemBuilder: (context) => [
-                          const PopupMenuItem(value: 'play_next', child: Text('Reproducir a continuación')),
-                          const PopupMenuItem(value: 'add_to_queue', child: Text('Añadir a la cola')),
+                          const PopupMenuItem(
+                            value: 'play_next',
+                            child: Text('Reproducir a continuación'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'add_to_queue',
+                            child: Text('Añadir a la cola'),
+                          ),
                         ],
                       ),
                     ),
@@ -274,7 +307,9 @@ class LibraryTrackList extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
-                  color: isPlaying ? Theme.of(context).colorScheme.primary : null,
+                    color: isPlaying
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
                 ),
                 textAlign: TextAlign.center,
               ),

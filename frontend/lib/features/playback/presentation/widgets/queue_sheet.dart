@@ -167,7 +167,9 @@ class QueueSheet extends ConsumerWidget {
                      ),
                    )
                  : Icon(
-                     isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
+                     isCurrent
+                       ? Icons.volume_up_rounded
+                       : Icons.music_note_rounded,
                      color: isCurrent
                          ? theme.colorScheme.primary
                          : theme.colorScheme.onSurfaceVariant,
@@ -218,7 +220,9 @@ class QueueSheet extends ConsumerWidget {
                   ),
                 )
               : Icon(
-                  isCurrent ? Icons.volume_up_rounded : Icons.music_note_rounded,
+                    isCurrent
+                      ? Icons.volume_up_rounded
+                      : Icons.music_note_rounded,
                   color: isCurrent
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onSurfaceVariant,

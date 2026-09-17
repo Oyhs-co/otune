@@ -28,7 +28,10 @@ class PlayerWidget extends ConsumerWidget {
 
     final track = session.currentTrack;
     final title = track?.title ?? 'Sin pista seleccionada';
-    final artist = track?.artist ?? (track == null ? 'Carga un archivo de audio para comenzar' : 'Artista desconocido');
+    final artist = track?.artist ??
+      (track == null
+        ? 'Carga un archivo de audio para comenzar'
+        : 'Artista desconocido');
 
     final position = session.position;
     final duration = session.duration;
