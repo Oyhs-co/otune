@@ -9,6 +9,8 @@ import 'package:otune/features/library/application/state/library_scan_state.dart
 import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
+import 'package:otune/features/library/presentation/widgets/library_empty_state.dart';
+import 'package:otune/features/library/presentation/widgets/library_scan_banner.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
@@ -97,19 +99,25 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Buscar canciones, artistas...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                const LibraryScanBanner(),
+                const SizedBox(height: 16),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Buscar canciones, artistas...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: (value) {
+                    ref.read(librarySearchQueryProvider.notifier).query = value;
+                  },
                 ),
-                contentPadding: EdgeInsets.zero,
-              ),
-              onChanged: (value) {
-                ref.read(librarySearchQueryProvider.notifier).query = value;
-              },
+              ],
             ),
           ),
           Expanded(
@@ -121,26 +129,35 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 }
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text(
-                      'Error al cargar la biblioteca: ${snapshot.error}',
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error al cargar la biblioteca: ${snapshot.error}',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => setState(() {}),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
                     ),
                   );
                 }
 
                 final tracks = snapshot.data ?? <LibraryTrack>[];
+                final query = ref.read(librarySearchQueryProvider);
                 if (tracks.isEmpty) {
-                  return const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.music_note, size: 64, color: Colors.grey),
-                        SizedBox(height: 16),
-                        Text(
-                          'No hay canciones que coincidan.',
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                  return LibraryEmptyState(
+                    message: query.isEmpty
+                        ? 'Tu biblioteca está vacía'
+                        : 'No hay canciones que coincidan con "$query"',
+                    buttonText: query.isEmpty ? 'Escanear carpeta' : '',
+                    onButtonPressed: _handleScanFolder,
+                    icon: query.isEmpty ? Icons.music_note : Icons.search_off,
                   );
                 }
 
