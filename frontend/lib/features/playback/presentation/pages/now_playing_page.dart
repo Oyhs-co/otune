@@ -69,9 +69,8 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
           final horizontalPadding = constraints.maxWidth < 480
               ? DesignTokens.spaceM
               : DesignTokens.spaceXL;
-          final contentHeight = constraints.maxHeight < 700 ? 300.0 : 380.0;
 
-          return SingleChildScrollView(
+          return Padding(
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
               0,
@@ -79,32 +78,34 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
               DesignTokens.spaceL,
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(
-                  height: contentHeight,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: _showLyrics
-                        ? const Center(
-                            key: ValueKey('lyrics'),
-                            child: LyricsWidget(),
-                          )
-                        : const Column(
-                            key: ValueKey('artwork'),
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ArtworkPanel(size: 300, isLarge: true),
-                              SizedBox(height: DesignTokens.spaceL),
-                              TrackInfo(isHeadline: true),
-                            ],
-                          ),
+                Expanded(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: DesignTokens.artworkLarge,
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: _showLyrics
+                          ? Center(
+                              key: ValueKey('lyrics'),
+                              child: const LyricsWidget(),
+                            )
+                          : Column(
+                              key: ValueKey('artwork'),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ArtworkPanel(size: 300, isLarge: true),
+                                const SizedBox(height: DesignTokens.spaceL),
+                                const TrackInfo(isHeadline: true),
+                              ],
+                            ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: DesignTokens.spaceM),
                 const PlaybackProgress(),
-                const SizedBox(height: DesignTokens.spaceL),
                 const PlaybackControls(),
-                const SizedBox(height: DesignTokens.spaceL),
               ],
             ),
           );
