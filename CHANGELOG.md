@@ -9,6 +9,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Added
 
+- Añadida una nueva suite de pruebas con `flutter_test` que cubre 73 casos de dominio, aplicación, repositorios, letras, playback, widgets y permisos, incluyendo generación de cobertura mediante `flutter test --coverage`.
 - Añadida la shell adaptativa de la aplicación con navegación responsive y estructura visual centralizada.
 - Añadido sistema de tokens de diseño para colores, espacios, radios y tipografía de la interfaz.
 - Añadido placeholder visual para carátulas ausentes y componente de mini reproductor para la experiencia de escucha compacta.
