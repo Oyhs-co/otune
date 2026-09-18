@@ -25,6 +25,11 @@ void main() {
               filesProcessed: 1,
               totalFilesFound: 2,
             ),
+            ScanError(
+              message: 'Corrupt file',
+              path: '/music/broken.mp3',
+              kind: ScanErrorKind.file,
+            ),
             ScanComplete(2),
           ]),
         ),
@@ -36,9 +41,13 @@ void main() {
 
     final state = container.read(libraryScanProvider);
     expect(state.isScanning, isFalse);
-    expect(state.status, 'Escaneo completado. 2 pistas indexadas.');
+    expect(
+      state.status,
+      'Escaneo completado. 2 pistas indexadas y 1 archivos omitidos.',
+    );
     expect(state.filesProcessed, 1);
     expect(state.totalFilesFound, 2);
+    expect(state.filesWithErrors, 1);
   });
 
   test('exposes scan errors and stops scanning', () async {
@@ -72,5 +81,56 @@ void main() {
 
     expect(state.copyWith(status: 'Done').isScanning, isTrue);
     expect(state.copyWith(status: 'Done').filesProcessed, 1);
+  });
+
+  test('file errors do not stop the scan', () async {
+    final container = ProviderContainer(
+      overrides: [
+        libraryScannerProvider.overrideWithValue(
+          FakeLibraryScanner([
+            ScanProgress(
+              currentFile: 'song.mp3',
+              filesProcessed: 1,
+              totalFilesFound: 2,
+            ),
+            ScanError(
+              message: 'Corrupt file',
+              path: '/music/broken.mp3',
+              kind: ScanErrorKind.file,
+            ),
+            ScanComplete(1),
+          ]),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container.read(libraryScanProvider.notifier).scanDirectory('/music');
+
+    final state = container.read(libraryScanProvider);
+    expect(state.isScanning, isFalse);
+    expect(state.filesWithErrors, 1);
+    expect(state.status, contains('archivos omitidos'));
+  });
+
+  test('critical errors expose the last path for retry', () async {
+    final container = ProviderContainer(
+      overrides: [
+        libraryScannerProvider.overrideWithValue(
+          FakeLibraryScanner([
+            ScanError(message: 'Directory does not exist', path: '/missing'),
+          ]),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container
+        .read(libraryScanProvider.notifier)
+        .scanDirectory('/missing');
+    expect(container.read(libraryScanProvider).lastScanPath, '/missing');
+
+    await container.read(libraryScanProvider.notifier).retryLastScan();
+    expect(container.read(libraryScanProvider).status, contains('Error:'));
   });
 }

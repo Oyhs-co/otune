@@ -1,7 +1,7 @@
 # SPEC: Scan Progress Feedback
 
 ## Status
-Draft
+In Progress
 
 ## Context
 Scanning a local filesystem for music can take significant time. Currently, the user might not have enough feedback on whether the app is frozen or actively working, and how many files have been processed.
@@ -13,7 +13,7 @@ Provide real-time, non-blocking feedback during the library scan process.
 - Progress banner/panel during scanning.
 - Counter of processed files.
 - Display of the current file being processed (with safe truncation).
-- Summary of scan results upon completion.
+- Summary of scan results upon completion, including skipped files.
 - Error handling for individual files vs critical directory errors.
 
 ## Non-goals
@@ -35,6 +35,7 @@ Provide real-time, non-blocking feedback during the library scan process.
 - FR-003: Show the current file path, truncated if it exceeds the available width.
 - FR-004: Show a "Scan complete: [X] tracks added" summary that disappears after a few seconds or on user action.
 - FR-005: Distinguish between a "File Error" (skipped) and a "Critical Error" (scan stopped).
+- FR-006: A critical scan error exposes a retry action for the last selected directory.
 
 ## Non-functional requirements
 - NFR-001: The progress banner should not block the user from browsing already indexed tracks.
@@ -100,3 +101,4 @@ And a non-intrusive error indicator is shown (or logged)
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-17 | Initial spec | Phase 0 Preparation |
+| 2026-09-18 | Status changed to In Progress | Partial implementation now distinguishes file and critical errors |

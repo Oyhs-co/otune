@@ -144,7 +144,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () => setState(() {}),
+                          onPressed: () {
+                            ref.invalidate(filteredTracksProvider);
+                          },
                           child: const Text('Reintentar'),
                         ),
                       ],

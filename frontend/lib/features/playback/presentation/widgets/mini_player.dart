@@ -19,56 +19,50 @@ class MiniPlayer extends ConsumerWidget {
     if (track == null) return const SizedBox.shrink();
 
     return Container(
-      height: 64,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
+      child: Material(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+        elevation: 2,
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          onTap: () => _navigateToNowPlaying(context),
+          leading: ArtworkPlaceholder(
+            size: ArtworkSize.small,
+            child: track.albumArt != null
+                ? Image.memory(track.albumArt!, fit: BoxFit.cover)
+                : null,
           ),
-        ],
-      ),
-      child: ListTile(
-        onTap: () => _navigateToNowPlaying(context),
-        leading: ArtworkPlaceholder(
-          size: ArtworkSize.small,
-          child: track.albumArt != null
-              ? Image.memory(track.albumArt!, fit: BoxFit.cover)
-              : null,
-        ),
-        title: Text(
-          track.title,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          track.artist ?? 'Artista desconocido',
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.skip_previous_rounded),
-              onPressed: () => unawaited(controller.skipPrevious()),
-            ),
-            IconButton(
-              icon: Icon(
-                session.isPlaying
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded,
+          title: Text(
+            track.title,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            track.artist ?? 'Artista desconocido',
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.skip_previous_rounded),
+                onPressed: () => unawaited(controller.skipPrevious()),
               ),
-              onPressed: () => unawaited(controller.togglePlayPause()),
-            ),
-            IconButton(
-              icon: const Icon(Icons.skip_next_rounded),
-              onPressed: () => unawaited(controller.skipNext()),
-            ),
-          ],
+              IconButton(
+                icon: Icon(
+                  session.isPlaying
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                ),
+                onPressed: () => unawaited(controller.togglePlayPause()),
+              ),
+              IconButton(
+                icon: const Icon(Icons.skip_next_rounded),
+                onPressed: () => unawaited(controller.skipNext()),
+              ),
+            ],
+          ),
         ),
       ),
     );

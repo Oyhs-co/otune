@@ -22,10 +22,6 @@ class AppShell extends ConsumerWidget {
               labelType: NavigationRailLabelType.all,
               destinations: const [
                 NavigationRailDestination(
-                  icon: Icon(Icons.home_filled),
-                  label: Text('Inicio'),
-                ),
-                NavigationRailDestination(
                   icon: Icon(Icons.library_music),
                   label: Text('Biblioteca'),
                 ),
@@ -36,15 +32,10 @@ class AppShell extends ConsumerWidget {
               ],
             ),
           Expanded(
-            child: Stack(
+            child: Column(
               children: [
-                navigationShell,
-                Positioned(
-                  bottom: isWideScreen ? 0 : 80,
-                  left: 0,
-                  right: 0,
-                  child: const MiniPlayer(),
-                ),
+                Expanded(child: navigationShell),
+                const SafeArea(top: false, child: MiniPlayer()),
               ],
             ),
           ),
@@ -55,10 +46,6 @@ class AppShell extends ConsumerWidget {
               currentIndex: navigationShell.currentIndex,
               onTap: navigationShell.goBranch,
               items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home_filled),
-                  label: 'Inicio',
-                ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.library_music),
                   label: 'Biblioteca',

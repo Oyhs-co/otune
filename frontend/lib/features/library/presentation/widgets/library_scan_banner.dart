@@ -24,8 +24,8 @@ class LibraryScanBanner extends ConsumerWidget {
         color: isError
             ? Theme.of(context).colorScheme.errorContainer
             : isComplete
-                ? Colors.green.shade100
-                : Theme.of(context).colorScheme.primaryContainer,
+            ? Colors.green.shade100
+            : Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -56,9 +56,8 @@ class LibraryScanBanner extends ConsumerWidget {
               children: [
                 Text(
                   scanState.status,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (scanState.isScanning)
@@ -69,6 +68,13 @@ class LibraryScanBanner extends ConsumerWidget {
               ],
             ),
           ),
+          if (isError)
+            TextButton(
+              onPressed: scanState.isScanning
+                  ? null
+                  : ref.read(libraryScanProvider.notifier).retryLastScan,
+              child: const Text('Reintentar'),
+            ),
         ],
       ),
     );

@@ -7,7 +7,14 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-_Sin cambios todavía._
+### Fixed
+
+- Corregido el flujo de escaneo para continuar ante errores de archivos individuales y reservar el estado crítico para errores de directorio.
+- Añadido reintento real para errores de carga de la biblioteca y para el último escaneo fallido.
+- Alineada la documentación del shell adaptativo con sus tres destinos persistentes actuales y la ruta independiente de reproducción actual.
+- Corregido el layout del shell para reservar espacio al mini-player y evitar solapamientos con el contenido o la navegación inferior.
+- Añadidas pruebas de navegación móvil, navegación amplia y continuidad de reproducción al cambiar de sección.
+- Convertida Biblioteca en la pantalla principal y eliminada la navegación duplicada desde la antigua pantalla de Inicio.
 
 ## [0.5.0-alpha.0+21] - 2026-09-18
 

@@ -1,7 +1,7 @@
 # SPEC: Library Empty States
 
 ## Status
-Draft
+In Progress
 
 ## Context
 When a user first opens Otune or clears their library, they are met with an empty screen. Without guidance, the user may not know how to start adding music.
@@ -83,3 +83,4 @@ Then a message "No results found for 'NonExistentSong123'" is displayed
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-17 | Initial spec | Phase 0 Preparation |
+| 2026-09-18 | Status changed to In Progress | Empty and search states are implemented; full widget coverage remains pending |
