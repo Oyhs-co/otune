@@ -7,7 +7,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-_Sin cambios todavía._
+### Added
+- Widget `StateBadge`: indicador de estado reutilizable con timeout configurable, auto-dismiss tras duración definida, animación de entrada/salida y soporte para acciones (ej: Deshacer).
+- Proveedor `badgeProvider`: servicio global para mostrar badges de estado programáticamente desde cualquier widget.
+- Configuración de duración de badges en Ajustes (1, 2, 3, 5, 10 segundos).
+- Badges reemplazan SnackBars en toda la app (permisos, cola vaciada, eliminación de elementos con acción de deshacer).
+
+### Changed
+- Pantalla de reproducción actual (`NowPlayingPage`): objetos distribuidos uniformemente en el espacio disponible usando `MainAxisAlignment.spaceEvenly`. Área de artwork/letras limitada por token `DesignTokens.artworkLarge`.
+
+### Fixed
+- _Sin cambios todavía._
 
 ## [0.5.0-alpha.1+22] - 2026-09-18
 
