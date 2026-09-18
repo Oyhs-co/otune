@@ -1,13 +1,13 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:otune/core/design_system/providers/badge_provider.dart';
 import 'package:otune/core/permissions/permission_service.dart';
 import 'package:otune/features/library/application/library_search_provider.dart';
 import 'package:otune/features/library/application/library_view_provider.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
-import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
+import 'package:otune/features/library/presentation/widgets/library_app_bar_actions.dart';
 import 'package:otune/features/library/presentation/widgets/library_empty_state.dart';
 import 'package:otune/features/library/presentation/widgets/library_scan_banner.dart';
 import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
@@ -43,13 +43,13 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
     if (!hasPermission) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Se requiere permiso de almacenamiento para escanear música',
-          ),
-        ),
-      );
+      ref
+          .read(badgeProvider.notifier)
+          .show(
+            message:
+                'Se requiere permiso de almacenamiento para escanear música',
+            type: BadgeType.error,
+          );
       return;
     }
 
@@ -69,48 +69,22 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isWideScreen = MediaQuery.of(context).size.width >= 600;
     final scanState = ref.watch(libraryScanProvider);
     final viewMode = ref.watch(libraryViewModeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mi Biblioteca'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          PopupMenuButton<LibraryViewMode>(
-            icon: const Icon(Icons.view_module),
-            onSelected: (mode) =>
-                ref.read(libraryViewModeProvider.notifier).mode = mode,
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: LibraryViewMode.list,
-                child: Text('Lista'),
-              ),
-              const PopupMenuItem(
-                value: LibraryViewMode.grid,
-                child: Text('Carátulas'),
-              ),
-              const PopupMenuItem(
-                value: LibraryViewMode.detailed,
-                child: Text('Detallado'),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: scanState.isScanning
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.folder_open),
-            onPressed: scanState.isScanning ? null : _handleScanFolder,
-            tooltip: 'Escanear carpeta',
-          ),
-        ],
+        actions: isWideScreen
+            ? [
+                LibraryAppBarActions(
+                  isScanning: scanState.isScanning,
+                  onViewModeChanged: (mode) =>
+                      ref.read(libraryViewModeProvider.notifier).mode = mode,
+                  onScanFolder: _handleScanFolder,
+                ),
+              ]
+            : null,
       ),
       body: Column(
         children: [

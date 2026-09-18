@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:otune/core/design_system/providers/badge_provider.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/application/queue_view_provider.dart';
@@ -144,16 +145,15 @@ class QueueSheet extends ConsumerWidget {
                   onPressed: () {
                     final snapshot = session.queue;
                     unawaited(controller.clearQueue());
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Cola vaciada'),
-                        action: SnackBarAction(
-                          label: 'Deshacer',
-                          onPressed: () =>
+                    ref
+                        .read(badgeProvider.notifier)
+                        .show(
+                          message: 'Cola vaciada',
+                          actionLabel: 'Deshacer',
+                          onActionPressed: () =>
                               unawaited(controller.restoreQueue(snapshot)),
-                        ),
-                      ),
-                    );
+                          duration: const Duration(seconds: 5),
+                        );
                   },
                 ),
             ],
@@ -179,6 +179,7 @@ class QueueSheet extends ConsumerWidget {
               controller,
               theme,
               viewMode,
+              ref,
             ),
           ),
         ],
@@ -238,6 +239,7 @@ class QueueSheet extends ConsumerWidget {
     PlaybackController controller,
     ThemeData theme,
     QueueViewMode viewMode,
+    WidgetRef ref,
   ) {
     return ReorderableListView.builder(
       scrollController: scrollController,
@@ -292,7 +294,8 @@ class QueueSheet extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.close_rounded, size: 20),
                 tooltip: 'Eliminar de la cola',
-                onPressed: () => _removeItem(context, controller, item, index),
+                onPressed: () =>
+                    _removeItem(ref, context, controller, item, index),
               ),
               const Icon(Icons.drag_handle),
             ],
@@ -304,20 +307,20 @@ class QueueSheet extends ConsumerWidget {
   }
 
   void _removeItem(
+    WidgetRef ref,
     BuildContext context,
     PlaybackController controller,
     QueueItem item,
     int index,
   ) {
     controller.removeFromQueue(item.id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('"${item.track.title}" eliminado'),
-        action: SnackBarAction(
-          label: 'Deshacer',
-          onPressed: () => controller.restoreQueueItem(item, index),
-        ),
-      ),
-    );
+    ref
+        .read(badgeProvider.notifier)
+        .show(
+          message: '"${item.track.title}" eliminado',
+          actionLabel: 'Deshacer',
+          onActionPressed: () => controller.restoreQueueItem(item, index),
+          duration: const Duration(seconds: 5),
+        );
   }
 }
