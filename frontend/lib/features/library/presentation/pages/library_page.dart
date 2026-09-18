@@ -22,6 +22,22 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController(
+      text: ref.read(librarySearchQueryProvider),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleScanFolder() async {
     final hasPermission = await PermissionService().requestMediaPermissions();
 
@@ -105,16 +121,33 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 const LibraryScanBanner(),
                 const SizedBox(height: 16),
                 TextField(
+                  controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Buscar canciones, artistas...',
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                            icon: const Icon(Icons.clear),
+                            tooltip: 'Limpiar búsqueda',
+                            onPressed: () {
+                              _searchController.clear();
+                              ref
+                                      .read(librarySearchQueryProvider.notifier)
+                                      .query =
+                                  '';
+                              setState(() {});
+                            },
+                          ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     contentPadding: EdgeInsets.zero,
                   ),
                   onChanged: (value) {
-                    ref.read(librarySearchQueryProvider.notifier).query = value;
+                    ref.read(librarySearchQueryProvider.notifier).query = value
+                        .trim();
+                    setState(() {});
                   },
                 ),
               ],

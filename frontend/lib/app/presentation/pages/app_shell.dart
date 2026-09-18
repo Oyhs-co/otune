@@ -13,6 +13,12 @@ class AppShell extends ConsumerWidget {
     final isWideScreen = MediaQuery.of(context).size.width >= 600;
 
     return Scaffold(
+      appBar: isWideScreen
+          ? null
+          : AppBar(
+              title: const Text('Otune'),
+              centerTitle: false,
+            ),
       body: Row(
         children: [
           if (isWideScreen)

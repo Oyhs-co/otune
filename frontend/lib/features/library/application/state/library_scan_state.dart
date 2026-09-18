@@ -74,6 +74,14 @@ class LibraryScanNotifier extends Notifier<LibraryScanState> {
               'Escaneo completado. ${event.totalTracksIndexed}'
               ' pistas indexadas$skippedFiles.',
         );
+
+        // Auto-hide completion status after 5 seconds
+        Future.delayed(const Duration(seconds: 5), () {
+          if (!state.isScanning &&
+              state.status.startsWith('Escaneo completado')) {
+            state = state.copyWith(status: 'No se ha realizado ningún escaneo');
+          }
+        });
       } else if (event is ScanError) {
         if (event.kind == ScanErrorKind.file) {
           state = state.copyWith(
