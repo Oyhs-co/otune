@@ -9,17 +9,23 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Added
 
+- Añadida la shell adaptativa de la aplicación con navegación responsive y estructura visual centralizada.
+- Añadido sistema de tokens de diseño para colores, espacios, radios y tipografía de la interfaz.
+- Añadido placeholder visual para carátulas ausentes y componente de mini reproductor para la experiencia de escucha compacta.
 - Añadido estado vacío de biblioteca con mensaje contextual y botón de escaneo cuando la colección está vacía o no hay resultados de búsqueda.
 - Añadido banner visual para mostrar el progreso del escaneo de carpetas y el resultado final del proceso.
 - Añadidas especificaciones de diseño y UX para navegación adaptativa, estados vacíos de biblioteca y feedback de progreso de escaneo.
 
 ### Changed
 
+- Actualizada la navegación de la app para integrar el shell adaptativo y la estructura de rutas actualizada.
+- Reorganizado el diseño de la biblioteca y la capa visual del reproductor para reflejar la nueva experiencia de uso y continuidad del flujo.
 - Actualizada la pantalla de biblioteca para integrar el estado vacío, el buscador y la retroalimentación visual del escaneo de música.
 - Reorganizado el flujo de biblioteca para que la acción de escaneo y el feedback del estado sean más claros y mantenibles.
 
 ### Fixed
 
+- Corregido el tratamiento visual de elementos sin carátula para mantener una apariencia consistente en la biblioteca y el reproductor.
 - Corregido el comportamiento visual de la biblioteca para no mostrar un estado vacío ambiguo cuando la colección está vacía o filtrada.
 
 ## [0.4.0-alpha.2+20] - 2026-09-17

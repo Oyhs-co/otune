@@ -1,7 +1,8 @@
 import 'dart:async';
-
+ 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
@@ -45,8 +46,8 @@ class LibraryTrackList extends ConsumerWidget {
 
         return ListTile(
           leading: track.albumArt != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+              ? ArtworkPlaceholder(
+                  size: ArtworkSize.small,
                   child: Image.memory(
                     track.albumArt!,
                     width: 40,
@@ -54,7 +55,7 @@ class LibraryTrackList extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                 )
-              : const Icon(Icons.music_note),
+              : const ArtworkPlaceholder(size: ArtworkSize.small),
           title: Text(
             track.title,
             style: TextStyle(
@@ -109,8 +110,8 @@ class LibraryTrackList extends ConsumerWidget {
 
         return ListTile(
           leading: track.albumArt != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+              ? ArtworkPlaceholder(
+                  size: ArtworkSize.small,
                   child: Image.memory(
                     track.albumArt!,
                     width: 50,
@@ -118,7 +119,7 @@ class LibraryTrackList extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                 )
-              : const Icon(Icons.music_note),
+              : const ArtworkPlaceholder(size: ArtworkSize.small),
           title: Text(
             track.title,
             style: TextStyle(
@@ -197,22 +198,16 @@ class LibraryTrackList extends ConsumerWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                    ArtworkPlaceholder(
+                      size: ArtworkSize.medium,
                       child: track.albumArt != null
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.memory(
-                                track.albumArt!,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
+                          ? Image.memory(
+                              track.albumArt!,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
                             )
-                          : const Icon(Icons.music_note, size: 48),
+                          : null,
                     ),
                     Positioned(
                       right: 4,
