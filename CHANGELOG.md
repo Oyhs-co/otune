@@ -7,6 +7,10 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+_Sin cambios todavía._
+
+## [0.5.0-alpha.0+21] - 2026-09-18
+
 ### Added
 
 - Añadida una nueva suite de pruebas con `flutter_test` que cubre 73 casos de dominio, aplicación, repositorios, letras, playback, widgets y permisos, incluyendo generación de cobertura mediante `flutter test --coverage`.
