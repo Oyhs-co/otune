@@ -149,7 +149,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 }
 
                 final tracks = snapshot.data ?? <LibraryTrack>[];
-                final query = ref.read(librarySearchQueryProvider);
+                final query = ref.watch(librarySearchQueryProvider);
                 if (tracks.isEmpty) {
                   return LibraryEmptyState(
                     message: query.isEmpty

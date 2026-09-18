@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
@@ -73,6 +74,6 @@ class MiniPlayer extends ConsumerWidget {
   }
 
   void _navigateToNowPlaying(BuildContext context) {
-    // This will be linked to go_router later
+    context.pushNamed('now-playing');
   }
 }

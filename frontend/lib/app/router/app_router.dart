@@ -4,6 +4,7 @@ import 'package:otune/app/presentation/pages/app_shell.dart';
 import 'package:otune/app/presentation/pages/splash_page.dart';
 import 'package:otune/features/library/presentation/pages/library_page.dart';
 import 'package:otune/features/playback/presentation/pages/home_page.dart';
+import 'package:otune/features/playback/presentation/pages/now_playing_page.dart';
 import 'package:otune/features/settings/presentation/pages/settings_page.dart';
 
 /// Proveedor del enrutador principal de la aplicación.
@@ -49,6 +50,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/now-playing',
+        name: 'now-playing',
+        builder: (context, state) => const NowPlayingPage(),
       ),
     ],
   );

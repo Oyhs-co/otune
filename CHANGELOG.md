@@ -14,7 +14,11 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Añadido placeholder visual para carátulas ausentes y componente de mini reproductor para la experiencia de escucha compacta.
 - Añadido estado vacío de biblioteca con mensaje contextual y botón de escaneo cuando la colección está vacía o no hay resultados de búsqueda.
 - Añadido banner visual para mostrar el progreso del escaneo de carpetas y el resultado final del proceso.
+- Añadida pantalla de reproducción actual con controles de reproducción, barra de progreso y opciones de aleatorio y repetición.
+- Añadida hoja de cola de reproducción con vista lista/detallada, reordenado y acciones de vaciado y eliminación.
+- Añadido mini-player persistente para acceder rápidamente a la pista activa desde el shell principal.
 - Añadidas especificaciones de diseño y UX para navegación adaptativa, estados vacíos de biblioteca y feedback de progreso de escaneo.
+- Documentado el plan de evolución de UX/UI para la aplicación y la hoja de ruta visual futura.
 
 ### Changed
 
@@ -22,11 +26,14 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Reorganizado el diseño de la biblioteca y la capa visual del reproductor para reflejar la nueva experiencia de uso y continuidad del flujo.
 - Actualizada la pantalla de biblioteca para integrar el estado vacío, el buscador y la retroalimentación visual del escaneo de música.
 - Reorganizado el flujo de biblioteca para que la acción de escaneo y el feedback del estado sean más claros y mantenibles.
+- Ajustada la navegación global para incluir la vista de reproducción actual y la persistencia del mini-player dentro del shell.
+- Mejorado el flujo de escucha para abrir rápidamente la cola y la reproducción detallada desde la vista principal.
 
 ### Fixed
 
 - Corregido el tratamiento visual de elementos sin carátula para mantener una apariencia consistente en la biblioteca y el reproductor.
 - Corregido el comportamiento visual de la biblioteca para no mostrar un estado vacío ambiguo cuando la colección está vacía o filtrada.
+- Corregido el flujo de acceso a la reproducción actual para evitar pantallas de audio incompletas y transiciones poco claras entre la cola y el detalle.
 
 ## [0.4.0-alpha.2+20] - 2026-09-17
 

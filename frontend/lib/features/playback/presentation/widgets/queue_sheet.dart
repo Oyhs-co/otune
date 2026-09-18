@@ -1,7 +1,9 @@
 import 'dart:async';
-
+ 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/application/queue_view_provider.dart';
 import 'package:otune/features/playback/domain/entities/playback_session.dart';
@@ -104,18 +106,34 @@ class QueueSheet extends ConsumerWidget {
             const Divider(height: 1),
 
             // Lista de canciones
-            if (items.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Text(
-                    'La cola está vacía',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                if (items.isEmpty)
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.queue_music, size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          Text(
+                            'La cola está vacía',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextButton.icon(
+                            icon: const Icon(Icons.library_music),
+                            label: const Text('Ir a la biblioteca'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              context.goNamed('library');
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              )
-            else
+                  )
+                else
               Expanded(
                 child: _buildQueueList(
                   context,
@@ -156,24 +174,24 @@ class QueueSheet extends ConsumerWidget {
         if (viewMode == QueueViewMode.detailed) {
           return ListTile(
             key: key,
-            leading: item.track.albumArt != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.memory(
-                      item.track.albumArt!,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : Icon(
-                    isCurrent
-                        ? Icons.volume_up_rounded
-                        : Icons.music_note_rounded,
-                    color: isCurrent
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
+                            leading: item.track.albumArt != null
+                                ? ArtworkPlaceholder(
+                                    size: ArtworkSize.small,
+                                    child: Image.memory(
+                                      item.track.albumArt!,
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Icon(
+                                    isCurrent
+                                        ? Icons.volume_up_rounded
+                                        : Icons.music_note_rounded,
+                                    color: isCurrent
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.onSurfaceVariant,
+                                  ),
             title: Text(
               item.track.title,
               style: theme.textTheme.bodyMedium?.copyWith(
