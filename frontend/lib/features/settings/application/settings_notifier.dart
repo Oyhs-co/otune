@@ -24,6 +24,12 @@ class SettingsNotifier extends Notifier<SettingsState> {
       settings: state.settings.copyWith(themePreference: preference),
     );
   }
+
+  void updateBadgeDuration(Duration duration) {
+    state = state.copyWith(
+      settings: state.settings.copyWith(badgeDuration: duration),
+    );
+  }
 }
 
 /// Proveedor del estado de configuración.
