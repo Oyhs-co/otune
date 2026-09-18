@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/playback_modes.dart';
+import 'package:otune/features/lyrics/presentation/widgets/lyrics_widget.dart';
 
 class NowPlayingPage extends ConsumerStatefulWidget {
   const NowPlayingPage({super.key});
@@ -14,6 +15,7 @@ class NowPlayingPage extends ConsumerStatefulWidget {
 class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
   double? _dragPositionMs;
   String? _dragTrackId;
+  bool _showLyrics = false;
 
   static String _formatDuration(Duration duration) {
     final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
@@ -50,6 +52,14 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
         ),
         actions: [
           IconButton(
+            icon: Icon(
+              _showLyrics ? Icons.music_note_rounded : Icons.lyrics_rounded,
+              color: _showLyrics ? theme.colorScheme.primary : null,
+            ),
+            onPressed: () => setState(() => _showLyrics = !_showLyrics),
+            tooltip: _showLyrics ? 'Mostrar portada' : 'Mostrar letras',
+          ),
+          IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {}, // Add track options later
           ),
@@ -58,39 +68,49 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Artwork
-            Center(
-              child: ArtworkPlaceholder(
-                size: ArtworkSize.large,
-                child: track?.albumArt != null
-                    ? Image.memory(track!.albumArt!, fit: BoxFit.cover)
-                    : null,
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: _showLyrics
+                    ? const Center(key: ValueKey('lyrics'), child: LyricsWidget())
+                    : Column(
+                        key: const ValueKey('artwork'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: ArtworkPlaceholder(
+                              size: ArtworkSize.large,
+                              child: track?.albumArt != null
+                                  ? Image.memory(track!.albumArt!, fit: BoxFit.cover)
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(height: 48),
+                          Text(
+                            title,
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            artist,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
               ),
             ),
-            const SizedBox(height: 48),
-            // Track Info
-            Text(
-              title,
-              style: theme.textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              artist,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
             // Progress Slider
             Slider(
               value: sliderPositionMs.clamp(0, maxDurationMs),
@@ -152,6 +172,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

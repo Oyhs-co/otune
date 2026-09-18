@@ -15,9 +15,12 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Añadido estado vacío de biblioteca con mensaje contextual y botón de escaneo cuando la colección está vacía o no hay resultados de búsqueda.
 - Añadido banner visual para mostrar el progreso del escaneo de carpetas y el resultado final del proceso.
 - Añadida pantalla de reproducción actual con controles de reproducción, barra de progreso y opciones de aleatorio y repetición.
+- Añadida vista de letras integrada en la pantalla de reproducción actual con alternancia entre portada y letras.
+- Añadido modo de letras con resaltado de línea activa, auto-scroll y salto por toque de línea para sincronizar la reproducción.
 - Añadida hoja de cola de reproducción con vista lista/detallada, reordenado y acciones de vaciado y eliminación.
 - Añadido mini-player persistente para acceder rápidamente a la pista activa desde el shell principal.
 - Añadidas especificaciones de diseño y UX para navegación adaptativa, estados vacíos de biblioteca y feedback de progreso de escaneo.
+- Añadida especificación del flujo de letras integradas para la experiencia de escucha actual.
 - Documentado el plan de evolución de UX/UI para la aplicación y la hoja de ruta visual futura.
 
 ### Changed
@@ -27,6 +30,8 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Actualizada la pantalla de biblioteca para integrar el estado vacío, el buscador y la retroalimentación visual del escaneo de música.
 - Reorganizado el flujo de biblioteca para que la acción de escaneo y el feedback del estado sean más claros y mantenibles.
 - Ajustada la navegación global para incluir la vista de reproducción actual y la persistencia del mini-player dentro del shell.
+- Actualizada la pantalla de reproducción para mostrar la vista de letras y mantener el control de progreso con seek interactivo.
+- Reorganizado el flujo de sincronización de letras para que el texto siga la pista activa y gestione estados vacíos de forma más clara.
 - Mejorado el flujo de escucha para abrir rápidamente la cola y la reproducción detallada desde la vista principal.
 
 ### Fixed
@@ -34,6 +39,8 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Corregido el tratamiento visual de elementos sin carátula para mantener una apariencia consistente en la biblioteca y el reproductor.
 - Corregido el comportamiento visual de la biblioteca para no mostrar un estado vacío ambiguo cuando la colección está vacía o filtrada.
 - Corregido el flujo de acceso a la reproducción actual para evitar pantallas de audio incompletas y transiciones poco claras entre la cola y el detalle.
+- Corregido el estado sin letras para mostrar una indicación útil cuando la pista no tiene LRC asociado.
+- Corregido el desplazamiento de la lista de letras para mantener visible la línea activa durante la reproducción.
 
 ## [0.4.0-alpha.2+20] - 2026-09-17
 
