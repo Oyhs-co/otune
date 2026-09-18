@@ -183,6 +183,24 @@ class PlaybackQueue {
     );
   }
 
+  /// Restaura un elemento en una posición concreta sin perder el índice actual.
+  PlaybackQueue insertItem(QueueItem item, int index) {
+    if (index < 0 || index > items.length) return this;
+
+    final newItems = List<QueueItem>.from(items)..insert(index, item);
+    var newCurrentIndex = currentIndex;
+    if (currentIndex >= index) newCurrentIndex++;
+    final newShuffle = isShuffle
+        ? _recalculateShuffle(newItems.length, newCurrentIndex)
+        : const <int>[];
+
+    return copyWith(
+      items: List.unmodifiable(newItems),
+      currentIndex: newCurrentIndex,
+      shuffleIndices: newShuffle,
+    );
+  }
+
   /// Vacía la cola y restablece el índice.
   PlaybackQueue clear() {
     return copyWith(

@@ -48,10 +48,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Sin pista seleccionada'), findsOneWidget);
-      expect(
-        find.text('Carga un archivo de audio para comenzar'),
-        findsOneWidget,
-      );
+      expect(find.text('Carga una pista para comenzar'), findsOneWidget);
       expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
       expect(find.byIcon(Icons.skip_previous_rounded), findsOneWidget);
       expect(find.byIcon(Icons.skip_next_rounded), findsOneWidget);

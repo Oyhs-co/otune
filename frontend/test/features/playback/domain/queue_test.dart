@@ -60,6 +60,21 @@ void main() {
       expect(queue.currentIndex, equals(1)); // Se decrementó de 2 a 1
     });
 
+    test('insertItem restores a removed item at its original position', () {
+      var queue = const PlaybackQueue()
+          .addTrack(trackA)
+          .addTrack(trackB)
+          .addTrack(trackC)
+          .moveTo(2);
+      final itemB = queue.items[1];
+
+      queue = queue.removeItem(itemB.id).insertItem(itemB, 1);
+
+      expect(queue.items[1], equals(itemB));
+      expect(queue.currentIndex, equals(2));
+      expect(queue.items.map((item) => item.track), [trackA, trackB, trackC]);
+    });
+
     test('clear resets queue to empty state', () {
       final queue = const PlaybackQueue()
           .addTrack(trackA)
