@@ -1,7 +1,7 @@
 # SPEC: Library Empty States
 
 ## Status
-In Progress
+Implemented
 
 ## Context
 When a user first opens Otune or clears their library, they are met with an empty screen. Without guidance, the user may not know how to start adding music.
@@ -74,13 +74,13 @@ Then a message "No results found for 'NonExistentSong123'" is displayed
 
 | Acceptance Criterion | Evidence / Test | Status |
 |---|---|---|
-| AC-001 | `test/features/library/presentation/library_empty_state_test.dart` | ⬜ |
-| AC-002 | `test/features/library/presentation/library_search_empty_test.dart` | ⬜ |
-| AC-003 | `test/features/library/presentation/library_scan_trigger_test.dart` | ⬜ |
+| AC-001 | `test/features/library/presentation/library_widgets_test.dart` | ✅ |
+| AC-002 | `test/features/library/presentation/library_widgets_test.dart` | ✅ |
+| AC-003 | `test/features/library/application/library_scan_notifier_test.dart` | ✅ |
 
 ## Change history
 
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-17 | Initial spec | Phase 0 Preparation |
-| 2026-09-18 | Status changed to In Progress | Empty and search states are implemented; full widget coverage remains pending |
+| 2026-09-18 | Implemented | Empty and search states plus scan action are covered by existing tests |

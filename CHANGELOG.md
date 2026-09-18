@@ -7,6 +7,21 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+_Sin cambios todavía._
+
+## [0.5.0-alpha.1+22] - 2026-09-18
+
+### Added
+
+- Cerrada la experiencia local de cola con superficie adaptativa, reordenamiento y acciones reversibles.
+- Añadidas especificaciones verificables para cola adaptativa, búsqueda, interacciones de pistas, preferencias y accesibilidad.
+- Añadida acción para limpiar la búsqueda y normalizar consultas con espacios.
+
+### Changed
+
+- Actualizada la versión de Flutter a `0.5.0-alpha.1+22`.
+- Marcadas como implementadas las SPECS de estados de biblioteca, progreso de escaneo y cola funcional.
+
 ### Fixed
 
 - Corregido el flujo de escaneo para continuar ante errores de archivos individuales y reservar el estado crítico para errores de directorio.

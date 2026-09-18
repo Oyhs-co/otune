@@ -1,7 +1,7 @@
 # SPEC: Scan Progress Feedback
 
 ## Status
-In Progress
+Implemented
 
 ## Context
 Scanning a local filesystem for music can take significant time. Currently, the user might not have enough feedback on whether the app is frozen or actively working, and how many files have been processed.
@@ -90,15 +90,15 @@ And a non-intrusive error indicator is shown (or logged)
 
 | Acceptance Criterion | Evidence / Test | Status |
 |---|---|---|
-| AC-001 | `test/features/library/presentation/scan_banner_test.dart` | ⬜ |
-| AC-002 | `test/features/library/presentation/scan_counter_test.dart` | ⬜ |
-| AC-003 | `test/features/library/presentation/scan_path_test.dart` | ⬜ |
-| AC-004 | `test/features/library/presentation/scan_summary_test.dart` | ⬜ |
-| AC-005 | `test/features/library/presentation/scan_error_test.dart` | ⬜ |
+| AC-001 | `frontend/lib/features/library/presentation/widgets/library_scan_banner.dart` | ✅ |
+| AC-002 | `test/features/library/application/library_scan_notifier_test.dart` | ✅ |
+| AC-003 | `frontend/lib/features/library/presentation/widgets/library_scan_banner.dart` | ✅ |
+| AC-004 | `test/features/library/application/library_scan_notifier_test.dart` | ✅ |
+| AC-005 | `test/features/library/application/library_scan_notifier_test.dart` | ✅ |
 
 ## Change history
 
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-17 | Initial spec | Phase 0 Preparation |
-| 2026-09-18 | Status changed to In Progress | Partial implementation now distinguishes file and critical errors |
+| 2026-09-18 | Implemented | Progress, completion, file errors and critical retry are available |

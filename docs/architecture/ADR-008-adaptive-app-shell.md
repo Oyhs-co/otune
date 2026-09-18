@@ -15,7 +15,7 @@ We will implement an `AppShell` using `go_router`'s `StatefulShellRoute`.
    - For screen widths >= 600px: `NavigationRail`.
 3. **State Persistence**: `StatefulShellRoute` will be used to ensure that switching between Library and Settings preserves the state (scroll position, search query, etc.) of each branch.
 4. **Mini-Player**: The `MiniPlayer` will be a persistent child of the `AppShell`, sitting above the bottom navigation or at the bottom of the screen, ensuring the user always has playback control.
-5. **Detail routes**: `Now Playing` remains a dedicated detail route outside the shell. The queue remains a modal surface until an adaptive queue specification is implemented.
+5. **Detail routes**: `Now Playing` remains a dedicated detail route outside the shell. The queue uses the adaptive surface defined in `docs/specs/playback/adaptive-queue.md`: a bottom sheet on narrow screens and a bounded dialog on wide screens.
 
 ## Alternatives considered
 - **Independent Routes**: Current implementation. Too disruptive for a media app.

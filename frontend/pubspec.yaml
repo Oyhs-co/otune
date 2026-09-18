@@ -2,7 +2,7 @@ name: otune
 description: "Reproductor musical multiplataforma, offline-first y orientado a bibliotecas locales."
 publish_to: 'none'
 
-version: 0.5.0-alpha.0+21
+version: 0.5.0-alpha.1+22
 
 environment:
   sdk: ^3.13.3

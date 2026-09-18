@@ -1,7 +1,7 @@
 # SPEC: Queue Management
 
 ## Status
-Proposed
+Implemented
 
 ## Context
 A music player needs to handle a sequence of tracks to be played, allowing the user to organize their listening experience without manual selection for every song.
@@ -90,3 +90,12 @@ And song 1 is moved to position 2
 
 ## Open questions
 - Should we support "Queue as a Playlist" (saved) or only volatile session queues?
+
+## Verification
+
+| Acceptance Criterion | Evidence / Test | Status |
+|---|---|---|
+| AC-QUEUE-001 | `test/features/playback/domain/queue_test.dart` | ✅ |
+| AC-QUEUE-002 | `test/features/playback/domain/queue_test.dart` and `playback_controller_test.dart` | ✅ |
+| AC-QUEUE-003 | `test/features/playback/domain/queue_test.dart` | ✅ |
+| AC-QUEUE-004 | `test/features/playback/application/playback_controller_test.dart` | ✅ |
