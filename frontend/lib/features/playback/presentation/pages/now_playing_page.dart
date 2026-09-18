@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:otune/core/design_system/design_tokens.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/lyrics/presentation/widgets/lyrics_widget.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
@@ -72,135 +73,158 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          children: [
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                child: _showLyrics
-                    ? const Center(
-                        key: ValueKey('lyrics'),
-                        child: LyricsWidget(),
-                      )
-                    : Column(
-                        key: const ValueKey('artwork'),
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Center(
-                            child: ArtworkPlaceholder(
-                              size: ArtworkSize.large,
-                              child: track?.albumArt != null
-                                  ? Image.memory(
-                                      track!.albumArt!,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(height: 48),
-                          Text(
-                            title,
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            artist,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-              ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final horizontalPadding = constraints.maxWidth < 480
+              ? DesignTokens.spaceM
+              : DesignTokens.spaceXL;
+          final contentHeight = constraints.maxHeight < 700 ? 300.0 : 380.0;
+
+          return SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              0,
+              horizontalPadding,
+              DesignTokens.spaceL,
             ),
-            const SizedBox(height: 32),
-            Slider(
-              value: sliderPositionMs.clamp(0, maxDurationMs),
-              max: maxDurationMs,
-              onChanged: (newMs) {
-                setState(() {
-                  _dragTrackId = track?.id;
-                  _dragPositionMs = newMs;
-                });
-              },
-              onChangeEnd: (newMs) async {
-                await controller.seek(Duration(milliseconds: newMs.toInt()));
-                setState(() {
-                  _dragPositionMs = null;
-                  _dragTrackId = null;
-                });
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _formatDuration(position),
-                    style: theme.textTheme.labelMedium,
-                  ),
-                  Text(
-                    _formatDuration(duration),
-                    style: theme.textTheme.labelMedium,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Column(
               children: [
-                IconButton(
-                  icon: Icon(
-                    session.isShuffle ? Icons.shuffle_rounded : Icons.shuffle,
-                    color: session.isShuffle ? theme.colorScheme.primary : null,
+                SizedBox(
+                  height: contentHeight,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _showLyrics
+                        ? const Center(
+                            key: ValueKey('lyrics'),
+                            child: LyricsWidget(),
+                          )
+                        : Column(
+                            key: const ValueKey('artwork'),
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: FittedBox(
+                                  child: ArtworkPlaceholder(
+                                    size: ArtworkSize.large,
+                                    child: track?.albumArt != null
+                                        ? Image.memory(
+                                            track!.albumArt!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: DesignTokens.spaceL),
+                              Text(
+                                title,
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: DesignTokens.spaceS),
+                              Text(
+                                artist,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                   ),
-                  onPressed: controller.toggleShuffle,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.skip_previous_rounded, size: 48),
-                  onPressed: controller.skipPrevious,
+                const SizedBox(height: DesignTokens.spaceM),
+                Slider(
+                  value: sliderPositionMs.clamp(0, maxDurationMs),
+                  max: maxDurationMs,
+                  onChanged: (newMs) {
+                    setState(() {
+                      _dragTrackId = track?.id;
+                      _dragPositionMs = newMs;
+                    });
+                  },
+                  onChangeEnd: (newMs) async {
+                    await controller.seek(
+                      Duration(milliseconds: newMs.toInt()),
+                    );
+                    setState(() {
+                      _dragPositionMs = null;
+                      _dragTrackId = null;
+                    });
+                  },
                 ),
-                FloatingActionButton.large(
-                  onPressed: controller.togglePlayPause,
-                  child: Icon(
-                    session.isPlaying
-                        ? Icons.pause_rounded
-                        : Icons.play_arrow_rounded,
-                    size: 48,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _formatDuration(position),
+                        style: theme.textTheme.labelMedium,
+                      ),
+                      Text(
+                        _formatDuration(duration),
+                        style: theme.textTheme.labelMedium,
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.skip_next_rounded, size: 48),
-                  onPressed: controller.skipNext,
+                const SizedBox(height: DesignTokens.spaceL),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        session.isShuffle
+                            ? Icons.shuffle_rounded
+                            : Icons.shuffle,
+                        color: session.isShuffle
+                            ? theme.colorScheme.primary
+                            : null,
+                      ),
+                      onPressed: controller.toggleShuffle,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.skip_previous_rounded, size: 48),
+                      onPressed: controller.skipPrevious,
+                    ),
+                    FloatingActionButton.large(
+                      onPressed: controller.togglePlayPause,
+                      child: Icon(
+                        session.isPlaying
+                            ? Icons.pause_rounded
+                            : Icons.play_arrow_rounded,
+                        size: 48,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.skip_next_rounded, size: 48),
+                      onPressed: controller.skipNext,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        session.repeatMode == RepeatMode.one
+                            ? Icons.repeat_one_rounded
+                            : Icons.repeat_rounded,
+                        color: session.repeatMode != RepeatMode.off
+                            ? theme.colorScheme.primary
+                            : null,
+                      ),
+                      onPressed: controller.cycleRepeatMode,
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    session.repeatMode == RepeatMode.one
-                        ? Icons.repeat_one_rounded
-                        : Icons.repeat_rounded,
-                    color: session.repeatMode != RepeatMode.off
-                        ? theme.colorScheme.primary
-                        : null,
-                  ),
-                  onPressed: controller.cycleRepeatMode,
-                ),
+                const SizedBox(height: DesignTokens.spaceL),
               ],
             ),
-            const SizedBox(height: 32),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
