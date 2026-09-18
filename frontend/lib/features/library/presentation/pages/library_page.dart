@@ -8,9 +8,9 @@ import 'package:otune/features/library/application/library_view_provider.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
 import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
-import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
 import 'package:otune/features/library/presentation/widgets/library_empty_state.dart';
 import 'package:otune/features/library/presentation/widgets/library_scan_banner.dart';
+import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
@@ -99,7 +99,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 const LibraryScanBanner(),
@@ -132,7 +132,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Error al cargar la biblioteca: ${snapshot.error}',

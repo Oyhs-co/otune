@@ -10,9 +10,9 @@ enum ArtworkSize {
 
 class ArtworkPlaceholder extends StatelessWidget {
   const ArtworkPlaceholder({
-    super.key,
     required this.size,
     this.child,
+    super.key,
   });
 
   final ArtworkSize size;
@@ -36,7 +36,7 @@ class ArtworkPlaceholder extends StatelessWidget {
       height: _dimension,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(DesignTokens.radiusM),
       ),
       child: child ?? _buildDefaultPlaceholder(context),
@@ -48,7 +48,10 @@ class ArtworkPlaceholder extends StatelessWidget {
       child: Icon(
         Icons.music_note,
         size: _dimension * 0.4,
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .onSurfaceVariant
+            .withValues(alpha: 0.5),
       ),
     );
   }

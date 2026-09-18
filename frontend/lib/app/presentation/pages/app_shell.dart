@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:otune/core/design_system/design_tokens.dart';
 import 'package:otune/features/playback/presentation/widgets/mini_player.dart';
 
 class AppShell extends ConsumerWidget {
-  const AppShell({super.key, required this.navigationShell});
+  const AppShell({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool isWideScreen = MediaQuery.of(context).size.width >= 600;
+    final isWideScreen = MediaQuery.of(context).size.width >= 600;
 
     return Scaffold(
       body: Row(
@@ -19,7 +18,7 @@ class AppShell extends ConsumerWidget {
           if (isWideScreen)
             NavigationRail(
               selectedIndex: navigationShell.currentIndex,
-              onDestinationSelected: (index) => navigationShell.goBranch(index),
+              onDestinationSelected: navigationShell.goBranch,
               labelType: NavigationRailLabelType.all,
               destinations: const [
                 NavigationRailDestination(
@@ -41,7 +40,7 @@ class AppShell extends ConsumerWidget {
               children: [
                 navigationShell,
                 Positioned(
-                  bottom: isWideScreen ? 0 : 80, // Above bottom nav if mobile
+                  bottom: isWideScreen ? 0 : 80,
                   left: 0,
                   right: 0,
                   child: const MiniPlayer(),
@@ -54,7 +53,7 @@ class AppShell extends ConsumerWidget {
       bottomNavigationBar: !isWideScreen
           ? BottomNavigationBar(
               currentIndex: navigationShell.currentIndex,
-              onTap: (index) => navigationShell.goBranch(index),
+              onTap: navigationShell.goBranch,
               items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_filled),

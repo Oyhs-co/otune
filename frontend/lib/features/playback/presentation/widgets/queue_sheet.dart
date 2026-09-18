@@ -112,7 +112,11 @@ class QueueSheet extends ConsumerWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.queue_music, size: 64, color: Colors.grey),
+                          const Icon(
+                            Icons.queue_music,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(height: 16),
                           Text(
                             'La cola está vacía',

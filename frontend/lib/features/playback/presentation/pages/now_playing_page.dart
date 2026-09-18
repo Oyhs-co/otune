@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
+import 'package:otune/features/lyrics/presentation/widgets/lyrics_widget.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/playback_modes.dart';
-import 'package:otune/features/lyrics/presentation/widgets/lyrics_widget.dart';
 
 class NowPlayingPage extends ConsumerStatefulWidget {
   const NowPlayingPage({super.key});
@@ -34,13 +34,23 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
 
     final track = session.currentTrack;
     final title = track?.title ?? 'Sin pista seleccionada';
-    final artist = track?.artist ?? (track == null ? 'Carga una pista para comenzar' : 'Artista desconocido');
+    final artist =
+        track?.artist ??
+        (track == null
+            ? 'Carga una pista para comenzar'
+            : 'Artista desconocido');
 
     final position = session.position;
     final duration = session.duration;
-    final maxDurationMs = duration.inMilliseconds > 0 ? duration.inMilliseconds.toDouble() : 1.0;
-    final currentPosMs = position.inMilliseconds.clamp(0, maxDurationMs.toInt()).toDouble();
-    final sliderPositionMs = _dragTrackId == track?.id ? (_dragPositionMs ?? currentPosMs) : currentPosMs;
+    final maxDurationMs = duration.inMilliseconds > 0
+        ? duration.inMilliseconds.toDouble()
+        : 1.0;
+    final currentPosMs = position.inMilliseconds
+        .clamp(0, maxDurationMs.toInt())
+        .toDouble();
+    final sliderPositionMs = _dragTrackId == track?.id
+        ? (_dragPositionMs ?? currentPosMs)
+        : currentPosMs;
 
     return Scaffold(
       appBar: AppBar(
@@ -59,21 +69,21 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
             onPressed: () => setState(() => _showLyrics = !_showLyrics),
             tooltip: _showLyrics ? 'Mostrar portada' : 'Mostrar letras',
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {}, // Add track options later
-          ),
+          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 32),
         child: Column(
           children: [
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 child: _showLyrics
-                    ? const Center(key: ValueKey('lyrics'), child: LyricsWidget())
+                    ? const Center(
+                        key: ValueKey('lyrics'),
+                        child: LyricsWidget(),
+                      )
                     : Column(
                         key: const ValueKey('artwork'),
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -82,7 +92,10 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                             child: ArtworkPlaceholder(
                               size: ArtworkSize.large,
                               child: track?.albumArt != null
-                                  ? Image.memory(track!.albumArt!, fit: BoxFit.cover)
+                                  ? Image.memory(
+                                      track!.albumArt!,
+                                      fit: BoxFit.cover,
+                                    )
                                   : null,
                             ),
                           ),
@@ -111,7 +124,6 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
               ),
             ),
             const SizedBox(height: 32),
-            // Progress Slider
             Slider(
               value: sliderPositionMs.clamp(0, maxDurationMs),
               max: maxDurationMs,
@@ -134,13 +146,18 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(_formatDuration(position), style: theme.textTheme.labelMedium),
-                  Text(_formatDuration(duration), style: theme.textTheme.labelMedium),
+                  Text(
+                    _formatDuration(position),
+                    style: theme.textTheme.labelMedium,
+                  ),
+                  Text(
+                    _formatDuration(duration),
+                    style: theme.textTheme.labelMedium,
+                  ),
                 ],
               ),
             ),
             const SizedBox(height: 32),
-            // Main Controls
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -153,20 +170,29 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_previous_rounded, size: 48),
-                  onPressed: () => controller.skipPrevious(),
+                  onPressed: controller.skipPrevious,
                 ),
                 FloatingActionButton.large(
-                  onPressed: () => controller.togglePlayPause(),
-                  child: Icon(session.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 48),
+                  onPressed: controller.togglePlayPause,
+                  child: Icon(
+                    session.isPlaying
+                        ? Icons.pause_rounded
+                        : Icons.play_arrow_rounded,
+                    size: 48,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.skip_next_rounded, size: 48),
-                  onPressed: () => controller.skipNext(),
+                  onPressed: controller.skipNext,
                 ),
                 IconButton(
                   icon: Icon(
-                    session.repeatMode == RepeatMode.one ? Icons.repeat_one_rounded : Icons.repeat_rounded,
-                    color: session.repeatMode != RepeatMode.off ? theme.colorScheme.primary : null,
+                    session.repeatMode == RepeatMode.one
+                        ? Icons.repeat_one_rounded
+                        : Icons.repeat_rounded,
+                    color: session.repeatMode != RepeatMode.off
+                        ? theme.colorScheme.primary
+                        : null,
                   ),
                   onPressed: controller.cycleRepeatMode,
                 ),

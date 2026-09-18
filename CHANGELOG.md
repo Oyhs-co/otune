@@ -25,6 +25,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Changed
 
+- Desactivada globalmente la regla `unnecessary_type_name_in_constructor` para mantener la convención actual de constructores también en el análisis del pipeline de CI.
 - Actualizada la navegación de la app para integrar el shell adaptativo y la estructura de rutas actualizada.
 - Reorganizado el diseño de la biblioteca y la capa visual del reproductor para reflejar la nueva experiencia de uso y continuidad del flujo.
 - Actualizada la pantalla de biblioteca para integrar el estado vacío, el buscador y la retroalimentación visual del escaneo de música.

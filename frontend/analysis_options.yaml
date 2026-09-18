@@ -23,5 +23,6 @@ analyzer:
 
 linter:
   rules:
+    unnecessary_type_name_in_constructor: false
     public_member_api_docs: false
 

@@ -9,20 +9,23 @@ class LibraryScanBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scanState = ref.watch(libraryScanProvider);
 
-    if (!scanState.isScanning && scanState.status == 'No se ha realizado ningún escaneo') {
+    if (!scanState.isScanning &&
+        scanState.status == 'No se ha realizado ningún escaneo') {
       return const SizedBox.shrink();
     }
 
-    final bool isError = scanState.status.startsWith('Error:');
-    final bool isComplete = scanState.status.startsWith('Escaneo completado');
+    final isError = scanState.status.startsWith('Error:');
+    final isComplete = scanState.status.startsWith('Escaneo completado');
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isError 
-            ? Theme.of(context).colorScheme.errorContainer 
-            : (isComplete ? Colors.green.shade100 : Theme.of(context).colorScheme.primaryContainer),
+        color: isError
+            ? Theme.of(context).colorScheme.errorContainer
+            : isComplete
+                ? Colors.green.shade100
+                : Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -54,8 +57,8 @@ class LibraryScanBanner extends ConsumerWidget {
                 Text(
                   scanState.status,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (scanState.isScanning)

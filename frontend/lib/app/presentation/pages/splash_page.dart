@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 /// Página de carga inicial (Splash Screen).
 class SplashPage extends ConsumerStatefulWidget {
-  const new({super.key});
+  const SplashPage({super.key});
 
   @override
   ConsumerState<SplashPage> createState() => _SplashPageState();

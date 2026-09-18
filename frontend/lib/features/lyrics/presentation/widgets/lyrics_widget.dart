@@ -21,9 +21,7 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
 
   void _scrollToActiveLine(int index) {
     if (index < 0) return;
-    // Simple approximation: each line is roughly 40-60 pixels
-    // For a more precise approach, we'd need GlobalKeys or a fixed height
-    final double offset = index * 45.0;
+    final offset = index * 45.0;
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         offset - (MediaQuery.of(context).size.height / 3),
@@ -38,7 +36,6 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
     final state = ref.watch(lyricsSyncProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
 
-    // Trigger scroll when the active line changes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToActiveLine(state.currentLineIndex);
     });
@@ -48,7 +45,11 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.music_note, size: 64, color: Theme.of(context).colorScheme.outline),
+            Icon(
+              Icons.music_note,
+              size: 64,
+              color: Theme.of(context).colorScheme.outline,
+            ),
             const SizedBox(height: 16),
             Text(
               'No hay letras disponibles para esta pista',
@@ -65,7 +66,9 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
 
     return ListView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.3), // Offset for centering
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.3,
+      ),
       itemCount: lines.length,
       itemBuilder: (context, index) {
         final line = lines[index];
@@ -82,8 +85,11 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               color: isActive
                   ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).textTheme.bodyMedium?.color
-                        ?.withValues(alpha: 0.6),
+                  : Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withValues(alpha: 0.6),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
