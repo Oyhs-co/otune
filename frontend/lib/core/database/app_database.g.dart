@@ -99,6 +99,17 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _albumArtMeta = const VerificationMeta(
+    'albumArt',
+  );
+  @override
+  late final GeneratedColumn<Uint8List> albumArt = GeneratedColumn<Uint8List>(
+    'album_art',
+    aliasedName,
+    true,
+    type: DriftSqlType.blob,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -110,6 +121,7 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
     trackNumber,
     durationMs,
     fileFormat,
+    albumArt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -186,6 +198,12 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
         fileFormat.isAcceptableOrUnknown(data['file_format']!, _fileFormatMeta),
       );
     }
+    if (data.containsKey('album_art')) {
+      context.handle(
+        _albumArtMeta,
+        albumArt.isAcceptableOrUnknown(data['album_art']!, _albumArtMeta),
+      );
+    }
     return context;
   }
 
@@ -231,6 +249,10 @@ class $TracksTable extends Tracks with TableInfo<$TracksTable, Track> {
         DriftSqlType.string,
         data['${effectivePrefix}file_format'],
       ),
+      albumArt: attachedDatabase.typeMapping.read(
+        DriftSqlType.blob,
+        data['${effectivePrefix}album_art'],
+      ),
     );
   }
 
@@ -250,6 +272,7 @@ class Track extends DataClass implements Insertable<Track> {
   final int? trackNumber;
   final int? durationMs;
   final String? fileFormat;
+  final Uint8List? albumArt;
   const Track({
     required this.id,
     required this.title,
@@ -260,6 +283,7 @@ class Track extends DataClass implements Insertable<Track> {
     this.trackNumber,
     this.durationMs,
     this.fileFormat,
+    this.albumArt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -284,6 +308,9 @@ class Track extends DataClass implements Insertable<Track> {
     }
     if (!nullToAbsent || fileFormat != null) {
       map['file_format'] = Variable<String>(fileFormat);
+    }
+    if (!nullToAbsent || albumArt != null) {
+      map['album_art'] = Variable<Uint8List>(albumArt);
     }
     return map;
   }
@@ -311,6 +338,9 @@ class Track extends DataClass implements Insertable<Track> {
       fileFormat: fileFormat == null && nullToAbsent
           ? const Value.absent()
           : Value(fileFormat),
+      albumArt: albumArt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(albumArt),
     );
   }
 
@@ -329,6 +359,7 @@ class Track extends DataClass implements Insertable<Track> {
       trackNumber: serializer.fromJson<int?>(json['trackNumber']),
       durationMs: serializer.fromJson<int?>(json['durationMs']),
       fileFormat: serializer.fromJson<String?>(json['fileFormat']),
+      albumArt: serializer.fromJson<Uint8List?>(json['albumArt']),
     );
   }
   @override
@@ -344,6 +375,7 @@ class Track extends DataClass implements Insertable<Track> {
       'trackNumber': serializer.toJson<int?>(trackNumber),
       'durationMs': serializer.toJson<int?>(durationMs),
       'fileFormat': serializer.toJson<String?>(fileFormat),
+      'albumArt': serializer.toJson<Uint8List?>(albumArt),
     };
   }
 
@@ -357,6 +389,7 @@ class Track extends DataClass implements Insertable<Track> {
     Value<int?> trackNumber = const Value.absent(),
     Value<int?> durationMs = const Value.absent(),
     Value<String?> fileFormat = const Value.absent(),
+    Value<Uint8List?> albumArt = const Value.absent(),
   }) => Track(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -367,6 +400,7 @@ class Track extends DataClass implements Insertable<Track> {
     trackNumber: trackNumber.present ? trackNumber.value : this.trackNumber,
     durationMs: durationMs.present ? durationMs.value : this.durationMs,
     fileFormat: fileFormat.present ? fileFormat.value : this.fileFormat,
+    albumArt: albumArt.present ? albumArt.value : this.albumArt,
   );
   Track copyWithCompanion(TracksCompanion data) {
     return Track(
@@ -387,6 +421,7 @@ class Track extends DataClass implements Insertable<Track> {
       fileFormat: data.fileFormat.present
           ? data.fileFormat.value
           : this.fileFormat,
+      albumArt: data.albumArt.present ? data.albumArt.value : this.albumArt,
     );
   }
 
@@ -401,7 +436,8 @@ class Track extends DataClass implements Insertable<Track> {
           ..write('albumArtist: $albumArtist, ')
           ..write('trackNumber: $trackNumber, ')
           ..write('durationMs: $durationMs, ')
-          ..write('fileFormat: $fileFormat')
+          ..write('fileFormat: $fileFormat, ')
+          ..write('albumArt: $albumArt')
           ..write(')'))
         .toString();
   }
@@ -417,6 +453,7 @@ class Track extends DataClass implements Insertable<Track> {
     trackNumber,
     durationMs,
     fileFormat,
+    $driftBlobEquality.hash(albumArt),
   );
   @override
   bool operator ==(Object other) =>
@@ -430,7 +467,8 @@ class Track extends DataClass implements Insertable<Track> {
           other.albumArtist == this.albumArtist &&
           other.trackNumber == this.trackNumber &&
           other.durationMs == this.durationMs &&
-          other.fileFormat == this.fileFormat);
+          other.fileFormat == this.fileFormat &&
+          $driftBlobEquality.equals(other.albumArt, this.albumArt));
 }
 
 class TracksCompanion extends UpdateCompanion<Track> {
@@ -443,6 +481,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
   final Value<int?> trackNumber;
   final Value<int?> durationMs;
   final Value<String?> fileFormat;
+  final Value<Uint8List?> albumArt;
   final Value<int> rowid;
   const TracksCompanion({
     this.id = const Value.absent(),
@@ -454,6 +493,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.trackNumber = const Value.absent(),
     this.durationMs = const Value.absent(),
     this.fileFormat = const Value.absent(),
+    this.albumArt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TracksCompanion.insert({
@@ -466,6 +506,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     this.trackNumber = const Value.absent(),
     this.durationMs = const Value.absent(),
     this.fileFormat = const Value.absent(),
+    this.albumArt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        title = Value(title),
@@ -480,6 +521,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     Expression<int>? trackNumber,
     Expression<int>? durationMs,
     Expression<String>? fileFormat,
+    Expression<Uint8List>? albumArt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -492,6 +534,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
       if (trackNumber != null) 'track_number': trackNumber,
       if (durationMs != null) 'duration_ms': durationMs,
       if (fileFormat != null) 'file_format': fileFormat,
+      if (albumArt != null) 'album_art': albumArt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -506,6 +549,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
     Value<int?>? trackNumber,
     Value<int?>? durationMs,
     Value<String?>? fileFormat,
+    Value<Uint8List?>? albumArt,
     Value<int>? rowid,
   }) {
     return TracksCompanion(
@@ -518,6 +562,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
       trackNumber: trackNumber ?? this.trackNumber,
       durationMs: durationMs ?? this.durationMs,
       fileFormat: fileFormat ?? this.fileFormat,
+      albumArt: albumArt ?? this.albumArt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -552,6 +597,9 @@ class TracksCompanion extends UpdateCompanion<Track> {
     if (fileFormat.present) {
       map['file_format'] = Variable<String>(fileFormat.value);
     }
+    if (albumArt.present) {
+      map['album_art'] = Variable<Uint8List>(albumArt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -570,6 +618,7 @@ class TracksCompanion extends UpdateCompanion<Track> {
           ..write('trackNumber: $trackNumber, ')
           ..write('durationMs: $durationMs, ')
           ..write('fileFormat: $fileFormat, ')
+          ..write('albumArt: $albumArt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -597,6 +646,7 @@ typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
   Value<int?> trackNumber,
   Value<int?> durationMs,
   Value<String?> fileFormat,
+  Value<Uint8List?> albumArt,
   Value<int> rowid,
 });
 typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
@@ -609,6 +659,7 @@ typedef $$TracksTableUpdateCompanionBuilder = TracksCompanion Function({
   Value<int?> trackNumber,
   Value<int?> durationMs,
   Value<String?> fileFormat,
+  Value<Uint8List?> albumArt,
   Value<int> rowid,
 });
 
@@ -663,6 +714,11 @@ class $$TracksTableFilterComposer
 
   ColumnFilters<String> get fileFormat => $composableBuilder(
     column: $table.fileFormat,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<Uint8List> get albumArt => $composableBuilder(
+    column: $table.albumArt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -720,6 +776,11 @@ class $$TracksTableOrderingComposer
     column: $table.fileFormat,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<Uint8List> get albumArt => $composableBuilder(
+    column: $table.albumArt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$TracksTableAnnotationComposer
@@ -765,6 +826,9 @@ class $$TracksTableAnnotationComposer
     column: $table.fileFormat,
     builder: (column) => column,
   );
+
+  GeneratedColumn<Uint8List> get albumArt =>
+      $composableBuilder(column: $table.albumArt, builder: (column) => column);
 }
 
 class $$TracksTableTableManager
@@ -804,6 +868,7 @@ class $$TracksTableTableManager
                 Value<int?> trackNumber = const Value.absent(),
                 Value<int?> durationMs = const Value.absent(),
                 Value<String?> fileFormat = const Value.absent(),
+                Value<Uint8List?> albumArt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TracksCompanion(
                 id: id,
@@ -815,6 +880,7 @@ class $$TracksTableTableManager
                 trackNumber: trackNumber,
                 durationMs: durationMs,
                 fileFormat: fileFormat,
+                albumArt: albumArt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -828,6 +894,7 @@ class $$TracksTableTableManager
                 Value<int?> trackNumber = const Value.absent(),
                 Value<int?> durationMs = const Value.absent(),
                 Value<String?> fileFormat = const Value.absent(),
+                Value<Uint8List?> albumArt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => TracksCompanion.insert(
                 id: id,
@@ -839,6 +906,7 @@ class $$TracksTableTableManager
                 trackNumber: trackNumber,
                 durationMs: durationMs,
                 fileFormat: fileFormat,
+                albumArt: albumArt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/library/domain/entities/library_view_mode.dart';
@@ -40,7 +41,7 @@ class LibraryTrackList extends ConsumerWidget {
       itemBuilder: (context, index) {
         final track = tracks[index];
         final isPlaying =
-          session.currentTrack?.id == track.id && session.isPlaying;
+            session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
           leading: track.albumArt != null
@@ -104,7 +105,7 @@ class LibraryTrackList extends ConsumerWidget {
       itemBuilder: (context, index) {
         final track = tracks[index];
         final isPlaying =
-          session.currentTrack?.id == track.id && session.isPlaying;
+            session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
           leading: track.albumArt != null
@@ -187,7 +188,7 @@ class LibraryTrackList extends ConsumerWidget {
       itemBuilder: (context, index) {
         final track = tracks[index];
         final isPlaying =
-          session.currentTrack?.id == track.id && session.isPlaying;
+            session.currentTrack?.id == track.id && session.isPlaying;
 
         return GestureDetector(
           onTap: () => onTrackSelected(track),
@@ -222,9 +223,7 @@ class LibraryTrackList extends ConsumerWidget {
                           if (value == 'play_next') {
                             unawaited(
                               ref
-                                  .read(
-                                    playbackControllerProvider.notifier,
-                                  )
+                                  .read(playbackControllerProvider.notifier)
                                   .playNext(TrackRef.fromLibraryTrack(track)),
                             );
                           } else if (value == 'add_to_queue') {
@@ -255,7 +254,7 @@ class LibraryTrackList extends ConsumerWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
-                    color: isPlaying
+                  color: isPlaying
                       ? Theme.of(context).colorScheme.primary
                       : null,
                 ),

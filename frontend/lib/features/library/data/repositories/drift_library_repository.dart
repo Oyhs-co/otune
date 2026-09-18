@@ -30,6 +30,7 @@ class DriftLibraryRepository implements LibraryRepository {
         trackNumber: Value(track.trackNumber),
         durationMs: Value(track.duration?.inMilliseconds),
         fileFormat: Value(track.fileFormat),
+        albumArt: Value(track.albumArt),
       ),
     );
   }

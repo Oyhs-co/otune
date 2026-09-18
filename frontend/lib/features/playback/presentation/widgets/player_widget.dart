@@ -36,10 +36,11 @@ class _PlayerWidgetState extends ConsumerState<PlayerWidget> {
 
     final track = session.currentTrack;
     final title = track?.title ?? 'Sin pista seleccionada';
-    final artist = track?.artist ??
-      (track == null
-        ? 'Carga un archivo de audio para comenzar'
-        : 'Artista desconocido');
+    final artist =
+        track?.artist ??
+        (track == null
+            ? 'Carga un archivo de audio para comenzar'
+            : 'Artista desconocido');
 
     final position = session.position;
     final duration = session.duration;
@@ -51,8 +52,8 @@ class _PlayerWidgetState extends ConsumerState<PlayerWidget> {
         .clamp(0, maxDurationMs.toInt())
         .toDouble();
     final sliderPositionMs = _dragTrackId == track?.id
-      ? (_dragPositionMs ?? currentPosMs)
-      : currentPosMs;
+        ? (_dragPositionMs ?? currentPosMs)
+        : currentPosMs;
 
     final isShuffle = session.isShuffle;
     final repeatMode = session.repeatMode;
@@ -62,37 +63,37 @@ class _PlayerWidgetState extends ConsumerState<PlayerWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-            // Arte / Icono de carátula
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.shadow.withValues(alpha: 0.1),
-                    blurRadius: 16,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: track?.albumArt != null
-                    ? Image.memory(
-                        track!.albumArt!,
-                        width: 140,
-                        height: 140,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.music_note_rounded,
-                        size: 64,
-                        color: theme.colorScheme.primary,
-                      ),
-              ),
+          // Arte / Icono de carátula
+          Container(
+            width: 140,
+            height: 140,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: track?.albumArt != null
+                  ? Image.memory(
+                      track!.albumArt!,
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      Icons.music_note_rounded,
+                      size: 64,
+                      color: theme.colorScheme.primary,
+                    ),
+            ),
+          ),
 
           const SizedBox(height: 24),
 
@@ -129,9 +130,7 @@ class _PlayerWidgetState extends ConsumerState<PlayerWidget> {
               });
             },
             onChangeEnd: (newMs) {
-              unawaited(
-                _commitSeek(controller, newMs, trackId: _dragTrackId),
-              );
+              unawaited(_commitSeek(controller, newMs, trackId: _dragTrackId));
             },
           ),
           Padding(

@@ -18,6 +18,7 @@ class Tracks extends Table {
   IntColumn get trackNumber => integer().nullable()();
   IntColumn get durationMs => integer().nullable()();
   TextColumn get fileFormat => text().nullable()();
+  BlobColumn get albumArt => blob().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -31,7 +32,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   Future<List<LibraryTrack>> getAllTracks() {
     return select(tracks).map((row) {
@@ -47,6 +48,7 @@ class AppDatabase extends _$AppDatabase {
             ? Duration(milliseconds: row.durationMs!)
             : null,
         fileFormat: row.fileFormat,
+        albumArt: row.albumArt,
       );
     }).get();
   }
@@ -80,6 +82,7 @@ class AppDatabase extends _$AppDatabase {
                 ? Duration(milliseconds: row.durationMs!)
                 : null,
             fileFormat: row.fileFormat,
+            albumArt: row.albumArt,
           );
         })
         .get();

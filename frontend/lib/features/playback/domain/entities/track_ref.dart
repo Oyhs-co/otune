@@ -17,6 +17,9 @@ class TrackRef {
     this.albumArt,
   });
 
+  // Keep the explicit constructor type name for compatibility with
+  // existing callers.
+  // ignore: unnecessary_type_name_in_constructor
   factory TrackRef.fromLibraryTrack(LibraryTrack track) {
     return TrackRef(
       id: track.id,

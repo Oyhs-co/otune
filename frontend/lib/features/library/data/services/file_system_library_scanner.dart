@@ -62,6 +62,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
             trackNumber: metadata?.trackNumber,
             duration: metadata?.duration,
             fileFormat: p.extension(file.path),
+            albumArt: metadata?.imageMetadata?.data,
           );
 
           // Persist in database
@@ -76,6 +77,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
               trackNumber: Value(track.trackNumber),
               durationMs: Value(track.duration?.inMilliseconds),
               fileFormat: Value(track.fileFormat),
+              albumArt: Value(track.albumArt),
             ),
           );
 

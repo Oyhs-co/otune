@@ -18,7 +18,7 @@ _Sin cambios todavía._
   cola desde las vistas de biblioteca.
 - Añadido resaltado visual de la pista que se está reproduciendo.
 - Añadido soporte para mostrar el icono de la aplicación y la firma `By
-  Oyhs-Co` en la información de Otune.
+Oyhs-Co` en la información de Otune.
 
 ### Changed
 
@@ -26,6 +26,8 @@ _Sin cambios todavía._
   ajustes y pantalla principal.
 - Ampliado el modelo de referencia de pista para conservar la carátula del
   álbum junto con sus metadatos.
+- Persistidas las carátulas de álbum en la biblioteca local mediante una migración del esquema de Drift/SQLite.
+- Ampliada la selección de archivos locales para leer título, artista, álbum, duración y carátula desde los metadatos del archivo.
 - Añadidos controles de silencio y ajustes de reproducción en el reproductor.
 - Actualizados los textos de versión de la aplicación a `0.4.0-alpha.2+20`.
 

@@ -3,11 +3,7 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
 /// Control visual para seleccionar la preferencia de tema.
 class ThemePreferenceTile extends StatelessWidget {
-  const new({
-    required this.preference,
-    required this.onChanged,
-    super.key,
-  });
+  const new({required this.preference, required this.onChanged, super.key});
 
   final ThemePreference preference;
   final ValueChanged<ThemePreference> onChanged;

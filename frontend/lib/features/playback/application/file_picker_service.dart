@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_metadata/media_metadata.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 import 'package:uuid/uuid.dart';
 
@@ -45,10 +46,17 @@ class SystemLocalAudioPicker implements LocalAudioPicker {
         ? fileName.substring(0, fileName.lastIndexOf('.'))
         : fileName;
 
+    final metadata = await MediaMetadata.read(path);
+
     return TrackRef(
       id: const Uuid().v4(),
       uri: Uri.file(path).toString(),
-      title: title,
+      title: metadata?.title ?? title,
+      artist: metadata?.artist,
+      album: metadata?.album,
+      albumArtist: metadata?.albumArtist,
+      duration: metadata?.duration,
+      albumArt: metadata?.imageMetadata?.data,
     );
   }
 }

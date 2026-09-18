@@ -4,18 +4,12 @@ import 'package:otune/features/lyrics/domain/entities/lyrics.dart';
 
 /// Estado de la letra activa en la reproducción actual.
 class ActiveLyricsState {
-  const new({
-    this.lyrics,
-    this.currentLineIndex = -1,
-  });
+  const new({this.lyrics, this.currentLineIndex = -1});
 
   final Lyrics? lyrics;
   final int currentLineIndex;
 
-  ActiveLyricsState copyWith({
-    Lyrics? lyrics,
-    int? currentLineIndex,
-  }) {
+  ActiveLyricsState copyWith({Lyrics? lyrics, int? currentLineIndex}) {
     return ActiveLyricsState(
       lyrics: lyrics ?? this.lyrics,
       currentLineIndex: currentLineIndex ?? this.currentLineIndex,
@@ -36,10 +30,7 @@ class LyricsSyncNotifier extends Notifier<ActiveLyricsState> {
 
     if (!ref.mounted) return;
 
-    state = state.copyWith(
-      lyrics: lyrics,
-      currentLineIndex: -1,
-    );
+    state = state.copyWith(lyrics: lyrics, currentLineIndex: -1);
   }
 
   void updatePosition(Duration position) {
@@ -70,5 +61,5 @@ class LyricsSyncNotifier extends Notifier<ActiveLyricsState> {
 /// Proveedor del sincronizador de letras.
 final lyricsSyncProvider =
     NotifierProvider<LyricsSyncNotifier, ActiveLyricsState>(
-  LyricsSyncNotifier.new,
-);
+      LyricsSyncNotifier.new,
+    );
