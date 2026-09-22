@@ -12,12 +12,19 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Proveedor `badgeProvider`: servicio global para mostrar badges de estado programáticamente desde cualquier widget.
 - Configuración de duración de badges en Ajustes (1, 2, 3, 5, 10 segundos).
 - Badges reemplazan SnackBars en toda la app (permisos, cola vaciada, eliminación de elementos con acción de deshacer).
+- Proveedor `badgeDefaultDurationProvider`: la duración configurada en Ajustes controla la caducidad real de los badges (contrato settings→badges).
+- Enum `BadgeDurationOption` en el dominio de settings con catálogo cerrado de duraciones válidas.
+- Pruebas de duración efectiva de badges y de rechazo de valores inválidos.
 
 ### Changed
+- El título de cada sección vive en el `AppShell` ('Mi Biblioteca', 'Ajustes'); `SettingsPage` y `LibraryPage` ya no montan AppBar propio (elimina el doble AppBar apilado en móvil).
+- La caducidad de los badges la programa únicamente `BadgeNotifier`; `StateBadge` ya no mantiene temporizadores propios.
+- CI ejecuta análisis y pruebas también en la rama `Improve-UX-UI`.
 - Pantalla de reproducción actual (`NowPlayingPage`): objetos distribuidos uniformemente en el espacio disponible usando `MainAxisAlignment.spaceEvenly`. Área de artwork/letras limitada por token `DesignTokens.artworkLarge`.
 
 ### Fixed
-- _Sin cambios todavía._
+- Arreglados los tests de navegación y ajustes que esperaban contratos visuales anteriores ('Mi Biblioteca' y título de Ajustes en SettingsPage).
+- El feedback de cambio de duración de badges sólo se muestra cuando la preferencia se aplicó realmente.
 
 ## [0.5.0-alpha.1+22] - 2026-09-18
 
