@@ -82,23 +82,23 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
               children: [
                 Expanded(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(
+                    constraints: const BoxConstraints(
                       maxHeight: DesignTokens.artworkLarge,
                     ),
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: _showLyrics
-                          ? Center(
+                          ? const Center(
                               key: ValueKey('lyrics'),
-                              child: const LyricsWidget(),
+                              child: LyricsWidget(),
                             )
-                          : Column(
+                          : const Column(
                               key: ValueKey('artwork'),
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 ArtworkPanel(size: 300, isLarge: true),
-                                const SizedBox(height: DesignTokens.spaceL),
-                                const TrackInfo(isHeadline: true),
+                                SizedBox(height: DesignTokens.spaceL),
+                                TrackInfo(isHeadline: true),
                               ],
                             ),
                     ),

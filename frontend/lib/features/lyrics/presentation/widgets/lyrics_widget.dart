@@ -85,11 +85,8 @@ class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
               fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               color: isActive
                   ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.color
-                      ?.withValues(alpha: 0.6),
+                  : Theme.of(context).textTheme.bodyMedium?.color
+                        ?.withValues(alpha: 0.6),
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

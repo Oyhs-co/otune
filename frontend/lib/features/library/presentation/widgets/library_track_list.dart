@@ -1,5 +1,5 @@
 import 'dart:async';
- 
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';

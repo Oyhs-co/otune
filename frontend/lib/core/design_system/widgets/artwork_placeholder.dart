@@ -2,18 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:otune/core/design_system/design_tokens.dart';
 
 /// Define los tamaños estándar para las portadas de música en la aplicación.
-enum ArtworkSize {
-  small,
-  medium,
-  large,
-}
+enum ArtworkSize { small, medium, large }
 
 class ArtworkPlaceholder extends StatelessWidget {
-  const ArtworkPlaceholder({
-    required this.size,
-    this.child,
-    super.key,
-  });
+  const ArtworkPlaceholder({required this.size, this.child, super.key});
 
   final ArtworkSize size;
   final Widget? child;
@@ -48,9 +40,7 @@ class ArtworkPlaceholder extends StatelessWidget {
       child: Icon(
         Icons.music_note,
         size: _dimension * 0.4,
-        color: Theme.of(context)
-            .colorScheme
-            .onSurfaceVariant
+        color: Theme.of(context).colorScheme.onSurfaceVariant
             .withValues(alpha: 0.5),
       ),
     );

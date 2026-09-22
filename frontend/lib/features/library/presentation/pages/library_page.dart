@@ -7,7 +7,6 @@ import 'package:otune/features/library/application/library_search_provider.dart'
 import 'package:otune/features/library/application/library_view_provider.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
-import 'package:otune/features/library/presentation/widgets/library_app_bar_actions.dart';
 import 'package:otune/features/library/presentation/widgets/library_empty_state.dart';
 import 'package:otune/features/library/presentation/widgets/library_scan_banner.dart';
 import 'package:otune/features/library/presentation/widgets/library_track_list.dart';
@@ -69,23 +68,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isWideScreen = MediaQuery.of(context).size.width >= 600;
-    final scanState = ref.watch(libraryScanProvider);
     final viewMode = ref.watch(libraryViewModeProvider);
 
+    // El shell adaptativo proporciona el AppBar con el título de sección y
+    // las acciones de biblioteca; la página no monta barras propias.
     return Scaffold(
-      appBar: AppBar(
-        actions: isWideScreen
-            ? [
-                LibraryAppBarActions(
-                  isScanning: scanState.isScanning,
-                  onViewModeChanged: (mode) =>
-                      ref.read(libraryViewModeProvider.notifier).mode = mode,
-                  onScanFolder: _handleScanFolder,
-                ),
-              ]
-            : null,
-      ),
       body: Column(
         children: [
           Padding(
