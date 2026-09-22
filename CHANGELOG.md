@@ -7,7 +7,97 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-_Sin cambios todavía._
+### Added
+- _Sin cambios todavía._
+
+### Changed
+- _Sin cambios todavía._
+
+### Fixed
+- _Sin cambios todavía._
+
+## [0.6.0-alpha.0+23] - 2026-09-22
+
+### Added
+- Widget `StateBadge`: indicador de estado reutilizable con timeout configurable, auto-dismiss tras duración definida, animación de entrada/salida y soporte para acciones (ej: Deshacer).
+- Proveedor `badgeProvider`: servicio global para mostrar badges de estado programáticamente desde cualquier widget.
+- Configuración de duración de badges en Ajustes (1, 2, 3, 5, 10 segundos).
+- Badges reemplazan SnackBars en toda la app (permisos, cola vaciada, eliminación de elementos con acción de deshacer).
+- Proveedor `badgeDefaultDurationProvider`: la duración configurada en Ajustes controla la caducidad real de los badges (contrato settings→badges).
+- Enum `BadgeDurationOption` en el dominio de settings con catálogo cerrado de duraciones válidas.
+- Pruebas de duración efectiva de badges y de rechazo de valores inválidos.
+
+### Changed
+- Actualizada la versión de la aplicación a `0.6.0-alpha.0+23`.
+- El título de cada sección vive en el `AppShell` ('Mi Biblioteca', 'Ajustes'); `SettingsPage` y `LibraryPage` ya no montan AppBar propio (elimina el doble AppBar apilado en móvil).
+- La caducidad de los badges la programa únicamente `BadgeNotifier`; `StateBadge` ya no mantiene temporizadores propios.
+- CI ejecuta análisis y pruebas también en la rama `Improve-UX-UI`.
+- Pantalla de reproducción actual (`NowPlayingPage`): objetos distribuidos uniformemente en el espacio disponible usando `MainAxisAlignment.spaceEvenly`. Área de artwork/letras limitada por token `DesignTokens.artworkLarge`.
+
+### Fixed
+- Arreglados los tests de navegación y ajustes que esperaban contratos visuales anteriores ('Mi Biblioteca' y título de Ajustes en SettingsPage).
+- El feedback de cambio de duración de badges sólo se muestra cuando la preferencia se aplicó realmente.
+
+## [0.5.0-alpha.1+22] - 2026-09-18
+
+### Added
+
+- Cerrada la experiencia local de cola con superficie adaptativa, reordenamiento y acciones reversibles.
+- Añadidas especificaciones verificables para cola adaptativa, búsqueda, interacciones de pistas, preferencias y accesibilidad.
+- Añadida acción para limpiar la búsqueda y normalizar consultas con espacios.
+
+### Changed
+
+- Actualizada la versión de Flutter a `0.5.0-alpha.1+22`.
+- Marcadas como implementadas las SPECS de estados de biblioteca, progreso de escaneo y cola funcional.
+
+### Fixed
+
+- Corregido el flujo de escaneo para continuar ante errores de archivos individuales y reservar el estado crítico para errores de directorio.
+- Añadido reintento real para errores de carga de la biblioteca y para el último escaneo fallido.
+- Alineada la documentación del shell adaptativo con sus tres destinos persistentes actuales y la ruta independiente de reproducción actual.
+- Corregido el layout del shell para reservar espacio al mini-player y evitar solapamientos con el contenido o la navegación inferior.
+- Añadidas pruebas de navegación móvil, navegación amplia y continuidad de reproducción al cambiar de sección.
+- Convertida Biblioteca en la pantalla principal y eliminada la navegación duplicada desde la antigua pantalla de Inicio.
+
+## [0.5.0-alpha.0+21] - 2026-09-18
+
+### Added
+
+- Añadida una nueva suite de pruebas con `flutter_test` que cubre 73 casos de dominio, aplicación, repositorios, letras, playback, widgets y permisos, incluyendo generación de cobertura mediante `flutter test --coverage`.
+- Añadida la shell adaptativa de la aplicación con navegación responsive y estructura visual centralizada.
+- Añadido sistema de tokens de diseño para colores, espacios, radios y tipografía de la interfaz.
+- Añadido placeholder visual para carátulas ausentes y componente de mini reproductor para la experiencia de escucha compacta.
+- Añadido estado vacío de biblioteca con mensaje contextual y botón de escaneo cuando la colección está vacía o no hay resultados de búsqueda.
+- Añadido banner visual para mostrar el progreso del escaneo de carpetas y el resultado final del proceso.
+- Añadida pantalla de reproducción actual con controles de reproducción, barra de progreso y opciones de aleatorio y repetición.
+- Añadida vista de letras integrada en la pantalla de reproducción actual con alternancia entre portada y letras.
+- Añadido modo de letras con resaltado de línea activa, auto-scroll y salto por toque de línea para sincronizar la reproducción.
+- Añadida hoja de cola de reproducción con vista lista/detallada, reordenado y acciones de vaciado y eliminación.
+- Añadido mini-player persistente para acceder rápidamente a la pista activa desde el shell principal.
+- Añadidas especificaciones de diseño y UX para navegación adaptativa, estados vacíos de biblioteca y feedback de progreso de escaneo.
+- Añadida especificación del flujo de letras integradas para la experiencia de escucha actual.
+- Documentado el plan de evolución de UX/UI para la aplicación y la hoja de ruta visual futura.
+
+### Changed
+
+- Desactivada globalmente la regla `unnecessary_type_name_in_constructor` para mantener la convención actual de constructores también en el análisis del pipeline de CI.
+- Actualizada la navegación de la app para integrar el shell adaptativo y la estructura de rutas actualizada.
+- Reorganizado el diseño de la biblioteca y la capa visual del reproductor para reflejar la nueva experiencia de uso y continuidad del flujo.
+- Actualizada la pantalla de biblioteca para integrar el estado vacío, el buscador y la retroalimentación visual del escaneo de música.
+- Reorganizado el flujo de biblioteca para que la acción de escaneo y el feedback del estado sean más claros y mantenibles.
+- Ajustada la navegación global para incluir la vista de reproducción actual y la persistencia del mini-player dentro del shell.
+- Actualizada la pantalla de reproducción para mostrar la vista de letras y mantener el control de progreso con seek interactivo.
+- Reorganizado el flujo de sincronización de letras para que el texto siga la pista activa y gestione estados vacíos de forma más clara.
+- Mejorado el flujo de escucha para abrir rápidamente la cola y la reproducción detallada desde la vista principal.
+
+### Fixed
+
+- Corregido el tratamiento visual de elementos sin carátula para mantener una apariencia consistente en la biblioteca y el reproductor.
+- Corregido el comportamiento visual de la biblioteca para no mostrar un estado vacío ambiguo cuando la colección está vacía o filtrada.
+- Corregido el flujo de acceso a la reproducción actual para evitar pantallas de audio incompletas y transiciones poco claras entre la cola y el detalle.
+- Corregido el estado sin letras para mostrar una indicación útil cuando la pista no tiene LRC asociado.
+- Corregido el desplazamiento de la lista de letras para mantener visible la línea activa durante la reproducción.
 
 ## [0.4.0-alpha.2+20] - 2026-09-17
 

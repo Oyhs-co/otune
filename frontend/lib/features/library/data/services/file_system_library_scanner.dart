@@ -86,6 +86,7 @@ class FileSystemLibraryScanner implements LibraryScanner {
           yield ScanError(
             message: 'Failed to read metadata: $e',
             path: file.path,
+            kind: ScanErrorKind.file,
           );
         }
       }

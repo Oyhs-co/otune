@@ -212,5 +212,24 @@ void main() {
         expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
       },
     );
+
+    test(
+      'restoreQueueItem restores an item without changing playback',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.setQueue([track1, track2]);
+        final session = container.read(playbackControllerProvider);
+        final removed = session.queueItems[1];
+
+        controller
+          ..removeFromQueue(removed.id)
+          ..restoreQueueItem(removed, 1);
+
+        final restored = container.read(playbackControllerProvider);
+        expect(restored.queueItems[1], equals(removed));
+        expect(restored.currentTrack, equals(track1));
+        expect(restored.isPlaying, isTrue);
+      },
+    );
   });
 }

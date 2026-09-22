@@ -8,7 +8,7 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
 /// Widget raíz de la aplicación Otune.
 class OtuneApp extends ConsumerWidget {
-  const new({super.key});
+  const OtuneApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

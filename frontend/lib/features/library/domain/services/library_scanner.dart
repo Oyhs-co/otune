@@ -31,8 +31,15 @@ class ScanComplete extends ScanEvent {
   final int totalTracksIndexed;
 }
 
+enum ScanErrorKind { file, critical }
+
 class ScanError extends ScanEvent {
-  new({required this.message, required this.path});
+  new({
+    required this.message,
+    required this.path,
+    this.kind = ScanErrorKind.critical,
+  });
   final String message;
   final String path;
+  final ScanErrorKind kind;
 }

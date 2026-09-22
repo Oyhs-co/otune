@@ -1,17 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/lyrics/application/lyrics_sync_notifier.dart';
+import 'package:otune/features/playback/application/playback_controller.dart';
 
-class LyricsWidget extends ConsumerWidget {
-  const new({super.key});
+class LyricsWidget extends ConsumerStatefulWidget {
+  const LyricsWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LyricsWidget> createState() => _LyricsWidgetState();
+}
+
+class _LyricsWidgetState extends ConsumerState<LyricsWidget> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToActiveLine(int index) {
+    if (index < 0) return;
+    final offset = index * 45.0;
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        offset - (MediaQuery.of(context).size.height / 3),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(lyricsSyncProvider);
+    final controller = ref.read(playbackControllerProvider.notifier);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToActiveLine(state.currentLineIndex);
+    });
 
     if (state.lyrics == null || state.lyrics!.isEmpty) {
-      return const Center(
-        child: Text('No hay letras disponibles para esta pista'),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.music_note,
+              size: 64,
+              color: Theme.of(context).colorScheme.outline,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No hay letras disponibles para esta pista',
+              style: TextStyle(color: Theme.of(context).colorScheme.outline),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       );
     }
 
@@ -19,26 +65,33 @@ class LyricsWidget extends ConsumerWidget {
     final currentIndex = state.currentLineIndex;
 
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      controller: _scrollController,
+      padding: EdgeInsets.symmetric(
+        vertical: MediaQuery.of(context).size.height * 0.3,
+      ),
       itemCount: lines.length,
       itemBuilder: (context, index) {
         final line = lines[index];
         final isActive = index == currentIndex;
 
-        return AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 200),
-          style: TextStyle(
-            fontSize: isActive ? 24 : 18,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).textTheme.bodyMedium?.color
-                      ?.withValues(alpha: 0.6),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Text(line.text, textAlign: TextAlign.center),
+        return InkWell(
+          onTap: () async {
+            await controller.seek(line.timestamp);
+          },
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 200),
+            style: TextStyle(
+              fontSize: isActive ? 24 : 18,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).textTheme.bodyMedium?.color
+                        ?.withValues(alpha: 0.6),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              child: Text(line.text, textAlign: TextAlign.center),
+            ),
           ),
         );
       },

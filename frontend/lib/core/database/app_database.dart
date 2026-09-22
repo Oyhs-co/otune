@@ -28,7 +28,6 @@ class Tracks extends Table {
 class AppDatabase extends _$AppDatabase {
   new() : super(_openConnection());
   // Keep the named constructor explicit because it is used as a test seam.
-  // ignore: unnecessary_type_name_in_constructor
   AppDatabase.forTesting(super.e);
 
   @override

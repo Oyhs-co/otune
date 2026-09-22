@@ -14,7 +14,7 @@ Regla principal:
 
 ## Stack objetivo
 
-- Flutter 3.47.x / Dart 3.12.x como base de desarrollo.
+- Flutter 3.47.x / Dart 3.13.x como base de desarrollo.
 - `media_kit` como motor de reproducción inicial.
 - Riverpod 3 para estado e inyección de dependencias.
 - Drift/SQLite para persistencia local.

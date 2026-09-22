@@ -7,6 +7,7 @@ import 'package:otune/features/playback/application/playback_providers.dart';
 import 'package:otune/features/playback/domain/entities/playback_session.dart';
 import 'package:otune/features/playback/domain/entities/playback_state.dart';
 import 'package:otune/features/playback/domain/entities/queue.dart';
+import 'package:otune/features/playback/domain/entities/queue_item.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 import 'package:otune/features/playback/domain/services/audio_engine.dart';
 
@@ -120,6 +121,19 @@ class PlaybackController extends Notifier<PlaybackSession> {
       } else {
         unawaited(_engine.stop());
       }
+    }
+  }
+
+  /// Restaura un elemento eliminado por una acción reversible de la UI.
+  void restoreQueueItem(QueueItem item, int index) {
+    state = state.copyWith(queue: state.queue.insertItem(item, index));
+  }
+
+  /// Restaura una instantánea de cola para deshacer un vaciado.
+  Future<void> restoreQueue(PlaybackQueue queue) async {
+    state = state.copyWith(queue: queue);
+    if (queue.currentItem != null) {
+      await _loadAndPlayCurrent();
     }
   }
 

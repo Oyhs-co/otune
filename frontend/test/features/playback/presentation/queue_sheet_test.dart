@@ -58,6 +58,9 @@ void main() {
 
       expect(find.text('Cola de reproducción (1)'), findsOneWidget);
       expect(find.text('Song Beta'), findsNothing);
+
+      container.dispose();
+      await tester.pump();
     });
   });
 }
