@@ -3,7 +3,7 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
 /// Estado de la configuración de la aplicación.
 class SettingsState {
-  const new({AppSettings? settings})
+  const SettingsState({AppSettings? settings})
     : settings = settings ?? const AppSettings();
   final AppSettings settings;
 
@@ -25,9 +25,14 @@ class SettingsNotifier extends Notifier<SettingsState> {
     );
   }
 
+  /// Actualiza la duración de los badges sólo con valores del catálogo
+  /// soportado. Las duraciones fuera del catálogo se ignoran para no
+  /// representar estados de preferencia inválidos.
   void updateBadgeDuration(Duration duration) {
+    final option = BadgeDurationOption.tryFromSeconds(duration.inSeconds);
+    if (option == null) return;
     state = state.copyWith(
-      settings: state.settings.copyWith(badgeDuration: duration),
+      settings: state.settings.copyWith(badgeDuration: option.toDuration()),
     );
   }
 }

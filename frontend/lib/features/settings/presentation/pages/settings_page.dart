@@ -2,24 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/providers/badge_provider.dart';
 import 'package:otune/features/settings/application/settings_notifier.dart';
+import 'package:otune/features/settings/domain/entities/app_settings.dart';
 import 'package:otune/features/settings/presentation/widgets/theme_preference_tile.dart';
 
 class SettingsPage extends ConsumerWidget {
-  const new({super.key});
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themePreference = ref
-        .watch(settingsProvider)
-        .settings
-        .themePreference;
-    final badgeDuration = ref.watch(settingsProvider).settings.badgeDuration;
+    final settings = ref.watch(settingsProvider).settings;
+    final badgeDuration = settings.badgeDuration;
 
     return Scaffold(
       body: ListView(
         children: [
           ThemePreferenceTile(
-            preference: themePreference,
+            preference: settings.themePreference,
             onChanged: ref.read(settingsProvider.notifier).updateTheme,
           ),
           const Divider(),
@@ -30,10 +28,18 @@ class SettingsPage extends ConsumerWidget {
             trailing: DropdownButton<int>(
               value: badgeDuration.inSeconds,
               onChanged: (value) {
-                if (value != null) {
-                  ref
-                      .read(settingsProvider.notifier)
-                      .updateBadgeDuration(Duration(seconds: value));
+                if (value == null) return;
+                ref
+                    .read(settingsProvider.notifier)
+                    .updateBadgeDuration(Duration(seconds: value));
+                final applied =
+                    ref
+                        .read(settingsProvider)
+                        .settings
+                        .badgeDuration
+                        .inSeconds ==
+                    value;
+                if (applied) {
                   ref
                       .read(badgeProvider.notifier)
                       .show(
@@ -41,13 +47,20 @@ class SettingsPage extends ConsumerWidget {
                             'Duración de badge actualizada a $value segundos',
                         type: BadgeType.success,
                       );
+                } else {
+                  ref
+                      .read(badgeProvider.notifier)
+                      .show(
+                        message: 'No se pudo actualizar la duración',
+                        type: BadgeType.error,
+                      );
                 }
               },
-              items: [1, 2, 3, 5, 10]
+              items: BadgeDurationOption.values
                   .map(
-                    (seconds) => DropdownMenuItem(
-                      value: seconds,
-                      child: Text('$seconds segundos'),
+                    (option) => DropdownMenuItem(
+                      value: option.seconds,
+                      child: Text('${option.seconds} segundos'),
                     ),
                   )
                   .toList(),

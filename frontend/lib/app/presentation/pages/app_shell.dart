@@ -11,6 +11,19 @@ import 'package:otune/features/library/application/state/library_scan_state.dart
 import 'package:otune/features/library/presentation/widgets/library_app_bar_actions.dart';
 import 'package:otune/features/playback/presentation/widgets/mini_player.dart';
 
+/// Título de la sección activa. El nombre de cada sección vive en el shell:
+/// las páginas no repiten su propio AppBar de título.
+String _sectionTitle(int index) {
+  switch (index) {
+    case 0:
+      return 'Mi Biblioteca';
+    case 1:
+      return 'Ajustes';
+    default:
+      return 'Otune';
+  }
+}
+
 class AppShell extends ConsumerWidget {
   const AppShell({required this.navigationShell, super.key});
 
@@ -50,7 +63,7 @@ class AppShell extends ConsumerWidget {
       appBar: isWideScreen
           ? null
           : AppBar(
-              title: const Text('Otune'),
+              title: Text(_sectionTitle(navigationShell.currentIndex)),
               centerTitle: false,
               actions: isLibraryPage
                   ? [
@@ -145,7 +158,6 @@ class _BadgeStack extends ConsumerWidget {
                 type: badge.type,
                 backgroundColor: badge.backgroundColor,
                 textColor: badge.textColor,
-                duration: badge.duration,
                 onDismissed: () {
                   ref.read(badgeProvider.notifier).dismiss(badge.id);
                 },

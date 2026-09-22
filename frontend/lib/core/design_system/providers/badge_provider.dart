@@ -7,6 +7,15 @@ import 'package:uuid/uuid.dart';
 
 export 'package:otune/core/design_system/widgets/state_badge.dart';
 
+/// Duración por defecto de los badges de estado.
+///
+/// El núcleo no conoce las preferencias del usuario: la capa de composición
+/// (`app`) sobrescribe este provider para que el valor configurado en
+/// Ajustes controle el comportamiento real de los badges.
+final badgeDefaultDurationProvider = Provider<Duration>((ref) {
+  return const Duration(seconds: 3);
+});
+
 final badgeProvider = NotifierProvider<BadgeNotifier, List<BadgeItem>>(
   BadgeNotifier.new,
 );
@@ -38,6 +47,8 @@ class BadgeItem {
 class BadgeNotifier extends Notifier<List<BadgeItem>> {
   final Map<String, Timer> _timers = {};
 
+  static const _uuid = Uuid();
+
   @override
   List<BadgeItem> build() {
     ref.onDispose(() {
@@ -59,15 +70,18 @@ class BadgeNotifier extends Notifier<List<BadgeItem>> {
     String? actionLabel,
     VoidCallback? onActionPressed,
   }) {
-    final duration_ = duration ?? const Duration(seconds: 3);
-    final id = Uuid().v4();
+    // Única fuente de verdad de la caducidad: el temporizador del notificador.
+    // StateBadge no programa timers propios.
+    final fallback = ref.read(badgeDefaultDurationProvider);
+    final effectiveDuration = duration ?? fallback;
+    final id = _uuid.v4();
     final item = BadgeItem(
       id: id,
       message: message,
       type: type,
       backgroundColor: backgroundColor,
       textColor: textColor,
-      duration: duration_,
+      duration: effectiveDuration,
       onDismissed: onDismissed,
       actionLabel: actionLabel,
       onActionPressed: onActionPressed,
@@ -75,7 +89,7 @@ class BadgeNotifier extends Notifier<List<BadgeItem>> {
 
     state = [...state, item];
 
-    _timers[id] = Timer(duration_, () {
+    _timers[id] = Timer(effectiveDuration, () {
       dismiss(id);
     });
   }

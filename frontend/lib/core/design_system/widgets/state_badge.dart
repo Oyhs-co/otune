@@ -33,19 +33,13 @@ class StateBadge extends StatefulWidget {
 }
 
 class _StateBadgeState extends State<StateBadge> {
-  late final Timer _timer;
   bool _visible = true;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer(widget.duration, _dismiss);
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
+    // La caducidad la programa el notificador que emite el badge:
+    // este widget no mantiene temporizadores propios.
   }
 
   void _dismiss() {
