@@ -2,9 +2,9 @@ name: CI - Quality Check
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, Improve-UX-UI ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, Improve-UX-UI ]
 
 jobs:
   quality:
