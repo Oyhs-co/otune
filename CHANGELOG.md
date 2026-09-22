@@ -8,6 +8,17 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ## [Unreleased]
 
 ### Added
+- _Sin cambios todavía._
+
+### Changed
+- _Sin cambios todavía._
+
+### Fixed
+- _Sin cambios todavía._
+
+## [0.6.0-alpha.0+23] - 2026-09-22
+
+### Added
 - Widget `StateBadge`: indicador de estado reutilizable con timeout configurable, auto-dismiss tras duración definida, animación de entrada/salida y soporte para acciones (ej: Deshacer).
 - Proveedor `badgeProvider`: servicio global para mostrar badges de estado programáticamente desde cualquier widget.
 - Configuración de duración de badges en Ajustes (1, 2, 3, 5, 10 segundos).
@@ -17,6 +28,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Pruebas de duración efectiva de badges y de rechazo de valores inválidos.
 
 ### Changed
+- Actualizada la versión de la aplicación a `0.6.0-alpha.0+23`.
 - El título de cada sección vive en el `AppShell` ('Mi Biblioteca', 'Ajustes'); `SettingsPage` y `LibraryPage` ya no montan AppBar propio (elimina el doble AppBar apilado en móvil).
 - La caducidad de los badges la programa únicamente `BadgeNotifier`; `StateBadge` ya no mantiene temporizadores propios.
 - CI ejecuta análisis y pruebas también en la rama `Improve-UX-UI`.
