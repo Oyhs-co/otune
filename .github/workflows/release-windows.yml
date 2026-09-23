@@ -1,0 +1,109 @@
+name: CD - Windows Releases
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        default: debug
+        options:
+          - debug
+          - release
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build & Release Windows App
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.3'
+          channel: stable
+          cache: true
+
+      - name: Install Dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Generate Code
+        working-directory: frontend
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Resolve Version and Release Info
+        id: release_info
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+            RELEASE_NAME="Otune ${TAG_NAME} [Windows]"
+            IS_PRERELEASE="false"
+            if [[ "$TAG_NAME" =~ - ]]; then
+              IS_PRERELEASE="true"
+            fi
+            ENV_BUILD="release"
+          else
+            RAW_VERSION=$(grep '^version:' frontend/pubspec.yaml | sed 's/version: //' | cut -d '+' -f 1 | tr -d '[:space:]')
+            ENV_BUILD="${{ inputs.environment }}"
+            TAG_NAME="v${RAW_VERSION}-windows-manual-${ENV_BUILD}"
+            RELEASE_NAME="Otune v${RAW_VERSION} [Windows Manual Build - ${ENV_BUILD^^}]"
+            IS_PRERELEASE="true"
+          fi
+
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "release_name=${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=${IS_PRERELEASE}" >> "$GITHUB_OUTPUT"
+          echo "env_build=${ENV_BUILD}" >> "$GITHUB_OUTPUT"
+
+      - name: Analyze
+        working-directory: frontend
+        run: flutter analyze
+
+      - name: Test
+        working-directory: frontend
+        run: flutter test
+
+      - name: Build Windows App
+        working-directory: frontend
+        shell: bash
+        run: |
+          if [ "${{ steps.release_info.outputs.env_build }}" = "debug" ]; then
+            flutter build windows --debug
+          else
+            flutter build windows --release
+          fi
+
+      - name: Zip Bundle
+        shell: pwsh
+        run: |
+          if ("${{ steps.release_info.outputs.env_build }}" = "debug") {
+            $dir = "frontend/build/windows/x64/runner/Debug"
+          } else {
+            $dir = "frontend/build/windows/x64/runner/Release"
+          }
+          Compress-Archive -Path "$dir/*" -DestinationPath "otune-windows-x64.zip" -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag_name }}
+          name: ${{ steps.release_info.outputs.release_name }}
+          prerelease: ${{ steps.release_info.outputs.is_prerelease == 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+          files: |
+            otune-windows-x64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
