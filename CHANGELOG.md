@@ -10,6 +10,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 ## [0.6.1-alpha.0+24] - 2026-09-22
 
 ### Added
+
 - Persistencia de la sesión de reproducción (Sprint 2): la cola, el índice activo, los modos (aleatorio/repetición) y la posición de la pista se guardan con debounce y se restauran al arrancar la aplicación sin iniciar audio automáticamente.
 - Nueva tabla `playback_snapshots` (migración de esquema v2 → v3) y repositorio `DriftPlaybackSnapshotRepository` para la instantánea de sesión.
 - Entidad de dominio `PlaybackSnapshot` con conversión validada hacia `PlaybackQueue` (índice fuera de rango → 0, snapshot vacío → sesión limpia).
@@ -20,14 +21,20 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Pipeline de CD para Windows (`release-windows.yml`): build automático en tags `v*` y manual por entorno, con artefacto `otune-windows-x64.zip` y release en GitHub Releases.
 
 ### Changed
+
 - `SettingsNotifier` hidrata las preferencias desde el repositorio en el arranque (`hydrate()`) y persiste cada cambio; los fallos de almacenamiento se registran sin revertir el estado en memoria.
 - `PlaybackController` programa el guardado del snapshot en cada mutación de cola y en los cambios de posición/estado del motor.
 - Pantalla de reproducción actual (`NowPlayingPage`): layout reorganizado en zona flexible (portada/letras + info de pista) con barra de progreso y controles anclados abajo; el artwork escala según el ancho y alto disponibles evitando overflow en pantallas bajas.
 - Actualizada la versión de la aplicación a `0.6.1-alpha.0+24`.
 
+### Fixed
+
+- `NowPlayingPage`: el layout ahora usa `SafeArea` para respetar la barra de estado y navegación de Android, espaciado escalable mediante `DesignTokens.scale` (1.0–1.5 según ancho de pantalla) y artwork más grande en pantallas anchas (token `artworkXLarge`).
+
 ## [0.6.0-alpha.0+23] - 2026-09-22
 
 ### Added
+
 - Widget `StateBadge`: indicador de estado reutilizable con timeout configurable, auto-dismiss tras duración definida, animación de entrada/salida y soporte para acciones (ej: Deshacer).
 - Proveedor `badgeProvider`: servicio global para mostrar badges de estado programáticamente desde cualquier widget.
 - Configuración de duración de badges en Ajustes (1, 2, 3, 5, 10 segundos).
@@ -37,6 +44,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Pruebas de duración efectiva de badges y de rechazo de valores inválidos.
 
 ### Changed
+
 - Actualizada la versión de la aplicación a `0.6.0-alpha.0+23`.
 - El título de cada sección vive en el `AppShell` ('Mi Biblioteca', 'Ajustes'); `SettingsPage` y `LibraryPage` ya no montan AppBar propio (elimina el doble AppBar apilado en móvil).
 - La caducidad de los badges la programa únicamente `BadgeNotifier`; `StateBadge` ya no mantiene temporizadores propios.
@@ -44,6 +52,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Pantalla de reproducción actual (`NowPlayingPage`): objetos distribuidos uniformemente en el espacio disponible usando `MainAxisAlignment.spaceEvenly`. Área de artwork/letras limitada por token `DesignTokens.artworkLarge`.
 
 ### Fixed
+
 - Arreglados los tests de navegación y ajustes que esperaban contratos visuales anteriores ('Mi Biblioteca' y título de Ajustes en SettingsPage).
 - El feedback de cambio de duración de badges sólo se muestra cuando la preferencia se aplicó realmente.
 
