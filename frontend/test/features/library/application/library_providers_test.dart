@@ -25,6 +25,9 @@ class FakeLibraryRepository implements LibraryRepository {
 
   @override
   Future<void> deleteTrack(String id) async {}
+
+  @override
+  Future<LibraryTrack?> getTrackById(String id) async => null;
 }
 
 void main() {
