@@ -4,7 +4,7 @@ Otune es un reproductor musical local, offline-first y multiplataforma. Está
 orientado a personas que prefieren conservar y reproducir sus propias
 bibliotecas de audio sin depender de servicios de streaming.
 
-Versión actual: `0.6.0-alpha.0+23`
+Versión actual: `0.6.1-alpha.0+24`
 
 El proyecto se encuentra en desarrollo activo. La versión actual prioriza un
 núcleo funcional de biblioteca local, reproducción, cola y letras LRC antes de
@@ -46,6 +46,11 @@ incorporar funciones avanzadas.
 
 ### Aplicación y configuración
 
+- Persistencia de la sesión de reproducción: cola, pista activa, modos y
+  posición se restauran al arrancar la aplicación sin iniciar audio
+  automáticamente.
+- Persistencia de preferencias: el tema y la duración de los badges
+  sobreviven al reinicio de la aplicación.
 - Pantalla splash inicial.
 - Navegación entre reproductor, biblioteca y ajustes.
 - Tema claro, oscuro o dependiente del sistema.
@@ -57,8 +62,6 @@ incorporar funciones avanzadas.
 
 - La aplicación funciona principalmente con archivos locales; no ofrece
   streaming externo, cuentas ni sincronización en la nube.
-- Las preferencias de tema se mantienen en el estado de la sesión actual; la
-  persistencia de preferencias todavía está pendiente.
 - La asociación de letras utiliza la convención de nombre de archivo. La
   asociación manual todavía no modifica una relación persistente.
 - El soporte de letras actual es por línea; no incluye letras embebidas ni
@@ -71,7 +74,6 @@ incorporar funciones avanzadas.
 Las siguientes capacidades pertenecen a fases posteriores y no forman parte
 de la versión actual:
 
-- Persistencia de preferencias y configuración de usuario.
 - Mejoras de organización por álbumes y artistas.
 - Edición o asociación persistente de letras.
 - Karaoke, visualizadores y experiencias de DJ.
@@ -88,6 +90,7 @@ de la versión actual:
 - **Reproducción:** `media_kit` y `media_kit_libs_audio`.
 - **Navegación:** `go_router`.
 - **Archivos:** `file_picker` y APIs locales de plataforma.
+- **Preferencias:** `shared_preferences`.
 - **Calidad:** `very_good_analysis`, `flutter_test` y `mocktail`.
 
 ## Arquitectura
@@ -144,6 +147,16 @@ Si se modifican modelos que requieren generación de código:
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+## Releases y CD
+
+Los artefactos se generan automáticamente con GitHub Actions:
+
+- **Android** (`.github/workflows/release.yml`): APK/AAB firmados en cada tag
+  `vX.Y.Z` (o ejecución manual por entorno debug/staging/prod).
+- **Windows** (`.github/workflows/release-windows.yml`): zip portable x64 en
+  cada tag `vX.Y.Z` (o ejecución manual debug/release), publicado en
+  [GitHub Releases](../../releases).
 
 ## Documentación
 

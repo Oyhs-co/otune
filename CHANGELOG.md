@@ -7,14 +7,23 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.6.1-alpha.0+24] - 2026-09-22
+
 ### Added
-- _Sin cambios todavía._
+- Persistencia de la sesión de reproducción (Sprint 2): la cola, el índice activo, los modos (aleatorio/repetición) y la posición de la pista se guardan con debounce y se restauran al arrancar la aplicación sin iniciar audio automáticamente.
+- Nueva tabla `playback_snapshots` (migración de esquema v2 → v3) y repositorio `DriftPlaybackSnapshotRepository` para la instantánea de sesión.
+- Entidad de dominio `PlaybackSnapshot` con conversión validada hacia `PlaybackQueue` (índice fuera de rango → 0, snapshot vacío → sesión limpia).
+- Interfaz de dominio `SettingsRepository` y adaptador `SharedPreferencesSettingsRepository`: el tema y la duración de badges sobreviven al reinicio de la aplicación.
+- `SessionRestoreWatcher`: restauración de sesión al arrancar y guardado inmediato del snapshot al pasar a segundo plano (`paused`/`detached`).
+- SPEC `docs/specs/playback/session-persistence.md` con criterios de aceptación y pruebas asociadas.
+- Pruebas de persistencia de settings, roundtrip del snapshot en Drift en memoria, restauración sin autoplay y layout de `NowPlayingPage` en pantallas estrechas y amplias.
+- Pipeline de CD para Windows (`release-windows.yml`): build automático en tags `v*` y manual por entorno, con artefacto `otune-windows-x64.zip` y release en GitHub Releases.
 
 ### Changed
-- _Sin cambios todavía._
-
-### Fixed
-- _Sin cambios todavía._
+- `SettingsNotifier` hidrata las preferencias desde el repositorio en el arranque (`hydrate()`) y persiste cada cambio; los fallos de almacenamiento se registran sin revertir el estado en memoria.
+- `PlaybackController` programa el guardado del snapshot en cada mutación de cola y en los cambios de posición/estado del motor.
+- Pantalla de reproducción actual (`NowPlayingPage`): layout reorganizado en zona flexible (portada/letras + info de pista) con barra de progreso y controles anclados abajo; el artwork escala según el ancho y alto disponibles evitando overflow en pantallas bajas.
+- Actualizada la versión de la aplicación a `0.6.1-alpha.0+24`.
 
 ## [0.6.0-alpha.0+23] - 2026-09-22
 
