@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/design_tokens.dart';
@@ -9,6 +11,15 @@ import 'package:otune/features/playback/presentation/widgets/playback_progress.d
 import 'package:otune/features/playback/presentation/widgets/queue_sheet.dart';
 import 'package:otune/features/playback/presentation/widgets/track_info.dart';
 
+/// Pantalla de reproducción actual.
+///
+/// Layout (columna vertical):
+/// 1. zona flexible con portada/letras + información de pista;
+/// 2. barra de progreso;
+/// 3. controles de reproducción.
+///
+/// La zona central limita el artwork a `DesignTokens.artworkLarge` y escala
+/// según el ancho y alto reales para evitar overflow y huecos descompensados.
 class NowPlayingPage extends ConsumerStatefulWidget {
   const NowPlayingPage({super.key});
 
@@ -66,7 +77,8 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final horizontalPadding = constraints.maxWidth < 480
+          final isNarrow = constraints.maxWidth < 480;
+          final horizontalPadding = isNarrow
               ? DesignTokens.spaceM
               : DesignTokens.spaceXL;
 
@@ -78,39 +90,73 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
               DesignTokens.spaceL,
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                // Zona flexible: portada + título (o letras). Ocupa el resto
+                // del espacio y centra su contenido verticalmente.
                 Expanded(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxHeight: DesignTokens.artworkLarge,
-                    ),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: _showLyrics
-                          ? const Center(
-                              key: ValueKey('lyrics'),
-                              child: LyricsWidget(),
-                            )
-                          : const Column(
-                              key: ValueKey('artwork'),
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ArtworkPanel(size: 300, isLarge: true),
-                                SizedBox(height: DesignTokens.spaceL),
-                                TrackInfo(isHeadline: true),
-                              ],
-                            ),
-                    ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _showLyrics
+                        ? const Center(
+                            key: ValueKey('lyrics'),
+                            child: LyricsWidget(),
+                          )
+                        : _ArtworkSection(
+                            key: const ValueKey('artwork'),
+                            availableWidth:
+                                constraints.maxWidth - horizontalPadding * 2,
+                          ),
                   ),
                 ),
+                // Progreso y controles: tamaño fijo, anclados abajo.
                 const PlaybackProgress(),
+                const SizedBox(height: DesignTokens.spaceS),
                 const PlaybackControls(),
+                const SizedBox(height: DesignTokens.spaceXS),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+/// Sección de portada e información de pista, centrada en el espacio
+/// disponible, con el artwork escalado al alto y ancho reales sin desbordar.
+class _ArtworkSection extends StatelessWidget {
+  const _ArtworkSection({required this.availableWidth, super.key});
+
+  /// Ancho útil del cuerpo de la página ya sin padding horizontal.
+  final double availableWidth;
+
+  /// Espacio vertical reservado para la información de pista y el
+  /// espaciado entre artwork y textos.
+  static const double _infoReservedHeight = 96;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxHeight = constraints.maxHeight;
+        final artworkSize = max(
+          DesignTokens.artworkMedium,
+          min(
+            DesignTokens.artworkLarge,
+            min(availableWidth, maxHeight - _infoReservedHeight),
+          ),
+        );
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ArtworkPanel(size: artworkSize, isLarge: true),
+            const SizedBox(height: DesignTokens.spaceL),
+            // Los textos largos se truncan; la info no desplaza el artwork.
+            const TrackInfo(isHeadline: true),
+          ],
+        );
+      },
     );
   }
 }

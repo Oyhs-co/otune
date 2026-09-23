@@ -39,4 +39,9 @@ class DriftLibraryRepository implements LibraryRepository {
   Future<void> deleteTrack(String id) async {
     await _db.deleteTrack(id);
   }
+
+  @override
+  Future<LibraryTrack?> getTrackById(String id) async {
+    return await _db.getTrackById(id);
+  }
 }

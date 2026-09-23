@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
+import 'package:otune/features/playback/application/playback_persistence.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
 import 'package:otune/features/playback/domain/entities/playback_modes.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
@@ -27,12 +28,17 @@ void main() {
       fakeEngine = FakeAudioEngine();
     });
 
+    /// El debounce de persistencia usa timers reales que dejan estados
+    /// pendientes en pruebas; se desactiva para este árbol de widgets.
     Widget createWidgetUnderTest({ProviderContainer? container}) {
       return UncontrolledProviderScope(
         container:
             container ??
             ProviderContainer(
-              overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+              overrides: [
+                audioEngineProvider.overrideWithValue(fakeEngine),
+                playbackSaveDebounceProvider.overrideWithValue(null),
+              ],
             ),
         child: const MaterialApp(
           home: Scaffold(
@@ -61,7 +67,10 @@ void main() {
       tester,
     ) async {
       final container = ProviderContainer(
-        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+        overrides: [
+          audioEngineProvider.overrideWithValue(fakeEngine),
+          playbackSaveDebounceProvider.overrideWithValue(null),
+        ],
       );
 
       await tester.pumpWidget(createWidgetUnderTest(container: container));
@@ -78,7 +87,10 @@ void main() {
       tester,
     ) async {
       final container = ProviderContainer(
-        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+        overrides: [
+          audioEngineProvider.overrideWithValue(fakeEngine),
+          playbackSaveDebounceProvider.overrideWithValue(null),
+        ],
       );
 
       await tester.pumpWidget(createWidgetUnderTest(container: container));
@@ -108,7 +120,10 @@ void main() {
 
     testWidgets('play/pause button toggles playback state', (tester) async {
       final container = ProviderContainer(
-        overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+        overrides: [
+          audioEngineProvider.overrideWithValue(fakeEngine),
+          playbackSaveDebounceProvider.overrideWithValue(null),
+        ],
       );
 
       await tester.pumpWidget(createWidgetUnderTest(container: container));
