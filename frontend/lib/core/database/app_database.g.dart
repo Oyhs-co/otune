@@ -625,15 +625,502 @@ class TracksCompanion extends UpdateCompanion<Track> {
   }
 }
 
+class $PlaybackSnapshotsTable extends PlaybackSnapshots
+    with TableInfo<$PlaybackSnapshotsTable, PlaybackSnapshotRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlaybackSnapshotsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _queueJsonMeta = const VerificationMeta(
+    'queueJson',
+  );
+  @override
+  late final GeneratedColumn<String> queueJson = GeneratedColumn<String>(
+    'queue_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _currentIndexMeta = const VerificationMeta(
+    'currentIndex',
+  );
+  @override
+  late final GeneratedColumn<int> currentIndex = GeneratedColumn<int>(
+    'current_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isShuffleMeta = const VerificationMeta(
+    'isShuffle',
+  );
+  @override
+  late final GeneratedColumn<bool> isShuffle = GeneratedColumn<bool>(
+    'is_shuffle',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_shuffle" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _repeatModeIndexMeta = const VerificationMeta(
+    'repeatModeIndex',
+  );
+  @override
+  late final GeneratedColumn<int> repeatModeIndex = GeneratedColumn<int>(
+    'repeat_mode_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMsMeta = const VerificationMeta(
+    'positionMs',
+  );
+  @override
+  late final GeneratedColumn<int> positionMs = GeneratedColumn<int>(
+    'position_ms',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    queueJson,
+    currentIndex,
+    isShuffle,
+    repeatModeIndex,
+    positionMs,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'playback_snapshots';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PlaybackSnapshotRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('queue_json')) {
+      context.handle(
+        _queueJsonMeta,
+        queueJson.isAcceptableOrUnknown(data['queue_json']!, _queueJsonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_queueJsonMeta);
+    }
+    if (data.containsKey('current_index')) {
+      context.handle(
+        _currentIndexMeta,
+        currentIndex.isAcceptableOrUnknown(
+          data['current_index']!,
+          _currentIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_currentIndexMeta);
+    }
+    if (data.containsKey('is_shuffle')) {
+      context.handle(
+        _isShuffleMeta,
+        isShuffle.isAcceptableOrUnknown(data['is_shuffle']!, _isShuffleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_isShuffleMeta);
+    }
+    if (data.containsKey('repeat_mode_index')) {
+      context.handle(
+        _repeatModeIndexMeta,
+        repeatModeIndex.isAcceptableOrUnknown(
+          data['repeat_mode_index']!,
+          _repeatModeIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_repeatModeIndexMeta);
+    }
+    if (data.containsKey('position_ms')) {
+      context.handle(
+        _positionMsMeta,
+        positionMs.isAcceptableOrUnknown(data['position_ms']!, _positionMsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMsMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PlaybackSnapshotRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlaybackSnapshotRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      queueJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}queue_json'],
+      )!,
+      currentIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}current_index'],
+      )!,
+      isShuffle: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_shuffle'],
+      )!,
+      repeatModeIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}repeat_mode_index'],
+      )!,
+      positionMs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position_ms'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PlaybackSnapshotsTable createAlias(String alias) {
+    return $PlaybackSnapshotsTable(attachedDatabase, alias);
+  }
+}
+
+class PlaybackSnapshotRow extends DataClass
+    implements Insertable<PlaybackSnapshotRow> {
+  final String id;
+  final String queueJson;
+  final int currentIndex;
+  final bool isShuffle;
+
+  /// Almacena el índice de [RepeatMode] (off=0, all=1, one=2).
+  final int repeatModeIndex;
+  final int positionMs;
+  final DateTime updatedAt;
+  const PlaybackSnapshotRow({
+    required this.id,
+    required this.queueJson,
+    required this.currentIndex,
+    required this.isShuffle,
+    required this.repeatModeIndex,
+    required this.positionMs,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['queue_json'] = Variable<String>(queueJson);
+    map['current_index'] = Variable<int>(currentIndex);
+    map['is_shuffle'] = Variable<bool>(isShuffle);
+    map['repeat_mode_index'] = Variable<int>(repeatModeIndex);
+    map['position_ms'] = Variable<int>(positionMs);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PlaybackSnapshotsCompanion toCompanion(bool nullToAbsent) {
+    return PlaybackSnapshotsCompanion(
+      id: Value(id),
+      queueJson: Value(queueJson),
+      currentIndex: Value(currentIndex),
+      isShuffle: Value(isShuffle),
+      repeatModeIndex: Value(repeatModeIndex),
+      positionMs: Value(positionMs),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PlaybackSnapshotRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlaybackSnapshotRow(
+      id: serializer.fromJson<String>(json['id']),
+      queueJson: serializer.fromJson<String>(json['queueJson']),
+      currentIndex: serializer.fromJson<int>(json['currentIndex']),
+      isShuffle: serializer.fromJson<bool>(json['isShuffle']),
+      repeatModeIndex: serializer.fromJson<int>(json['repeatModeIndex']),
+      positionMs: serializer.fromJson<int>(json['positionMs']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'queueJson': serializer.toJson<String>(queueJson),
+      'currentIndex': serializer.toJson<int>(currentIndex),
+      'isShuffle': serializer.toJson<bool>(isShuffle),
+      'repeatModeIndex': serializer.toJson<int>(repeatModeIndex),
+      'positionMs': serializer.toJson<int>(positionMs),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PlaybackSnapshotRow copyWith({
+    String? id,
+    String? queueJson,
+    int? currentIndex,
+    bool? isShuffle,
+    int? repeatModeIndex,
+    int? positionMs,
+    DateTime? updatedAt,
+  }) => PlaybackSnapshotRow(
+    id: id ?? this.id,
+    queueJson: queueJson ?? this.queueJson,
+    currentIndex: currentIndex ?? this.currentIndex,
+    isShuffle: isShuffle ?? this.isShuffle,
+    repeatModeIndex: repeatModeIndex ?? this.repeatModeIndex,
+    positionMs: positionMs ?? this.positionMs,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PlaybackSnapshotRow copyWithCompanion(PlaybackSnapshotsCompanion data) {
+    return PlaybackSnapshotRow(
+      id: data.id.present ? data.id.value : this.id,
+      queueJson: data.queueJson.present ? data.queueJson.value : this.queueJson,
+      currentIndex: data.currentIndex.present
+          ? data.currentIndex.value
+          : this.currentIndex,
+      isShuffle: data.isShuffle.present ? data.isShuffle.value : this.isShuffle,
+      repeatModeIndex: data.repeatModeIndex.present
+          ? data.repeatModeIndex.value
+          : this.repeatModeIndex,
+      positionMs: data.positionMs.present
+          ? data.positionMs.value
+          : this.positionMs,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaybackSnapshotRow(')
+          ..write('id: $id, ')
+          ..write('queueJson: $queueJson, ')
+          ..write('currentIndex: $currentIndex, ')
+          ..write('isShuffle: $isShuffle, ')
+          ..write('repeatModeIndex: $repeatModeIndex, ')
+          ..write('positionMs: $positionMs, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    queueJson,
+    currentIndex,
+    isShuffle,
+    repeatModeIndex,
+    positionMs,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlaybackSnapshotRow &&
+          other.id == this.id &&
+          other.queueJson == this.queueJson &&
+          other.currentIndex == this.currentIndex &&
+          other.isShuffle == this.isShuffle &&
+          other.repeatModeIndex == this.repeatModeIndex &&
+          other.positionMs == this.positionMs &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PlaybackSnapshotsCompanion extends UpdateCompanion<PlaybackSnapshotRow> {
+  final Value<String> id;
+  final Value<String> queueJson;
+  final Value<int> currentIndex;
+  final Value<bool> isShuffle;
+  final Value<int> repeatModeIndex;
+  final Value<int> positionMs;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const PlaybackSnapshotsCompanion({
+    this.id = const Value.absent(),
+    this.queueJson = const Value.absent(),
+    this.currentIndex = const Value.absent(),
+    this.isShuffle = const Value.absent(),
+    this.repeatModeIndex = const Value.absent(),
+    this.positionMs = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PlaybackSnapshotsCompanion.insert({
+    required String id,
+    required String queueJson,
+    required int currentIndex,
+    required bool isShuffle,
+    required int repeatModeIndex,
+    required int positionMs,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       queueJson = Value(queueJson),
+       currentIndex = Value(currentIndex),
+       isShuffle = Value(isShuffle),
+       repeatModeIndex = Value(repeatModeIndex),
+       positionMs = Value(positionMs),
+       updatedAt = Value(updatedAt);
+  static Insertable<PlaybackSnapshotRow> custom({
+    Expression<String>? id,
+    Expression<String>? queueJson,
+    Expression<int>? currentIndex,
+    Expression<bool>? isShuffle,
+    Expression<int>? repeatModeIndex,
+    Expression<int>? positionMs,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (queueJson != null) 'queue_json': queueJson,
+      if (currentIndex != null) 'current_index': currentIndex,
+      if (isShuffle != null) 'is_shuffle': isShuffle,
+      if (repeatModeIndex != null) 'repeat_mode_index': repeatModeIndex,
+      if (positionMs != null) 'position_ms': positionMs,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PlaybackSnapshotsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? queueJson,
+    Value<int>? currentIndex,
+    Value<bool>? isShuffle,
+    Value<int>? repeatModeIndex,
+    Value<int>? positionMs,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PlaybackSnapshotsCompanion(
+      id: id ?? this.id,
+      queueJson: queueJson ?? this.queueJson,
+      currentIndex: currentIndex ?? this.currentIndex,
+      isShuffle: isShuffle ?? this.isShuffle,
+      repeatModeIndex: repeatModeIndex ?? this.repeatModeIndex,
+      positionMs: positionMs ?? this.positionMs,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (queueJson.present) {
+      map['queue_json'] = Variable<String>(queueJson.value);
+    }
+    if (currentIndex.present) {
+      map['current_index'] = Variable<int>(currentIndex.value);
+    }
+    if (isShuffle.present) {
+      map['is_shuffle'] = Variable<bool>(isShuffle.value);
+    }
+    if (repeatModeIndex.present) {
+      map['repeat_mode_index'] = Variable<int>(repeatModeIndex.value);
+    }
+    if (positionMs.present) {
+      map['position_ms'] = Variable<int>(positionMs.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlaybackSnapshotsCompanion(')
+          ..write('id: $id, ')
+          ..write('queueJson: $queueJson, ')
+          ..write('currentIndex: $currentIndex, ')
+          ..write('isShuffle: $isShuffle, ')
+          ..write('repeatModeIndex: $repeatModeIndex, ')
+          ..write('positionMs: $positionMs, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $TracksTable tracks = $TracksTable(this);
+  late final $PlaybackSnapshotsTable playbackSnapshots =
+      $PlaybackSnapshotsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [tracks];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    tracks,
+    playbackSnapshots,
+  ];
 }
 
 typedef $$TracksTableCreateCompanionBuilder = TracksCompanion Function({
@@ -940,10 +1427,280 @@ typedef $$TracksTableProcessedTableManager =
       Track,
       PrefetchHooks Function()
     >;
+typedef $$PlaybackSnapshotsTableCreateCompanionBuilder =
+    PlaybackSnapshotsCompanion Function({
+      required String id,
+      required String queueJson,
+      required int currentIndex,
+      required bool isShuffle,
+      required int repeatModeIndex,
+      required int positionMs,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PlaybackSnapshotsTableUpdateCompanionBuilder =
+    PlaybackSnapshotsCompanion Function({
+      Value<String> id,
+      Value<String> queueJson,
+      Value<int> currentIndex,
+      Value<bool> isShuffle,
+      Value<int> repeatModeIndex,
+      Value<int> positionMs,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$PlaybackSnapshotsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlaybackSnapshotsTable> {
+  $$PlaybackSnapshotsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get queueJson => $composableBuilder(
+    column: $table.queueJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isShuffle => $composableBuilder(
+    column: $table.isShuffle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get repeatModeIndex => $composableBuilder(
+    column: $table.repeatModeIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get positionMs => $composableBuilder(
+    column: $table.positionMs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PlaybackSnapshotsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlaybackSnapshotsTable> {
+  $$PlaybackSnapshotsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get queueJson => $composableBuilder(
+    column: $table.queueJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isShuffle => $composableBuilder(
+    column: $table.isShuffle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get repeatModeIndex => $composableBuilder(
+    column: $table.repeatModeIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get positionMs => $composableBuilder(
+    column: $table.positionMs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PlaybackSnapshotsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlaybackSnapshotsTable> {
+  $$PlaybackSnapshotsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get queueJson =>
+      $composableBuilder(column: $table.queueJson, builder: (column) => column);
+
+  GeneratedColumn<int> get currentIndex => $composableBuilder(
+    column: $table.currentIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isShuffle =>
+      $composableBuilder(column: $table.isShuffle, builder: (column) => column);
+
+  GeneratedColumn<int> get repeatModeIndex => $composableBuilder(
+    column: $table.repeatModeIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get positionMs => $composableBuilder(
+    column: $table.positionMs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PlaybackSnapshotsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PlaybackSnapshotsTable,
+          PlaybackSnapshotRow,
+          $$PlaybackSnapshotsTableFilterComposer,
+          $$PlaybackSnapshotsTableOrderingComposer,
+          $$PlaybackSnapshotsTableAnnotationComposer,
+          $$PlaybackSnapshotsTableCreateCompanionBuilder,
+          $$PlaybackSnapshotsTableUpdateCompanionBuilder,
+          (
+            PlaybackSnapshotRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PlaybackSnapshotsTable,
+              PlaybackSnapshotRow
+            >,
+          ),
+          PlaybackSnapshotRow,
+          PrefetchHooks Function()
+        > {
+  $$PlaybackSnapshotsTableTableManager(
+    _$AppDatabase db,
+    $PlaybackSnapshotsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlaybackSnapshotsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlaybackSnapshotsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlaybackSnapshotsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> queueJson = const Value.absent(),
+                Value<int> currentIndex = const Value.absent(),
+                Value<bool> isShuffle = const Value.absent(),
+                Value<int> repeatModeIndex = const Value.absent(),
+                Value<int> positionMs = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PlaybackSnapshotsCompanion(
+                id: id,
+                queueJson: queueJson,
+                currentIndex: currentIndex,
+                isShuffle: isShuffle,
+                repeatModeIndex: repeatModeIndex,
+                positionMs: positionMs,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String queueJson,
+                required int currentIndex,
+                required bool isShuffle,
+                required int repeatModeIndex,
+                required int positionMs,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PlaybackSnapshotsCompanion.insert(
+                id: id,
+                queueJson: queueJson,
+                currentIndex: currentIndex,
+                isShuffle: isShuffle,
+                repeatModeIndex: repeatModeIndex,
+                positionMs: positionMs,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PlaybackSnapshotsTable, PlaybackSnapshotRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PlaybackSnapshotsTable,
+                    PlaybackSnapshotRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PlaybackSnapshotsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PlaybackSnapshotsTable,
+      PlaybackSnapshotRow,
+      $$PlaybackSnapshotsTableFilterComposer,
+      $$PlaybackSnapshotsTableOrderingComposer,
+      $$PlaybackSnapshotsTableAnnotationComposer,
+      $$PlaybackSnapshotsTableCreateCompanionBuilder,
+      $$PlaybackSnapshotsTableUpdateCompanionBuilder,
+      (
+        PlaybackSnapshotRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PlaybackSnapshotsTable,
+          PlaybackSnapshotRow
+        >,
+      ),
+      PlaybackSnapshotRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$TracksTableTableManager get tracks =>
       $$TracksTableTableManager(_db, _db.tracks);
+  $$PlaybackSnapshotsTableTableManager get playbackSnapshots =>
+      $$PlaybackSnapshotsTableTableManager(_db, _db.playbackSnapshots);
 }

@@ -66,8 +66,8 @@ jobs:
           else
             RAW_VERSION=$(grep 'version:' frontend/pubspec.yaml | sed 's/version: //' | cut -d '+' -f 1 | tr -d '[:space:]')
             ENV_BUILD="${{ inputs.environment }}"
-            TAG_NAME="v${RAW_VERSION}-manual-${ENV_BUILD}"
-            RELEASE_NAME="Otune v${RAW_VERSION} [Manual Build - ${ENV_BUILD^^}]"
+            TAG_NAME="v${RAW_VERSION}-${ENV_BUILD}"
+            RELEASE_NAME="Otune v${RAW_VERSION} [${ENV_BUILD^^}]"
             
             if [ "$ENV_BUILD" != "prod" ]; then
               IS_PRERELEASE="true"

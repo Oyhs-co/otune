@@ -17,5 +17,18 @@ abstract final class DesignTokens {
   // Tamaños de Artwork
   static const double artworkSmall = 48;
   static const double artworkMedium = 120;
-  static const double artworkLarge = 300;
+  static const double artworkLarge = 340;
+  static const double artworkXLarge = 420;
+
+  /// Factor de escala responsivo basado en el ancho de pantalla.
+  /// 1.0 en móvil (~360px), ~1.5 en tableta grande (~800px).
+  static double scale(double screenWidth) {
+    const minPhone = 360.0;
+    const maxTablet = 800.0;
+    final t = ((screenWidth - minPhone) / (maxTablet - minPhone)).clamp(
+      0.0,
+      1.0,
+    );
+    return 1.0 + t * 0.5;
+  }
 }

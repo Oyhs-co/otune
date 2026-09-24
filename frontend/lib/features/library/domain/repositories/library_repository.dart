@@ -13,4 +13,7 @@ abstract interface class LibraryRepository {
 
   /// Elimina una pista de la biblioteca.
   Future<void> deleteTrack(String id);
+
+  /// Recupera una pista por su identificador; `null` si no existe.
+  Future<LibraryTrack?> getTrackById(String id);
 }

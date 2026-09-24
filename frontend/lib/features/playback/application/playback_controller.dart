@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/lyrics/application/lyrics_sync_notifier.dart';
 import 'package:otune/features/playback/application/file_picker_service.dart';
+import 'package:otune/features/playback/application/playback_persistence.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
 import 'package:otune/features/playback/domain/entities/playback_session.dart';
 import 'package:otune/features/playback/domain/entities/playback_state.dart';
@@ -29,6 +30,11 @@ class PlaybackController extends Notifier<PlaybackSession> {
           .read(lyricsSyncProvider.notifier)
           .updatePosition(playbackState.position);
 
+      // La posición/status del motor también alimenta el snapshot persistido
+      if (playbackState.isPlaying || playbackState.isPaused || wasCompleted) {
+        _scheduleSessionSave();
+      }
+
       if (wasCompleted) {
         unawaited(_handleTrackCompleted());
       }
@@ -37,6 +43,13 @@ class PlaybackController extends Notifier<PlaybackSession> {
     ref.onDispose(subscription.cancel);
 
     return PlaybackSession(playback: _engine.currentState);
+  }
+
+  /// Programa la persistencia diferida de la sesión actual (cola, modos,
+  /// pista y posición). Lo invocan las mutaciones de cola y el listener del
+  /// motor; el guardado real lo coordina `PlaybackPersistenceNotifier`.
+  void _scheduleSessionSave() {
+    ref.read(playbackPersistenceProvider.notifier).scheduleSave();
   }
 
   Future<void> _handleTrackCompleted() async {
@@ -70,6 +83,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
 
     final nextIdx = state.queue.isEmpty ? 0 : state.queue.currentIndex + 1;
     state = state.copyWith(queue: newQueue.moveTo(nextIdx));
+    _scheduleSessionSave();
 
     await _loadAndPlayCurrent();
   }
@@ -84,6 +98,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
     }
     queue = queue.moveTo(startIndex);
     state = state.copyWith(queue: queue);
+    _scheduleSessionSave();
 
     await _loadAndPlayCurrent();
   }
@@ -93,6 +108,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
     final wasEmpty = state.queue.isEmpty;
     final newQueue = state.queue.addTrack(track);
     state = state.copyWith(queue: newQueue);
+    _scheduleSessionSave();
 
     if (wasEmpty) {
       unawaited(_loadAndPlayCurrent());
@@ -104,6 +120,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
     final wasEmpty = state.queue.isEmpty;
     final newQueue = state.queue.addPlayNext(track);
     state = state.copyWith(queue: newQueue);
+    _scheduleSessionSave();
 
     if (wasEmpty) {
       await _loadAndPlayCurrent();
@@ -114,6 +131,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
   void removeFromQueue(String id) {
     final wasPlaying = state.queue.currentItem?.id == id;
     state = state.copyWith(queue: state.queue.removeItem(id));
+    _scheduleSessionSave();
 
     if (wasPlaying) {
       if (state.queue.isNotEmpty) {
@@ -127,11 +145,13 @@ class PlaybackController extends Notifier<PlaybackSession> {
   /// Restaura un elemento eliminado por una acción reversible de la UI.
   void restoreQueueItem(QueueItem item, int index) {
     state = state.copyWith(queue: state.queue.insertItem(item, index));
+    _scheduleSessionSave();
   }
 
   /// Restaura una instantánea de cola para deshacer un vaciado.
   Future<void> restoreQueue(PlaybackQueue queue) async {
     state = state.copyWith(queue: queue);
+    _scheduleSessionSave();
     if (queue.currentItem != null) {
       await _loadAndPlayCurrent();
     }
@@ -140,6 +160,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
   /// Vacía todos los elementos de la cola y detiene el audio.
   Future<void> clearQueue() async {
     state = state.copyWith(queue: state.queue.clear());
+    _scheduleSessionSave();
     await _engine.stop();
     // Limpiar letras al vaciar la cola
     ref.read(lyricsSyncProvider.notifier).clear();
@@ -149,6 +170,7 @@ class PlaybackController extends Notifier<PlaybackSession> {
   Future<void> playQueueItem(int index) async {
     if (index < 0 || index >= state.queue.length) return;
     state = state.copyWith(queue: state.queue.moveTo(index));
+    _scheduleSessionSave();
     await _loadAndPlayCurrent();
   }
 
@@ -182,11 +204,13 @@ class PlaybackController extends Notifier<PlaybackSession> {
   /// Alterna el modo aleatorio (Shuffle).
   void toggleShuffle() {
     state = state.copyWith(queue: state.queue.toggleShuffle());
+    _scheduleSessionSave();
   }
 
   /// Cicla el modo de repetición (Off -> All -> One -> Off).
   void cycleRepeatMode() {
     state = state.copyWith(queue: state.queue.cycleRepeat());
+    _scheduleSessionSave();
   }
 
   /// Alterna entre reproducción y pausa.
@@ -219,6 +243,29 @@ class PlaybackController extends Notifier<PlaybackSession> {
   /// Mueve un elemento de la cola de una posición a otra.
   void moveQueueItem(int from, int to) {
     state = state.copyWith(queue: state.queue.moveItem(from, to));
+    _scheduleSessionSave();
+  }
+
+  /// Restaura una sesión persistida sin iniciar la reproducción.
+  ///
+  /// Coloca la cola, los modos y la pista activa; el motor queda en pausa en
+  /// la posición guardada. Se usa durante el arranque de la aplicación
+  /// (SPEC session-persistence: nunca autoplay tras restaurar).
+  Future<void> restoreSnapshot(
+    PlaybackQueue queue, {
+    required int positionMs,
+  }) async {
+    if (queue.isEmpty) return;
+
+    state = state.copyWith(queue: queue);
+    final track = queue.currentTrack;
+    if (track == null) return;
+
+    await _engine.load(track);
+    if (positionMs > 0) {
+      await _engine.seek(Duration(milliseconds: positionMs));
+    }
+    // Sin play(): la sesión restaurada espera una acción explícita del usuario.
   }
 
   /// Abre el explorador del sistema para cargar y reproducir una pista local.

@@ -3,9 +3,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/features/settings/application/settings_notifier.dart';
 import 'package:otune/features/settings/domain/entities/app_settings.dart';
 
+import '../../fakes/fake_settings_repository.dart';
+
+ProviderContainer _offlineContainer() {
+  // Repositorio en memoria: evita tocar el almacenamiento real (y el binding
+  // de plataforma) en pruebas unitarias.
+  return ProviderContainer(
+    overrides: [
+      settingsRepositoryProvider.overrideWithValue(FakeSettingsRepository()),
+    ],
+  );
+}
+
 void main() {
   test('starts with system theme and updates the preference', () {
-    final container = ProviderContainer();
+    final container = _offlineContainer();
     addTearDown(container.dispose);
     final notifier = container.read(settingsProvider.notifier);
 
@@ -30,7 +42,7 @@ void main() {
 
   group('updateBadgeDuration', () {
     test('accepts supported durations', () {
-      final container = ProviderContainer();
+      final container = _offlineContainer();
       addTearDown(container.dispose);
 
       container
@@ -44,7 +56,7 @@ void main() {
     });
 
     test('rejects values outside the supported catalogue', () {
-      final container = ProviderContainer();
+      final container = _offlineContainer();
       addTearDown(container.dispose);
       const defaultDuration = Duration(seconds: 3);
 

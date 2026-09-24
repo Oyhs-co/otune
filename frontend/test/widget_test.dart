@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/app/app.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
+import 'package:otune/features/playback/application/playback_persistence.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
@@ -19,7 +20,11 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final fakeEngine = FakeAudioEngine();
     final container = ProviderContainer(
-      overrides: [audioEngineProvider.overrideWithValue(fakeEngine)],
+      overrides: [
+        audioEngineProvider.overrideWithValue(fakeEngine),
+        // Sin timers de debounce pendientes al desechar el árbol de widgets.
+        playbackSaveDebounceProvider.overrideWithValue(null),
+      ],
     );
 
     await tester.pumpWidget(

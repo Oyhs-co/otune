@@ -7,6 +7,8 @@ import 'package:otune/features/settings/domain/entities/app_settings.dart';
 import 'package:otune/features/settings/presentation/pages/settings_page.dart';
 import 'package:otune/features/settings/presentation/widgets/theme_preference_tile.dart';
 
+import '../../../fakes/fake_settings_repository.dart';
+
 void main() {
   testWidgets('theme preference tile displays and changes selection', (
     tester,
@@ -49,7 +51,12 @@ void main() {
   testWidgets('badge duration tile shows the effective preference', (
     tester,
   ) async {
-    final container = ProviderContainer();
+    // Repositorio en memoria: el widget test no debe tocar SharedPreferences.
+    final container = ProviderContainer(
+      overrides: [
+        settingsRepositoryProvider.overrideWithValue(FakeSettingsRepository()),
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(

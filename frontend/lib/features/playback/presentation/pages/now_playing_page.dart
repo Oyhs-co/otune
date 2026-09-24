@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/design_tokens.dart';
@@ -9,6 +11,18 @@ import 'package:otune/features/playback/presentation/widgets/playback_progress.d
 import 'package:otune/features/playback/presentation/widgets/queue_sheet.dart';
 import 'package:otune/features/playback/presentation/widgets/track_info.dart';
 
+/// Pantalla de reproducción actual.
+///
+/// Layout (columna vertical):
+/// 1. zona flexible con portada/letras + información de pista;
+/// 2. barra de progreso;
+/// 3. controles de reproducción.
+///
+/// La zona central limita el artwork según el ancho disponible y la altura
+/// real, escalando los espacios y el tamaño del artwork mediante
+/// [DesignTokens.scale] para aprovechar todo el espacio disponible en
+/// tablets y pantallas grandes, y usando [SafeArea] para respetar la barra
+/// de estado y la barra de navegación de Android.
 class NowPlayingPage extends ConsumerStatefulWidget {
   const NowPlayingPage({super.key});
 
@@ -24,6 +38,7 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
     final theme = Theme.of(context);
     final session = ref.watch(playbackControllerProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
+    final scale = DesignTokens.scale(MediaQuery.sizeOf(context).width);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,27 +79,26 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
           ),
         ],
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final horizontalPadding = constraints.maxWidth < 480
-              ? DesignTokens.spaceM
-              : DesignTokens.spaceXL;
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isNarrow = constraints.maxWidth < 480;
+            final horizontalPadding = isNarrow
+                ? DesignTokens.spaceM * scale
+                : DesignTokens.spaceXL * scale;
 
-          return Padding(
-            padding: EdgeInsets.fromLTRB(
-              horizontalPadding,
-              0,
-              horizontalPadding,
-              DesignTokens.spaceL,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      maxHeight: DesignTokens.artworkLarge,
-                    ),
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                horizontalPadding,
+                0,
+                horizontalPadding,
+                DesignTokens.spaceL * scale,
+              ),
+              child: Column(
+                children: [
+                  // Zona flexible: portada + título (o letras). Ocupa el resto
+                  // del espacio y centra su contenido verticalmente.
+                  Expanded(
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
                       child: _showLyrics
@@ -92,25 +106,75 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                               key: ValueKey('lyrics'),
                               child: LyricsWidget(),
                             )
-                          : const Column(
-                              key: ValueKey('artwork'),
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ArtworkPanel(size: 300, isLarge: true),
-                                SizedBox(height: DesignTokens.spaceL),
-                                TrackInfo(isHeadline: true),
-                              ],
+                          : _ArtworkSection(
+                              key: const ValueKey('artwork'),
+                              availableWidth:
+                                  constraints.maxWidth - horizontalPadding * 2,
+                              scale: scale,
                             ),
                     ),
                   ),
-                ),
-                const PlaybackProgress(),
-                const PlaybackControls(),
-              ],
-            ),
-          );
-        },
+                  // Progreso y controles: tamaño fijo, anclados abajo.
+                  const PlaybackProgress(),
+                  SizedBox(height: DesignTokens.spaceS * scale),
+                  const PlaybackControls(),
+                  const SizedBox(height: DesignTokens.spaceXS),
+                ],
+              ),
+            );
+          },
+        ),
       ),
+    );
+  }
+}
+
+/// Sección de portada e información de pista, centrada en el espacio
+/// disponible, con el artwork escalado al alto y ancho reales sin desbordar.
+class _ArtworkSection extends StatelessWidget {
+  const _ArtworkSection({
+    required this.availableWidth,
+    required this.scale,
+    super.key,
+  });
+
+  /// Ancho útil del cuerpo de la página ya sin padding horizontal.
+  final double availableWidth;
+
+  /// Factor de escala responsivo derivado del ancho de pantalla.
+  final double scale;
+
+  /// Espacio vertical reservado para la información de pista y el
+  /// espaciado entre artwork y textos.
+  static const double _infoReservedHeight = 96;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxHeight = constraints.maxHeight;
+        // Artwork más grande en pantallas anchos (tabletas, foldables).
+        final artworkMax = availableWidth >= 600
+            ? DesignTokens.artworkXLarge
+            : DesignTokens.artworkLarge;
+        final artworkSize = max(
+          DesignTokens.artworkMedium,
+          min(
+            artworkMax,
+            min(availableWidth, maxHeight - _infoReservedHeight * scale),
+          ),
+        );
+
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ArtworkPanel(size: artworkSize, isLarge: true),
+            SizedBox(height: DesignTokens.spaceL * scale),
+            // Los textos largos se truncan; la info no desplaza el artwork.
+            const TrackInfo(isHeadline: true),
+          ],
+        );
+      },
     );
   }
 }
