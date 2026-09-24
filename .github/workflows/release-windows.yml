@@ -57,8 +57,8 @@ jobs:
           else
             RAW_VERSION=$(grep '^version:' frontend/pubspec.yaml | sed 's/version: //' | cut -d '+' -f 1 | tr -d '[:space:]')
             ENV_BUILD="${{ inputs.environment }}"
-            TAG_NAME="v${RAW_VERSION}-windows-manual-${ENV_BUILD}"
-            RELEASE_NAME="Otune v${RAW_VERSION} [Windows Manual Build - ${ENV_BUILD^^}]"
+            TAG_NAME="v${RAW_VERSION}-${ENV_BUILD}"
+            RELEASE_NAME="Otune v${RAW_VERSION} [${ENV_BUILD^^}]"
             IS_PRERELEASE="true"
           fi
 
@@ -96,7 +96,7 @@ jobs:
           Compress-Archive -Path "$dir/*" -DestinationPath "otune-windows-x64.zip" -Force
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.release_info.outputs.tag_name }}
           name: ${{ steps.release_info.outputs.release_name }}
