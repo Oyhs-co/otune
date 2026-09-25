@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_metadata/media_metadata.dart';
@@ -51,13 +53,23 @@ class SystemLocalAudioPicker implements LocalAudioPicker {
     return TrackRef(
       id: const Uuid().v4(),
       uri: Uri.file(path).toString(),
+      // Las imágenes enormes se descartan (FR-AW-006 de artwork-management).
+      albumArt: _boundedArtwork(metadata?.imageMetadata?.data),
       title: metadata?.title ?? title,
       artist: metadata?.artist,
       album: metadata?.album,
       albumArtist: metadata?.albumArtist,
       duration: metadata?.duration,
-      albumArt: metadata?.imageMetadata?.data,
     );
+  }
+
+  static const int _maxArtworkBytes = 2 * 1024 * 1024;
+
+  Uint8List? _boundedArtwork(Uint8List? data) {
+    if (data == null || data.length > _maxArtworkBytes) {
+      return null;
+    }
+    return data;
   }
 }
 

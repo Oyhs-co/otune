@@ -6,10 +6,11 @@ import 'package:meta/meta.dart';
 /// indexada en la biblioteca local.
 @immutable
 class LibraryTrack {
-  const new({
+  const LibraryTrack({
     required this.id,
     required this.title,
     required this.path,
+    this.addedAt,
     this.artist,
     this.album,
     this.albumArtist,
@@ -22,6 +23,12 @@ class LibraryTrack {
   final String id;
   final String title;
   final String path;
+
+  /// Fecha de incorporación a la biblioteca (SPEC library-sorting).
+  ///
+  /// Es `null` en las consultas de lista que no hidratan la columna o en
+  /// entidades construidas fuera de la base de datos.
+  final DateTime? addedAt;
   final String? artist;
   final String? album;
   final String? albumArtist;

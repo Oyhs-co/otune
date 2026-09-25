@@ -1,17 +1,32 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:media_metadata/media_metadata.dart';
 import 'package:otune/core/database/app_database.dart';
+import 'package:otune/features/library/data/services/metadata_reader.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
 import 'package:otune/features/library/domain/services/library_scanner.dart';
 import 'package:path/path.dart' as p;
 
+/// Adaptador de escaneo sobre el filesystem local.
+///
+/// Sprint 4 (SPEC scan-robustness): cancelación cooperativa, normalización
+/// de rutas (FR-SCANR-004) y descarte de imágenes que exceden el límite de
+/// artwork (FR-AW-006 de artwork-management).
 class FileSystemLibraryScanner implements LibraryScanner {
-  new(this._db);
+  FileSystemLibraryScanner(this._db, {MediaMetadataReader? metadataReader})
+    : _metadataReader = metadataReader ?? defaultMetadataReader;
+
   final AppDatabase _db;
 
-  static const _supportedExtensions = {
+  /// Lector de metadatos inyectable: el plugin nativo no existe en tests
+  /// unitarios, así que las pruebas lo sustituyen por un falso.
+  final MediaMetadataReader _metadataReader;
+
+  /// Límite de tamaño de imagen embebida que se persiste como artwork.
+  /// Imágenes mayores se descartan y la pista se indexa sin carátula.
+  static const int maxArtworkBytes = 2 * 1024 * 1024;
+
+  static const Set<String> _supportedExtensions = {
     '.aac',
     '.flac',
     '.m4a',
@@ -27,7 +42,10 @@ class FileSystemLibraryScanner implements LibraryScanner {
   };
 
   @override
-  Stream<ScanEvent> scanDirectory(String path) async* {
+  Stream<ScanEvent> scanDirectory(
+    String path, {
+    ScanCancellationToken? cancellationToken,
+  }) async* {
     final directory = Directory(path);
     if (!directory.existsSync()) {
       yield ScanError(message: 'Directory does not exist', path: path);
@@ -40,6 +58,12 @@ class FileSystemLibraryScanner implements LibraryScanner {
       final total = allFiles.length;
 
       for (final file in allFiles) {
+        // Frontera de cancelación: antes de procesar el siguiente archivo.
+        if (cancellationToken?.isCancelled ?? false) {
+          yield ScanCancelled(processed);
+          return;
+        }
+
         processed++;
         yield ScanProgress(
           currentFile: p.basename(file.path),
@@ -48,21 +72,21 @@ class FileSystemLibraryScanner implements LibraryScanner {
         );
 
         try {
-          final metadata = await MediaMetadata.read(file.path);
+          final metadata = await _metadataReader(file.path);
 
           final track = LibraryTrack(
             id: file.path, // Path as unique ID for MVP
             title:
                 _metadataText(metadata?.title) ??
                 p.basenameWithoutExtension(file.path),
-            path: file.path,
+            path: p.normalize(file.path),
             artist: _metadataText(metadata?.artist),
             album: _metadataText(metadata?.album),
             albumArtist: _metadataText(metadata?.albumArtist),
             trackNumber: metadata?.trackNumber,
             duration: metadata?.duration,
             fileFormat: p.extension(file.path),
-            albumArt: metadata?.imageMetadata?.data,
+            albumArt: _boundedArtwork(metadata?.imageMetadata?.data),
           );
 
           // Persist in database
@@ -95,6 +119,15 @@ class FileSystemLibraryScanner implements LibraryScanner {
     } on Object catch (e) {
       yield ScanError(message: 'Critical scan error: $e', path: path);
     }
+  }
+
+  /// Devuelve los bytes de la imagen si están dentro del límite; `null` en
+  /// otro caso (descarte silencioso, la pista se indexa igualmente).
+  Uint8List? _boundedArtwork(Uint8List? data) {
+    if (data == null || data.length > maxArtworkBytes) {
+      return null;
+    }
+    return data;
   }
 
   String? _metadataText(String? value) {
