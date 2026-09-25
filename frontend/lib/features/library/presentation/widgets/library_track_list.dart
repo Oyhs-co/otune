@@ -5,13 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/library/domain/entities/library_view_mode.dart';
 import 'package:otune/features/library/domain/entities/track.dart';
+import 'package:otune/features/library/presentation/widgets/lazy_artwork.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/playback_session.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
 /// Lista visual de pistas de la biblioteca.
+///
+/// Sprint 4: artwork resuelto bajo demanda con [LazyArtwork] (las consultas
+/// de lista ya no cargan blobs) y truncamiento con ellipsis coherente en las
+/// tres vistas (FR-SORT-006 de library-sorting).
 class LibraryTrackList extends ConsumerWidget {
-  const new({
+  const LibraryTrackList({
     required this.tracks,
     required this.onTrackSelected,
     this.viewMode = LibraryViewMode.list,
@@ -35,6 +40,10 @@ class LibraryTrackList extends ConsumerWidget {
     }
   }
 
+  Widget _artwork(LibraryTrack track) {
+    return LazyArtwork(trackId: track.id);
+  }
+
   Widget _buildCompactList(WidgetRef ref, PlaybackSession session) {
     return ListView.separated(
       itemCount: tracks.length,
@@ -45,19 +54,11 @@ class LibraryTrackList extends ConsumerWidget {
             session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
-          leading: track.albumArt != null
-              ? ArtworkPlaceholder(
-                  size: ArtworkSize.small,
-                  child: Image.memory(
-                    track.albumArt!,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : const ArtworkPlaceholder(size: ArtworkSize.small),
+          leading: _artwork(track),
           title: Text(
             track.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: isPlaying ? Theme.of(context).colorScheme.primary : null,
               fontWeight: isPlaying ? FontWeight.bold : null,
@@ -66,6 +67,8 @@ class LibraryTrackList extends ConsumerWidget {
           subtitle: Text(
             '${track.artist ?? 'Artista desconocido'}'
             ' • ${track.album ?? 'Álbum desconocido'}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           trailing: PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
@@ -109,19 +112,11 @@ class LibraryTrackList extends ConsumerWidget {
             session.currentTrack?.id == track.id && session.isPlaying;
 
         return ListTile(
-          leading: track.albumArt != null
-              ? ArtworkPlaceholder(
-                  size: ArtworkSize.small,
-                  child: Image.memory(
-                    track.albumArt!,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : const ArtworkPlaceholder(size: ArtworkSize.small),
+          leading: _artwork(track),
           title: Text(
             track.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontWeight: isPlaying ? FontWeight.bold : FontWeight.normal,
               color: isPlaying ? Theme.of(context).colorScheme.primary : null,
@@ -130,9 +125,15 @@ class LibraryTrackList extends ConsumerWidget {
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(track.artist ?? 'Artista desconocido'),
+              Text(
+                track.artist ?? 'Artista desconocido',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               Text(
                 track.album ?? 'Álbum desconocido',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],
@@ -198,17 +199,7 @@ class LibraryTrackList extends ConsumerWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    ArtworkPlaceholder(
-                      size: ArtworkSize.medium,
-                      child: track.albumArt != null
-                          ? Image.memory(
-                              track.albumArt!,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            )
-                          : null,
-                    ),
+                    LazyArtwork(trackId: track.id, size: ArtworkSize.medium),
                     Positioned(
                       right: 4,
                       top: 4,
