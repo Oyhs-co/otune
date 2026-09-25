@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/database/app_database.dart';
+import 'package:otune/features/library/application/artwork_cache.dart';
 import 'package:otune/features/library/data/repositories/drift_library_repository.dart';
 import 'package:otune/features/library/data/services/file_system_library_scanner.dart';
 import 'package:otune/features/library/domain/repositories/library_repository.dart';
@@ -22,4 +23,10 @@ final libraryRepositoryProvider = Provider<LibraryRepository>((ref) {
 final libraryScannerProvider = Provider<LibraryScanner>((ref) {
   final db = ref.watch(databaseProvider);
   return FileSystemLibraryScanner(db);
+});
+
+/// Caché de artwork compartida por las filas de biblioteca (SPEC
+/// artwork-management). Se invalida al refrescar la lista tras un escaneo.
+final artworkCacheProvider = Provider<ArtworkCache>((ref) {
+  return ArtworkCache();
 });

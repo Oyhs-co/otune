@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/features/library/application/library_providers.dart';
@@ -12,10 +14,13 @@ class FakeLibraryRepository implements LibraryRepository {
   String? searchedQuery;
 
   @override
-  Future<List<LibraryTrack>> getAllTracks() async => tracks;
+  Future<List<LibraryTrack>> getAllTracks({LibrarySort? sort}) async => tracks;
 
   @override
-  Future<List<LibraryTrack>> searchTracks(String query) async {
+  Future<List<LibraryTrack>> searchTracks(
+    String query, {
+    LibrarySort? sort,
+  }) async {
     searchedQuery = query;
     return tracks;
   }
@@ -28,6 +33,19 @@ class FakeLibraryRepository implements LibraryRepository {
 
   @override
   Future<LibraryTrack?> getTrackById(String id) async => null;
+
+  @override
+  Future<Uint8List?> getTrackArtwork(String id) async => null;
+
+  @override
+  Future<List<String>> findMissingTracks({List<String>? candidateIds}) async =>
+      const [];
+
+  @override
+  Future<void> deleteTracks(List<String> ids) async {}
+
+  @override
+  Future<void> restoreTracks(List<LibraryTrack> tracks) async {}
 }
 
 void main() {
@@ -51,7 +69,11 @@ void main() {
         repository.tracks,
       );
 
-      container.read(librarySearchQueryProvider.notifier).query = 'one';
+      container.read(librarySearchQueryProvider.notifier).updateQuery('one');
+      // El debounce difiere la consulta; esperar su vencimiento.
+      await pumpEventQueue();
+      await Future<void>.delayed(librarySearchDebounce);
+
       expect(
         await container.read(filteredTracksProvider.future),
         repository.tracks,

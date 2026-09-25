@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otune/core/design_system/providers/badge_provider.dart';
 import 'package:otune/core/permissions/permission_service.dart';
+import 'package:otune/features/library/application/library_search_provider.dart';
 import 'package:otune/features/library/application/library_view_provider.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
 import 'package:otune/features/library/presentation/widgets/library_app_bar_actions.dart';
@@ -52,11 +53,42 @@ class AppShell extends ConsumerWidget {
         .scanDirectory(selectedDirectory);
   }
 
+  /// Limpieza de pistas ausentes (SPEC scan-robustness, FR-SCANR-006):
+  /// elimina de forma transaccional y ofrece deshacer mediante badge.
+  Future<void> _handleCleanupMissing(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final navigator = Navigator.of(context);
+    final count = await ref
+        .read(libraryScanProvider.notifier)
+        .removeMissingTracks();
+    if (!navigator.mounted) return;
+
+    if (count == 0) {
+      ref
+          .read(badgeProvider.notifier)
+          .show(message: 'No hay pistas ausentes en la biblioteca');
+      return;
+    }
+
+    final notifier = ref.read(libraryScanProvider.notifier);
+    ref
+        .read(badgeProvider.notifier)
+        .show(
+          message: '$count pistas ausentes eliminadas',
+          actionLabel: 'Deshacer',
+          onActionPressed: () => unawaited(notifier.undoRemoveMissingTracks()),
+          duration: const Duration(seconds: 5),
+        );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isWideScreen = MediaQuery.of(context).size.width >= 600;
     final isLibraryPage = navigationShell.currentIndex == 0;
     final scanState = ref.watch(libraryScanProvider);
+    final sortOption = ref.watch(librarySortOptionProvider);
     final badges = ref.watch(badgeProvider);
 
     return Scaffold(
@@ -68,11 +100,17 @@ class AppShell extends ConsumerWidget {
               actions: isLibraryPage
                   ? [
                       LibraryAppBarActions(
-                        isScanning: scanState.isScanning,
+                        isScanning: scanState.scan.isScanning,
                         onViewModeChanged: (mode) =>
                             ref.read(libraryViewModeProvider.notifier).mode =
                                 mode,
                         onScanFolder: () => _handleScanFolder(context, ref),
+                        sortOption: sortOption,
+                        onSortChanged: ref
+                            .read(librarySortOptionProvider.notifier)
+                            .setOption,
+                        onCancelScan: () =>
+                            ref.read(libraryScanProvider.notifier).cancelScan(),
                       ),
                     ]
                   : null,
@@ -133,6 +171,13 @@ class AppShell extends ConsumerWidget {
                   label: 'Ajustes',
                 ),
               ],
+            )
+          : null,
+      floatingActionButton: isLibraryPage && isWideScreen
+          ? FloatingActionButton.extended(
+              onPressed: () => _handleCleanupMissing(context, ref),
+              icon: const Icon(Icons.cleaning_services_rounded),
+              label: const Text('Limpiar ausentes'),
             )
           : null,
     );

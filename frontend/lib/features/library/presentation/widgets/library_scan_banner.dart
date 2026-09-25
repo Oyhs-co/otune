@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/features/library/application/state/library_scan_state.dart';
+import 'package:otune/features/library/presentation/widgets/library_app_bar_actions.dart';
 
+/// Banner de progreso del escaneo (SPEC scan-progress-feedback) con la
+/// cancelación y el estado final de cancelación de la SPEC scan-robustness.
 class LibraryScanBanner extends ConsumerWidget {
   const LibraryScanBanner({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scanState = ref.watch(libraryScanProvider);
+    final scanState = ref.watch(libraryScanProvider).scan;
 
-    if (!scanState.isScanning &&
-        scanState.status == 'No se ha realizado ningún escaneo') {
+    if (!scanState.isScanning && scanState.status == defaultScanStatus) {
       return const SizedBox.shrink();
     }
 
     final isError = scanState.status.startsWith('Error:');
     final isComplete = scanState.status.startsWith('Escaneo completado');
+    final isCancelled = scanState.status.startsWith('Escaneo cancelado');
 
     return Container(
       width: double.infinity,
@@ -25,6 +28,8 @@ class LibraryScanBanner extends ConsumerWidget {
             ? Theme.of(context).colorScheme.errorContainer
             : isComplete
             ? Colors.green.shade100
+            : isCancelled
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
             : Theme.of(context).colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
       ),
@@ -43,6 +48,11 @@ class LibraryScanBanner extends ConsumerWidget {
             const Padding(
               padding: EdgeInsets.only(right: 12),
               child: Icon(Icons.check_circle, color: Colors.green, size: 18),
+            )
+          else if (isCancelled)
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: Icon(Icons.cancel_outlined, size: 18),
             )
           else
             const Padding(
@@ -68,7 +78,12 @@ class LibraryScanBanner extends ConsumerWidget {
               ],
             ),
           ),
-          if (isError)
+          if (scanState.isScanning)
+            ScanCancelButton(
+              onPressed: () =>
+                  ref.read(libraryScanProvider.notifier).cancelScan(),
+            )
+          else if (isError)
             TextButton(
               onPressed: scanState.isScanning
                   ? null
