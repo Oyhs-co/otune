@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:otune/features/library/domain/entities/library_sort_option.dart';
 import 'package:otune/features/settings/domain/entities/app_settings.dart';
 import 'package:otune/features/settings/domain/repositories/settings_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,6 +39,7 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
     final map = <String, Object?>{
       'themePreference': settings.themePreference.name,
       'badgeDurationSeconds': settings.badgeDuration.inSeconds,
+      'librarySortOption': settings.librarySortOption.name,
     };
     final prefs = await _prefsFuture;
     final saved = await prefs.setString(settingsStorageKey, jsonEncode(map));
@@ -63,9 +65,16 @@ class SharedPreferencesSettingsRepository implements SettingsRepository {
       seconds is int ? seconds : null,
     );
 
+    // Criterio de orden desconocido o ausente: predeterminado (título).
+    final sort = LibrarySortOption.values.firstWhere(
+      (option) => option.name == map['librarySortOption'],
+      orElse: () => LibrarySortOption.title,
+    );
+
     return AppSettings(
       themePreference: theme ?? ThemePreference.system,
       badgeDuration: duration?.toDuration() ?? const Duration(seconds: 3),
+      librarySortOption: sort,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/logging/app_logger.dart';
+import 'package:otune/features/library/domain/entities/library_sort_option.dart';
 import 'package:otune/features/settings/data/repositories/shared_preferences_settings_repository.dart';
 import 'package:otune/features/settings/domain/entities/app_settings.dart';
 import 'package:otune/features/settings/domain/repositories/settings_repository.dart';
@@ -61,6 +62,15 @@ class SettingsNotifier extends Notifier<SettingsState> {
     if (option == null) return;
     state = state.copyWith(
       settings: state.settings.copyWith(badgeDuration: option.toDuration()),
+    );
+    unawaited(_persist());
+  }
+
+  /// Actualiza el criterio de orden de la biblioteca (SPEC library-sorting,
+  /// FR-SORT-005) y lo persiste.
+  void updateLibrarySort(LibrarySortOption option) {
+    state = state.copyWith(
+      settings: state.settings.copyWith(librarySortOption: option),
     );
     unawaited(_persist());
   }

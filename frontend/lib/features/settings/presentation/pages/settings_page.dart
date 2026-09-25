@@ -70,12 +70,12 @@ class SettingsPage extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Información'),
-            subtitle: const Text('Versión 0.6.1-alpha.0+24'),
+            subtitle: const Text('Versión 0.7.0-alpha.0+25'),
             onTap: () {
               showAboutDialog(
                 context: context,
                 applicationName: 'Otune',
-                applicationVersion: '0.6.1-alpha.0+24',
+                applicationVersion: '0.7.0-alpha.0+25',
                 applicationIcon: Image.asset(
                   'android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png',
                   width: 48,

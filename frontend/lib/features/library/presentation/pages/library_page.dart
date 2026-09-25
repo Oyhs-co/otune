@@ -14,7 +14,7 @@ import 'package:otune/features/playback/application/playback_controller.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
 class LibraryPage extends ConsumerStatefulWidget {
-  const new({super.key});
+  const LibraryPage({super.key});
 
   @override
   ConsumerState<LibraryPage> createState() => _LibraryPageState();
@@ -94,9 +94,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                             onPressed: () {
                               _searchController.clear();
                               ref
-                                      .read(librarySearchQueryProvider.notifier)
-                                      .query =
-                                  '';
+                                  .read(librarySearchQueryProvider.notifier)
+                                  .updateQuery('');
                               setState(() {});
                             },
                           ),
@@ -106,8 +105,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                     contentPadding: EdgeInsets.zero,
                   ),
                   onChanged: (value) {
-                    ref.read(librarySearchQueryProvider.notifier).query = value
-                        .trim();
+                    ref
+                        .read(librarySearchQueryProvider.notifier)
+                        .updateQuery(value.trim());
                     setState(() {});
                   },
                 ),
@@ -149,7 +149,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                 }
 
                 final tracks = snapshot.data ?? <LibraryTrack>[];
-                final query = ref.watch(librarySearchQueryProvider);
+                final query = ref.watch(libraryDebouncedQueryProvider).trim();
                 if (tracks.isEmpty) {
                   return LibraryEmptyState(
                     message: query.isEmpty

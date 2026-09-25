@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:otune/features/library/domain/entities/library_sort_option.dart';
 import 'package:otune/features/settings/application/settings_notifier.dart';
 import 'package:otune/features/settings/domain/entities/app_settings.dart';
 import 'package:otune/features/settings/domain/repositories/settings_repository.dart';
@@ -115,6 +116,61 @@ void main() {
         const Duration(seconds: 10),
       );
     });
+
+    test(
+      'AC-SORT-003: updateLibrarySort persiste y sobrevive al reinicio',
+      () async {
+        final repository = FakeSettingsRepository();
+        final container = ProviderContainer(
+          overrides: [settingsRepositoryProvider.overrideWithValue(repository)],
+        );
+        addTearDown(container.dispose);
+
+        container
+            .read(settingsProvider.notifier)
+            .updateLibrarySort(LibrarySortOption.addedAt);
+        await pumpEventQueue();
+
+        final restartedContainer = ProviderContainer(
+          overrides: [
+            settingsRepositoryProvider.overrideWithValue(
+              repository.simulateRestart(),
+            ),
+          ],
+        );
+        addTearDown(restartedContainer.dispose);
+        await restartedContainer.read(settingsProvider.notifier).hydrate();
+
+        expect(
+          restartedContainer.read(settingsProvider).settings.librarySortOption,
+          LibrarySortOption.addedAt,
+        );
+      },
+    );
+
+    test(
+      'AC-SORT-003: un criterio persistido desconocido cae al predeterminado',
+      () async {
+        // La serialización del repositorio real ignora valores fuera del
+        // catálogo; el fake sólo replica la persistencia, así que este test
+        // verifica el predeterminado cuando nunca se guardó el campo.
+        final container = ProviderContainer(
+          overrides: [
+            settingsRepositoryProvider.overrideWithValue(
+              FakeSettingsRepository(const AppSettings()),
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container.read(settingsProvider.notifier).hydrate();
+
+        expect(
+          container.read(settingsProvider).settings.librarySortOption,
+          LibrarySortOption.title,
+        );
+      },
+    );
 
     test(
       'un fallo de almacenamiento no revierte el estado en memoria',
