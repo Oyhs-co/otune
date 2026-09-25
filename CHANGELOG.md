@@ -5,6 +5,15 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [Unreleased]
+
+### Documentation
+
+- ADR-010: decisión de extraer las operaciones de mantenimiento de `AppDatabase` a la extensión `TracksMaintenance` (`core/database/tracks_maintenance.dart`), con alternativas evaluadas y límites de la separación.
+- SPEC scan-robustness: DR-005 (`TracksMaintenance`/ADR-010), DR-006 (`libraryVersionProvider`), prueba de banner «Reintentar» habilitado en la estrategia de testing y matriz de verificación actualizada.
+- SPEC artwork-management: referencia a ADR-010 para la ubicación de `getTrackArtwork`.
+- Review `docs/reviews/2026-09-25-sprint-3-4-code-review.md`: estado actualizado a hallazgos corregidos con tabla de resolución (F-01…F-05).
+
 ## [0.7.0-alpha.0+25] - 2026-09-25
 
 ### Added
@@ -20,6 +29,7 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Sprint 4 S4-2 «Gestión de artwork» (SPEC `artwork-management.md`): las consultas de lista ya no cargan blobs; nueva operación `getTrackArtwork(id)` con caché LRU acotada; widget `LazyArtwork` que resuelve la carátula bajo demanda en lista, detalle y cuadrícula; límite de tamaño de imágenes embebidas en el escaneo (descarte sobre 2 MB); refresco reactivo de la biblioteca al terminar un escaneo o limpiar el catálogo.
 - Sprint 4 S4-3 «Ordenación de biblioteca» (SPEC `library-sorting.md`): migración Drift v3 → v4 (columna `added_at`), ordenación SQL por título, artista, álbum y fecha de incorporación (NOCASE, más reciente primero), criterio persistido en `SettingsRepository` y selector de orden en la biblioteca.
 - Búsqueda con debounce de 300 ms (NFR-SEARCH-002 de `search-library.md`): la lista consulta la base de datos una vez el usuario deja de escribir; la consulta vacía se aplica de inmediato.
+- Acción «Limpiar ausentes» como FAB en la biblioteca, visible sólo en pantallas anchas (revisión 2026-09-25, F-01: la entrada anterior de `Fixed` describía indebidamente un arreglo del `BottomNavigationBar` que nunca estuvo roto en este rango).
 - Pruebas de cancelación, exclusión mutua, normalización, límite de artwork, caché LRU, resolución lazy, ordenación por criterios, persistencia del criterio y limpieza de huérfanos con deshacer (150 pruebas en total).
 
 ### Changed
@@ -34,8 +44,14 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### Fixed
 
-- Restaurado el `BottomNavigationBar` del shell en pantallas estrechas tras la refactorización de acciones de biblioteca del Sprint 4.
 - Títulos, artistas y álbumes largos se truncan con ellipsis de forma coherente en las tres vistas de la biblioteca (FR-SORT-006).
+- Eliminada la condición muerta en el botón «Reintentar» del banner de escaneo: la rama de error sólo se alcanza con el escaneo detenido (revisión 2026-09-25, F-02).
+- Renombrado `libraryLibraryVersionProvider` a `libraryVersionProvider` para seguir la convención del resto de providers (revisión 2026-09-25, F-03).
+- `PlaybackState.copyWith` conserva el mensaje de error almacenado en transiciones `error → sano → error` (revisión 2026-09-25, F-04): ahora propaga `_storedErrorMessage` en lugar del getter condicionado al estado y añade la bandera `clearError` para limpiarlo de forma explícita.
+
+### Changed
+
+- Extraídas las operaciones de mantenimiento de `AppDatabase` a `DriftLibraryMaintenance` (`core/database/tracks_maintenance.dart`): artwork puntual y detección/borrado/restauración de huérfanos viven en un archivo propio de acceso a datos; `AppDatabase` queda como dueño de la conexión y del esquema (revisión 2026-09-25, F-05).
 
 ## [Unreleased]
 

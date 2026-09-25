@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/logging/app_logger.dart';
 import 'package:otune/features/library/application/library_providers.dart';
@@ -89,6 +90,15 @@ class LibraryScanNotifier extends Notifier<LibraryScanControllerState> {
     return const LibraryScanControllerState();
   }
 
+  /// Sustituye el estado completo; sólo para pruebas de widgets del banner.
+  @visibleForTesting
+  // El lint no señala la línea exacta del método; se ignora a nivel de
+  // declaración para no mover el diagnóstico si cambia el formato.
+  // ignore: use_setters_to_change_properties
+  void debugSetStateForTest(LibraryScanControllerState testState) {
+    state = testState;
+  }
+
   LibraryScanState get _scanState => state.scan;
 
   set _scanState(LibraryScanState value) {
@@ -149,7 +159,7 @@ class LibraryScanNotifier extends Notifier<LibraryScanControllerState> {
             await _invalidateArtworkCache();
             // El proveedor de listas reacciona al finalizar el escaneo
             // (FR-AW-004 de artwork-management).
-            ref.read(libraryLibraryVersionProvider.notifier).bump();
+            ref.read(libraryVersionProvider.notifier).bump();
           case ScanError():
             if (event.kind == ScanErrorKind.file) {
               _scanState = _scanState.copyWith(
@@ -205,7 +215,7 @@ class LibraryScanNotifier extends Notifier<LibraryScanControllerState> {
     state = state.copyWith(missingTracks: MissingTracksState(removed: removed));
 
     await _invalidateArtworkCache();
-    ref.read(libraryLibraryVersionProvider.notifier).bump();
+    ref.read(libraryVersionProvider.notifier).bump();
     return removed.length;
   }
 
@@ -218,7 +228,7 @@ class LibraryScanNotifier extends Notifier<LibraryScanControllerState> {
     state = state.copyWith(missingTracks: const MissingTracksState());
 
     await _invalidateArtworkCache();
-    ref.read(libraryLibraryVersionProvider.notifier).bump();
+    ref.read(libraryVersionProvider.notifier).bump();
   }
 
   Future<void> _invalidateArtworkCache() async {
@@ -235,8 +245,9 @@ final libraryScanProvider =
 /// Contador de versiones de la biblioteca: se incrementa al completar un
 /// escaneo o modificar el catálogo (limpieza/deshacer) para que las listas
 /// reactivas se refresquen (FR-AW-004).
-final libraryLibraryVersionProvider =
-    NotifierProvider<_LibraryVersionNotifier, int>(_LibraryVersionNotifier.new);
+final libraryVersionProvider = NotifierProvider<_LibraryVersionNotifier, int>(
+  _LibraryVersionNotifier.new,
+);
 
 class _LibraryVersionNotifier extends Notifier<int> {
   @override

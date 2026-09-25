@@ -76,7 +76,7 @@ class _DebouncedQueryNotifier extends Notifier<String> {
 final filteredTracksProvider = FutureProvider<List<LibraryTrack>>((ref) {
   final query = ref.watch(libraryDebouncedQueryProvider);
   final sort = ref.watch(librarySortProvider);
-  ref.watch(libraryLibraryVersionProvider);
+  ref.watch(libraryVersionProvider);
   final repository = ref.watch(libraryRepositoryProvider);
 
   if (query.isEmpty) {

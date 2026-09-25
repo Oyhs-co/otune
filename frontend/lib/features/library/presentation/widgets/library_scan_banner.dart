@@ -85,9 +85,9 @@ class LibraryScanBanner extends ConsumerWidget {
             )
           else if (isError)
             TextButton(
-              onPressed: scanState.isScanning
-                  ? null
-                  : ref.read(libraryScanProvider.notifier).retryLastScan,
+              // La rama sólo se alcanza con el escaneo detenido (la rama
+              // previa cubre isScanning), por lo que no hace falta guard.
+              onPressed: ref.read(libraryScanProvider.notifier).retryLastScan,
               child: const Text('Reintentar'),
             ),
         ],

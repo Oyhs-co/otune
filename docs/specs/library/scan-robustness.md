@@ -44,6 +44,13 @@ sobre rutas normalizadas de forma consistente.
   huérfanos).
 - DR-004: la eliminación de huérfanos es transaccional, sólo afecta pistas
   verificadas como ausentes y conserva los metadatos para poder restaurarlos.
+- DR-005: las operaciones de datos del escaneo (detección y borrado de
+  huérfanos, restauración) viven en la extensión `TracksMaintenance`
+  (`core/database/tracks_maintenance.dart`, ADR-010), separadas de las
+  consultas de lista y ordenación de `AppDatabase`.
+- DR-006: el contador de versión del catálogo se expone como
+  `libraryVersionProvider` (convención de nombres del resto de providers);
+  las listas reactivas se refrescan al observarlo (revisión 2026-09-25, F-03).
 
 ## Functional requirements
 - FR-SCANR-001: la petición de cancelación detiene el procesamiento en la
@@ -109,16 +116,24 @@ And la acción puede deshacerse restaurando los registros
 
 ### Widget
 - Banner muestra botón Cancelar durante el escaneo y estado de cancelación.
+- Banner muestra «Reintentar» habilitado en estado de error con el escaneo
+  detenido (revisión 2026-09-25, F-02: la rama de error sólo es alcanzable
+  con `isScanning: false`, sin guard redundante).
 - Acción de limpieza con diálogo de confirmación y badge de deshacer.
 
 ## Dependencies
 - `LibraryRepository` (operaciones de huérfanos).
 - `LibraryScanNotifier` (guard y ciclo de vida del token).
+- `TracksMaintenance` (`core/database/tracks_maintenance.dart`, ADR-010):
+  acceso a datos de mantenimiento de pistas.
 
 ## Related DDD
 - Bounded context: `library`
 - Aggregate/entity: `LibraryTrack`
 - Use case: escaneo robusto de biblioteca
+
+## Related architecture decisions
+- ADR-010: extracción de las operaciones de mantenimiento de `AppDatabase`.
 
 ## Verification
 
@@ -128,9 +143,11 @@ And la acción puede deshacerse restaurando los registros
 | AC-SCANR-002 | `test/features/library/application/library_scan_notifier_test.dart` | ✅ |
 | AC-SCANR-003 | `test/features/library/data/file_system_library_scanner_test.dart` | ✅ |
 | AC-SCANR-004 | `test/features/library/data/library_repository_test.dart` | ✅ |
+| Widget (F-02) | `test/features/library/presentation/library_scan_banner_test.dart` («Reintentar» habilitado con escaneo detenido) | ✅ |
 
 ## Change history
 
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-25 | Initial spec (Sprint 4) | Sprint 4 «Endurecer biblioteca» |
+| 2026-09-25 | DR-005 (`TracksMaintenance`, ADR-010), DR-006 (`libraryVersionProvider`), test de banner «Reintentar» | Revisión 2026-09-25 (F-02, F-03, F-05) |

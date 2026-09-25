@@ -33,10 +33,18 @@ class PlaybackState {
 
   bool get isPlaying => status == PlaybackStatus.playing;
   bool get isPaused => status == PlaybackStatus.paused;
-  bool get isLoading => status == PlaybackStatus.loading;
   bool get isCompleted => status == PlaybackStatus.completed;
+  bool get isLoading => status == PlaybackStatus.loading;
+
   bool get hasError => status == PlaybackStatus.error;
 
+  /// Crea una copia conservando los campos no indicados.
+  ///
+  /// El mensaje de error se propaga desde el almacenamiento interno
+  /// (`_storedErrorMessage`) y no desde el getter condicionado al estado, de
+  /// modo que una transición `error → sano → error` no pierde el mensaje.
+  /// Como el patrón `x ?? this.x` no distingue «no tocado» de «limpiado», la
+  /// bandera [clearError] permite eliminar el mensaje de forma explícita.
   PlaybackState copyWith({
     PlaybackStatus? status,
     TrackRef? currentTrack,
@@ -45,6 +53,7 @@ class PlaybackState {
     Duration? duration,
     double? volume,
     String? errorMessage,
+    bool clearError = false,
   }) {
     return PlaybackState(
       status: status ?? this.status,
@@ -53,7 +62,7 @@ class PlaybackState {
       buffered: buffered ?? this.buffered,
       duration: duration ?? this.duration,
       volume: volume ?? this.volume,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: clearError ? null : (errorMessage ?? _storedErrorMessage),
     );
   }
 

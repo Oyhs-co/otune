@@ -117,6 +117,11 @@ Then la lista muestra N + M pistas sin reiniciar la aplicación
 - Aggregate/entity: `LibraryTrack`
 - Use case: carga eficiente de biblioteca
 
+## Related architecture decisions
+- ADR-010: extracción de las operaciones de mantenimiento de `AppDatabase`
+  (la resolución puntual de artwork vive en la extensión
+  `TracksMaintenance`, `core/database/tracks_maintenance.dart`).
+
 ## Verification
 
 | Acceptance Criterion | Evidence / Test | Status |
@@ -132,3 +137,4 @@ Then la lista muestra N + M pistas sin reiniciar la aplicación
 | Date | Change | Reason |
 |---|---|---|
 | 2026-09-25 | Initial spec (Sprint 4) | Sprint 4 «Endurecer biblioteca» |
+| 2026-09-25 | Referencia a ADR-010: `getTrackArtwork` vive en `TracksMaintenance` | Revisión 2026-09-25 (F-05) |

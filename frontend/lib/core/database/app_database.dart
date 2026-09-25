@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
+part 'tracks_maintenance.dart';
 
 class Tracks extends Table {
   TextColumn get id => text()();
@@ -110,70 +111,6 @@ class AppDatabase extends _$AppDatabase {
       tracks,
     )..where((t) => t.id.equals(id))).getSingleOrNull();
     return row == null ? null : _rowToLibraryTrack(row);
-  }
-
-  /// Resolución puntual del artwork de una pista (FR-AW-002).
-  Future<Uint8List?> getTrackArtwork(String id) async {
-    final row = await (select(
-      tracks,
-    )..where((t) => t.id.equals(id))).getSingleOrNull();
-    return row?.albumArt;
-  }
-
-  /// Identificadores de pistas cuyo archivo ya no existe (FR-SCANR-005).
-  ///
-  /// Sin [candidateIds] revisa toda la biblioteca; con ellos, acota la
-  /// comprobación al subconjunto dado (usado por la restauración de sesión).
-  Future<List<String>> findMissingTracks({List<String>? candidateIds}) async {
-    if (candidateIds != null && candidateIds.isEmpty) {
-      return const [];
-    }
-    final candidateList = candidateIds;
-    final query = candidateList == null
-        ? select(tracks)
-        : (select(tracks)..where((t) => t.id.isIn(candidateList)));
-    final rows = await query.get();
-    return [
-      for (final row in rows)
-        if (!File(row.path).existsSync()) row.id,
-    ];
-  }
-
-  /// Eliminación de varias pistas en una única transacción (DR-004 de
-  /// scan-robustness).
-  Future<void> deleteTracks(List<String> ids) {
-    if (ids.isEmpty) return Future.value();
-    return transaction(() async {
-      for (final id in ids) {
-        await (delete(tracks)..where((t) => t.id.equals(id))).go();
-      }
-    });
-  }
-
-  /// Restauración de varias pistas en una única transacción (acción
-  /// de deshacer de la limpieza de huérfanos).
-  Future<void> restoreTracks(List<LibraryTrack> tracksToRestore) {
-    if (tracksToRestore.isEmpty) return Future.value();
-    return transaction(() async {
-      for (final track in tracksToRestore) {
-        await into(tracks).insert(
-          TracksCompanion.insert(
-            id: track.id,
-            title: track.title,
-            path: track.path,
-            addedAt: Value(track.addedAt ?? DateTime.now()),
-            artist: Value(track.artist),
-            album: Value(track.album),
-            albumArtist: Value(track.albumArtist),
-            trackNumber: Value(track.trackNumber),
-            durationMs: Value(track.duration?.inMilliseconds),
-            fileFormat: Value(track.fileFormat),
-            albumArt: Value(track.albumArt),
-          ),
-          mode: InsertMode.insertOrReplace,
-        );
-      }
-    });
   }
 
   LibraryTrack _rowToLibraryTrack(Track row) {
