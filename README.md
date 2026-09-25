@@ -4,7 +4,7 @@ Otune es un reproductor musical local, offline-first y multiplataforma. Está
 orientado a personas que prefieren conservar y reproducir sus propias
 bibliotecas de audio sin depender de servicios de streaming.
 
-Versión actual: `0.6.1-alpha.0+24`
+Versión actual: `0.7.0-alpha.0+25`
 
 El proyecto se encuentra en desarrollo activo. La versión actual prioriza un
 núcleo funcional de biblioteca local, reproducción, cola y letras LRC antes de

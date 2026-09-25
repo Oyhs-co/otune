@@ -71,7 +71,7 @@ frontend/pubspec.yaml
 En la línea:
 
 ```yaml
-version: 0.6.1-alpha.0+24
+version: 0.7.0-alpha.0+25
 ```
 
 ### 4.1 Sincronización con Plataformas Nativas

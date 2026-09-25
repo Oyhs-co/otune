@@ -5,6 +5,38 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/),
 y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [0.7.0-alpha.0+25] - 2026-09-25
+
+### Added
+
+- Política de errores de reproducción (Sprint 3 S3-3): nueva entidad de dominio `PlaybackFailure` con taxonomía cerrada (archivo ausente, corrupto, permisos, desconocido), salto automático a la pista siguiente al fallar la carga con límite de 3 fallos consecutivos antes de detener, y `retryCurrentTrack()` para la acción de reintento.
+- Superficie de error accionable en `NowPlayingPage` (banner con mensaje clasificado y botón Reintentar, visible también cuando la reproducción queda detenida por fallos) e indicador de error en el `MiniPlayer`.
+- Excepción tipada `PlaybackLoadException` en el contrato `AudioEngine`: la carga fallida es determinista para el llamador y el error del stream queda reservado para la UI.
+- `PlaybackState.errorMessage` ahora sólo es significativo en estado `error`: un estado posterior sano no reporta errores anteriores.
+- SPECs de playback: `audio-engine-lifecycle.md` (Implemented), `playback_error_policy.md` (Implemented), `background_audio.md` (Proposed) y `playback_interruptions.md` (Proposed).
+- ADR-009: estrategia de reproducción en segundo plano (se adopta `audio_service` detrás de los contratos existentes; implementación en la siguiente iteración).
+- Pruebas de la política de errores (salto automático, límite de fallos, reintento, pista única, fallo aislado), clasificación de `PlaybackFailure`, controles deshabilitados, indicadores de error y contratos de UI S3-1 (mini player entre secciones en móvil/escritorio, sesión única al abrir Now Playing).
+- Sprint 4 S4-1 «Escaneo robusto» (SPEC `scan-robustness.md`): cancelación cooperativa del escáner con token (`ScanCancellationToken` + evento terminal `ScanCancelled`), botón Cancelar en el banner de progreso, guard de escaneo simultáneo en `LibraryScanNotifier`, normalización de rutas indexadas y detección/limpieza transaccional de pistas huérfanas con acción de deshacer.
+- Sprint 4 S4-2 «Gestión de artwork» (SPEC `artwork-management.md`): las consultas de lista ya no cargan blobs; nueva operación `getTrackArtwork(id)` con caché LRU acotada; widget `LazyArtwork` que resuelve la carátula bajo demanda en lista, detalle y cuadrícula; límite de tamaño de imágenes embebidas en el escaneo (descarte sobre 2 MB); refresco reactivo de la biblioteca al terminar un escaneo o limpiar el catálogo.
+- Sprint 4 S4-3 «Ordenación de biblioteca» (SPEC `library-sorting.md`): migración Drift v3 → v4 (columna `added_at`), ordenación SQL por título, artista, álbum y fecha de incorporación (NOCASE, más reciente primero), criterio persistido en `SettingsRepository` y selector de orden en la biblioteca.
+- Búsqueda con debounce de 300 ms (NFR-SEARCH-002 de `search-library.md`): la lista consulta la base de datos una vez el usuario deja de escribir; la consulta vacía se aplica de inmediato.
+- Pruebas de cancelación, exclusión mutua, normalización, límite de artwork, caché LRU, resolución lazy, ordenación por criterios, persistencia del criterio y limpieza de huérfanos con deshacer (150 pruebas en total).
+
+### Changed
+
+- `PlaybackControls`: play/pausa, siguiente, anterior, shuffle y repetir se deshabilitan sin pista activa; siguiente/anterior respetan `hasNext`/`hasPrevious` (DR-001/FR-AE-002 de la SPEC audio-engine-lifecycle).
+- Transición automática con repeat one: reintenta la pista actual con seek a cero sin recargar el archivo ni mover el índice (elimina el hueco audible).
+- El contador de fallos de carga se reinicia con cualquier reproducción sana y su último fallo se limpia de la superficie de error.
+- Tests existentes de shuffle/repeat de `PlayerWidget` ahora activan una pista antes de tocar los botones, alineados con la nueva regla de controles deshabilitados.
+- `LibraryRepository` ampliado con orden por criterio, resolución puntual de artwork y operaciones de huérfanos (detección, borrado y restauración transaccional); el estado de escaneo pasa a exponer `LibraryScanControllerState` (escaneo + limpieza).
+- El lector de metadatos del escáner es inyectable (`MediaMetadataReader`), desacoplando el plugin nativo de la lógica de escaneo y permitiendo pruebas unitarias deterministas.
+- Actualizada la versión de la aplicación a `0.7.0-alpha.0+25`.
+
+### Fixed
+
+- Restaurado el `BottomNavigationBar` del shell en pantallas estrechas tras la refactorización de acciones de biblioteca del Sprint 4.
+- Títulos, artistas y álbumes largos se truncan con ellipsis de forma coherente en las tres vistas de la biblioteca (FR-SORT-006).
+
 ## [Unreleased]
 
 ## [0.6.1-alpha.0+24] - 2026-09-22
