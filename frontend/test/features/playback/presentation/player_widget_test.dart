@@ -75,6 +75,11 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest(container: container));
 
+      // Con pista activa (DR-001: los controles requieren pista activa).
+      final controller = container.read(playbackControllerProvider.notifier);
+      await controller.playTrack(testTrack);
+      await tester.pump();
+
       expect(container.read(playbackControllerProvider).isShuffle, isFalse);
 
       await tester.tap(find.byIcon(Icons.shuffle_rounded));
@@ -94,6 +99,11 @@ void main() {
       );
 
       await tester.pumpWidget(createWidgetUnderTest(container: container));
+
+      // Con pista activa (DR-001: los controles requieren pista activa).
+      final controller = container.read(playbackControllerProvider.notifier);
+      await controller.playTrack(testTrack);
+      await tester.pump();
 
       expect(
         container.read(playbackControllerProvider).repeatMode,

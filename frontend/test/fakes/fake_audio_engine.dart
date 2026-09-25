@@ -13,6 +13,13 @@ class FakeAudioEngine implements AudioEngine {
   final _stateController = StreamController<PlaybackState>.broadcast();
   PlaybackState _currentState;
 
+  /// Pistas cuya carga debe fallar (por id), con el mensaje de error
+  /// que emitirá el motor (S3-3: política de errores de carga).
+  final Map<String, String> loadFailures = {};
+
+  /// Número de veces que se invocó [load], por id de pista.
+  final Map<String, int> loadCallCounts = {};
+
   void emitState(PlaybackState state) {
     _currentState = state;
     if (!_stateController.isClosed) {
@@ -22,6 +29,22 @@ class FakeAudioEngine implements AudioEngine {
 
   @override
   Future<void> load(TrackRef track) async {
+    loadCallCounts.update(track.id, (value) => value + 1, ifAbsent: () => 1);
+
+    final failureMessage = loadFailures[track.id];
+    if (failureMessage != null) {
+      emitState(
+        _currentState.copyWith(
+          status: PlaybackStatus.error,
+          currentTrack: track,
+          position: Duration.zero,
+          errorMessage: failureMessage,
+        ),
+      );
+      // Mismo contrato que MediaKitAudioEngine: fallo determinista.
+      throw PlaybackLoadException(failureMessage);
+    }
+
     emitState(
       _currentState.copyWith(
         status: PlaybackStatus.idle,

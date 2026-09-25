@@ -12,8 +12,8 @@ class PlaybackState {
     this.buffered = Duration.zero,
     this.duration = Duration.zero,
     this.volume = 1.0,
-    this.errorMessage,
-  });
+    String? errorMessage,
+  }) : _storedErrorMessage = errorMessage;
 
   final PlaybackStatus status;
   final TrackRef? currentTrack;
@@ -21,7 +21,15 @@ class PlaybackState {
   final Duration buffered;
   final Duration duration;
   final double volume;
-  final String? errorMessage;
+
+  /// Mensaje del último error del motor.
+  ///
+  /// Sólo es significativo mientras el estado es [PlaybackStatus.error]:
+  /// fuera de él se reporta `null` para que un error anterior no contamine
+  /// estados posteriores (por ejemplo, tras recargar con éxito la pista).
+  String? get errorMessage =>
+      status == PlaybackStatus.error ? _storedErrorMessage : null;
+  final String? _storedErrorMessage;
 
   bool get isPlaying => status == PlaybackStatus.playing;
   bool get isPaused => status == PlaybackStatus.paused;

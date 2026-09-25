@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:otune/features/library/application/library_providers.dart';
@@ -17,10 +19,14 @@ import '../../../fakes/fake_snapshot_repository.dart';
 /// datos real en pruebas.
 class _FakeLibraryRepository implements LibraryRepository {
   @override
-  Future<List<LibraryTrack>> getAllTracks() async => const [];
+  Future<List<LibraryTrack>> getAllTracks({LibrarySort? sort}) async =>
+      const [];
 
   @override
-  Future<List<LibraryTrack>> searchTracks(String query) async => const [];
+  Future<List<LibraryTrack>> searchTracks(
+    String query, {
+    LibrarySort? sort,
+  }) async => const [];
 
   @override
   Future<void> upsertTrack(LibraryTrack track) async {}
@@ -30,6 +36,19 @@ class _FakeLibraryRepository implements LibraryRepository {
 
   @override
   Future<LibraryTrack?> getTrackById(String id) async => null;
+
+  @override
+  Future<Uint8List?> getTrackArtwork(String id) async => null;
+
+  @override
+  Future<List<String>> findMissingTracks({List<String>? candidateIds}) async =>
+      const [];
+
+  @override
+  Future<void> deleteTracks(List<String> ids) async {}
+
+  @override
+  Future<void> restoreTracks(List<LibraryTrack> tracks) async {}
 }
 
 void main() {

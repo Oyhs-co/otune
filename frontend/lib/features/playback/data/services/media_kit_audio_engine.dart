@@ -79,6 +79,10 @@ class MediaKitAudioEngine implements AudioEngine {
           errorMessage: e.toString(),
         ),
       );
+      // El llamador necesita un fallo determinista (SPEC
+      // playback_error_policy): el stream informa a la UI, la excepción
+      // traduce el fallo a la aplicación.
+      throw PlaybackLoadException(e.toString());
     }
   }
 

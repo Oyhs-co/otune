@@ -1,6 +1,22 @@
 import 'package:otune/features/playback/domain/entities/playback_state.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
+/// Excepción tipada cuando la carga de una pista falla.
+///
+/// El motor también emite el estado [PlaybackStatus.error] por su stream
+/// (para la UI), y además lanza esta excepción para que el llamador pueda
+/// reaccionar de forma determinista sin depender del orden de eventos
+/// asíncronos (SPEC playback_error_policy).
+class PlaybackLoadException implements Exception {
+  const PlaybackLoadException(this.message);
+
+  /// Descripción técnica del fallo emitida por el motor subyacente.
+  final String message;
+
+  @override
+  String toString() => 'PlaybackLoadException: $message';
+}
+
 /// Contrato abstracto del motor de reproducción musical de Otune.
 ///
 /// La capa de dominio y aplicación interactúa exclusivamente mediante esta
@@ -8,6 +24,9 @@ import 'package:otune/features/playback/domain/entities/track_ref.dart';
 /// de plataforma (ej. media_kit, just_audio).
 abstract interface class AudioEngine {
   /// Carga una pista de audio y la prepara para reproducción.
+  ///
+  /// Lanza [PlaybackLoadException] si el archivo no existe, está corrupto o
+  /// no es accesible; el estado del motor queda en [PlaybackStatus.error].
   Future<void> load(TrackRef track);
 
   /// Inicia o reanuda la reproducción.

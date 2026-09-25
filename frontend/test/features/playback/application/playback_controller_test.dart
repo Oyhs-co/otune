@@ -214,6 +214,188 @@ void main() {
     );
 
     test(
+      'repeat one replays the same track without reloading or moving',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.setQueue([track1, track2]);
+        controller
+          ..cycleRepeatMode() // off -> all
+          ..cycleRepeatMode(); // all -> one
+
+        expect(
+          container.read(playbackControllerProvider).repeatMode,
+          equals(RepeatMode.one),
+        );
+
+        fakeEngine.emitState(
+          fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+        );
+        await pumpEventQueue();
+
+        final session = container.read(playbackControllerProvider);
+        expect(session.currentTrack, equals(track1));
+        expect(session.currentIndex, equals(0));
+        // No se recarga el archivo: play() reanuda tras seek a cero.
+        expect(fakeEngine.currentState.status, equals(PlaybackStatus.playing));
+      },
+    );
+
+    test(
+      'repeat off at end of queue stops the engine and keeps index',
+      () async {
+        final controller = container.read(playbackControllerProvider.notifier);
+        await controller.setQueue([track1, track2], startIndex: 1);
+
+        fakeEngine.emitState(
+          fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+        );
+        await pumpEventQueue();
+
+        final session = container.read(playbackControllerProvider);
+        expect(session.currentIndex, equals(1));
+        expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
+      },
+    );
+
+    test('repeat all restarts from the first track after completion', () async {
+      final controller = container.read(playbackControllerProvider.notifier);
+      await controller.setQueue([track1, track2], startIndex: 1);
+      controller.cycleRepeatMode(); // off -> all
+
+      fakeEngine.emitState(
+        fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+      );
+      await pumpEventQueue();
+
+      final session = container.read(playbackControllerProvider);
+      expect(session.currentIndex, equals(0));
+      expect(session.currentTrack, equals(track1));
+      expect(session.isPlaying, isTrue);
+    });
+
+    group('playback error policy (S3-3)', () {
+      test(
+        'failed load skips to next track without blocking the queue',
+        () async {
+          fakeEngine.loadFailures[track1.id] =
+              'Unable to open file: no such file or directory';
+          final controller = container.read(
+            playbackControllerProvider.notifier,
+          );
+
+          await controller.setQueue([track1, track2, track3]);
+          await pumpEventQueue();
+
+          final session = container.read(playbackControllerProvider);
+          expect(session.currentIndex, equals(1));
+          expect(session.currentTrack, equals(track2));
+          expect(session.isPlaying, isTrue);
+          // La pista fallida permanece en la cola.
+          expect(session.queueItems.length, equals(3));
+        },
+      );
+
+      test('three consecutive failures stop the engine', () async {
+        fakeEngine.loadFailures
+          ..[track1.id] = 'file not found'
+          ..[track2.id] = 'file not found'
+          ..[track3.id] = 'file not found';
+        final controller = container.read(playbackControllerProvider.notifier);
+
+        // t1 carga bien; al completar, la transición automática falla en
+        // t2 (fallo 1), salta a t3 (fallo 2). Sin más pistas: stop.
+        await controller.setQueue([track1, track2, track3]);
+        fakeEngine.emitState(
+          fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+        );
+        await pumpEventQueue();
+
+        expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
+        expect(
+          container.read(playbackControllerProvider).currentTrack,
+          equals(track3),
+          reason: 'el índice queda en la última pista fallida',
+        );
+      });
+
+      test(
+        'retryCurrentTrack reloads the active track and clears failures',
+        () async {
+          fakeEngine.loadFailures[track1.id] = 'no such file or directory';
+          final controller = container.read(
+            playbackControllerProvider.notifier,
+          );
+
+          await controller.playTrack(track1);
+          await pumpEventQueue();
+          // La política detuvo el motor (idle) tras el fallo sin pistas
+          // siguientes; el fallo queda registrado para la UI.
+          expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
+          expect(
+            container.read(playbackControllerProvider).status,
+            isNot(PlaybackStatus.error),
+          );
+
+          // El archivo "vuelve a estar disponible".
+          fakeEngine.loadFailures.remove(track1.id);
+          await controller.retryCurrentTrack();
+          await pumpEventQueue();
+
+          // Tras el reintento, el fallo previo se limpia al reproducir.
+          expect(
+            fakeEngine.currentState.status,
+            equals(PlaybackStatus.playing),
+          );
+          expect(
+            fakeEngine.loadCallCounts[track1.id],
+            equals(2),
+            reason: 'la pista se recargó exactamente una vez más',
+          );
+        },
+      );
+
+      test(
+        'failed load of the only track stops the engine with error',
+        () async {
+          fakeEngine.loadFailures[track1.id] = 'Permission denied';
+          final controller = container.read(
+            playbackControllerProvider.notifier,
+          );
+
+          await controller.playTrack(track1);
+          await pumpEventQueue();
+
+          expect(fakeEngine.currentState.status, equals(PlaybackStatus.idle));
+          expect(
+            container.read(playbackControllerProvider).queueItems.length,
+            equals(1),
+          );
+        },
+      );
+      test(
+        'isolated failure does not disturb subsequent valid tracks',
+        () async {
+          fakeEngine.loadFailures[track2.id] = 'invalid data';
+          final controller = container.read(
+            playbackControllerProvider.notifier,
+          );
+
+          // t1 carga y suena; al completar, la transición automática intenta
+          // t2 (falla), salta a t3 y reproduce con normalidad.
+          await controller.setQueue([track1, track2, track3]);
+          fakeEngine.emitState(
+            fakeEngine.currentState.copyWith(status: PlaybackStatus.completed),
+          );
+          await pumpEventQueue();
+
+          final session = container.read(playbackControllerProvider);
+          expect(session.currentTrack, equals(track3));
+          expect(session.isPlaying, isTrue);
+        },
+      );
+    });
+
+    test(
       'restoreQueueItem restores an item without changing playback',
       () async {
         final controller = container.read(playbackControllerProvider.notifier);

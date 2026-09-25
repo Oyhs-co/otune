@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:otune/core/design_system/design_tokens.dart';
 import 'package:otune/core/design_system/widgets/artwork_placeholder.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
+import 'package:otune/features/playback/domain/entities/playback_failure.dart';
 import 'package:otune/features/playback/domain/entities/track_ref.dart';
 
 /// Mini-reproductor persistente que vive en el AppShell.
@@ -43,6 +44,12 @@ class MiniPlayer extends ConsumerWidget {
                 key: ValueKey(track.id),
                 track: track,
                 isPlaying: session.isPlaying,
+                errorMessage: session.playback.hasError
+                    ? PlaybackFailure.categorize(
+                        engineMessage: session.playback.errorMessage,
+                        uri: track.uri,
+                      ).message
+                    : null,
                 onTap: () => _navigateToNowPlaying(context),
                 onPrevious: () => unawaited(controller.skipPrevious()),
                 onPlayPause: () => unawaited(controller.togglePlayPause()),
@@ -65,6 +72,7 @@ class _MiniPlayerContent extends StatelessWidget {
     required this.onPrevious,
     required this.onPlayPause,
     required this.onNext,
+    this.errorMessage,
     super.key,
   });
 
@@ -74,6 +82,10 @@ class _MiniPlayerContent extends StatelessWidget {
   final VoidCallback onPrevious;
   final VoidCallback onPlayPause;
   final VoidCallback onNext;
+
+  /// Mensaje de error clasificado mostrado en lugar del artista cuando la
+  /// reproducción falla (S3-3).
+  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +127,15 @@ class _MiniPlayerContent extends StatelessWidget {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        track.artist ?? 'Artista desconocido',
+                        errorMessage ?? track.artist ?? 'Artista desconocido',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        style: errorMessage == null
+                            ? null
+                            : TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                                fontStyle: FontStyle.italic,
+                              ),
                       ),
                     ],
                   ),

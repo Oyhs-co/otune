@@ -5,6 +5,8 @@ import 'package:otune/features/lyrics/application/lyrics_sync_notifier.dart';
 import 'package:otune/features/playback/application/file_picker_service.dart';
 import 'package:otune/features/playback/application/playback_persistence.dart';
 import 'package:otune/features/playback/application/playback_providers.dart';
+import 'package:otune/features/playback/domain/entities/playback_failure.dart';
+import 'package:otune/features/playback/domain/entities/playback_modes.dart';
 import 'package:otune/features/playback/domain/entities/playback_session.dart';
 import 'package:otune/features/playback/domain/entities/playback_state.dart';
 import 'package:otune/features/playback/domain/entities/queue.dart';
@@ -17,13 +19,27 @@ class PlaybackController extends Notifier<PlaybackSession> {
   late final AudioEngine _engine;
   bool _isMuted = false;
 
+  /// Límite de fallos de carga consecutivos antes de detener la cola
+  /// (política de la SPEC playback_error_policy).
+  static const int maxConsecutiveFailures = 3;
+
+  int _consecutiveFailures = 0;
+
   @override
   PlaybackSession build() {
     _engine = ref.watch(audioEngineProvider);
+    _consecutiveFailures = 0;
 
     final subscription = _engine.state.listen((playbackState) {
       final wasCompleted = playbackState.isCompleted;
       state = state.copyWith(playback: playbackState);
+
+      // Una reproducción sana reinicia el contador de fallos consecutivos
+      // y limpia el último fallo registrado para la superficie de error.
+      if (playbackState.isPlaying) {
+        _consecutiveFailures = 0;
+        ref.read(playbackFailureProvider.notifier).clear();
+      }
 
       // Sincronizar la posición actual con el sistema de letras
       ref
@@ -53,6 +69,15 @@ class PlaybackController extends Notifier<PlaybackSession> {
   }
 
   Future<void> _handleTrackCompleted() async {
+    // Repeat one reintenta la misma pista sin mover el índice (S3-2):
+    // mover con getNextIndex() devolvería el mismo índice y recargaría,
+    // produciendo un hueco audible y un reset de posición innecesario.
+    if (state.queue.repeatMode == RepeatMode.one) {
+      await _engine.seek(Duration.zero);
+      await _engine.play();
+      return;
+    }
+
     final nextIdx = state.queue.getNextIndex();
     if (nextIdx != null) {
       state = state.copyWith(queue: state.queue.moveTo(nextIdx));
@@ -64,15 +89,50 @@ class PlaybackController extends Notifier<PlaybackSession> {
 
   Future<void> _loadAndPlayCurrent() async {
     final track = state.currentTrack;
-    if (track != null) {
-      await _engine.load(track);
-      await _engine.play();
+    if (track == null) return;
 
-      // Cargar las letras asociadas a la pista que comienza a sonar
-      await ref
-          .read(lyricsSyncProvider.notifier)
-          .loadLyrics(track.id, track.uri);
+    try {
+      await _engine.load(track);
+    } on PlaybackLoadException catch (e) {
+      // Fallo determinista de carga: la política de errores decide el
+      // salto automático o la detención (S3-3, SPEC playback_error_policy).
+      await _handleLoadFailure(track, e.message);
+      return;
     }
+
+    await _engine.play();
+
+    // Cargar las letras asociadas a la pista que comienza a sonar
+    await ref.read(lyricsSyncProvider.notifier).loadLyrics(track.id, track.uri);
+  }
+
+  /// Traduce el fallo del motor a un tipo de dominio y aplica la política
+  /// de salto automático (SPEC playback_error_policy).
+  Future<void> _handleLoadFailure(TrackRef track, String message) async {
+    final failure = PlaybackFailure.categorize(
+      engineMessage: message,
+      uri: track.uri,
+    );
+
+    ref
+        .read(playbackFailureProvider.notifier)
+        .recordFailure(failure, trackId: track.id);
+
+    // Límite de fallos consecutivos sin reproducción sana intermedia:
+    // detiene el motor y deja el fallo visible en la UI.
+    if (_consecutiveFailures >= maxConsecutiveFailures) {
+      await _engine.stop();
+      return;
+    }
+
+    final nextIdx = state.queue.getNextIndex();
+    if (nextIdx == null || nextIdx == state.currentIndex) {
+      await _engine.stop();
+      return;
+    }
+
+    state = state.copyWith(queue: state.queue.moveTo(nextIdx));
+    await _loadAndPlayCurrent();
   }
 
   /// Carga y reproduce inmediatamente una pista agregándola a la cola.
@@ -224,6 +284,17 @@ class PlaybackController extends Notifier<PlaybackSession> {
     }
   }
 
+  /// Reintenta la carga y reproducción de la pista activa tras un fallo
+  /// (acción de la superficie de error en UI, S3-3).
+  Future<void> retryCurrentTrack() async {
+    _consecutiveFailures = 0;
+    ref.read(playbackFailureProvider.notifier).clear();
+    await _loadAndPlayCurrent();
+  }
+
+  /// Último fallo de reproducción registrado por la política de errores.
+  PlaybackFailure? get lastFailure => ref.read(playbackFailureProvider).failure;
+
   /// Desplaza la reproducción a una posición específica.
   Future<void> seek(Duration position) async {
     await _engine.seek(position);
@@ -277,6 +348,44 @@ class PlaybackController extends Notifier<PlaybackSession> {
     }
   }
 }
+
+/// Estado de la última política de error de reproducción aplicada.
+class PlaybackFailureState {
+  const PlaybackFailureState({this.failure, this.failedTrackId});
+
+  final PlaybackFailure? failure;
+  final String? failedTrackId;
+
+  PlaybackFailureState copyWith({
+    PlaybackFailure? failure,
+    String? failedTrackId,
+  }) {
+    return PlaybackFailureState(
+      failure: failure ?? this.failure,
+      failedTrackId: failedTrackId ?? this.failedTrackId,
+    );
+  }
+}
+
+/// Notificador que registra el último fallo para la superficie de error UI.
+class PlaybackFailureNotifier extends Notifier<PlaybackFailureState> {
+  @override
+  PlaybackFailureState build() => const PlaybackFailureState();
+
+  void recordFailure(PlaybackFailure failure, {required String trackId}) {
+    state = PlaybackFailureState(failure: failure, failedTrackId: trackId);
+  }
+
+  void clear() {
+    state = const PlaybackFailureState();
+  }
+}
+
+/// Proveedor del último fallo de reproducción (S3-3).
+final playbackFailureProvider =
+    NotifierProvider<PlaybackFailureNotifier, PlaybackFailureState>(
+      PlaybackFailureNotifier.new,
+    );
 
 /// Proveedor del controlador de sesión y cola de reproducción.
 final playbackControllerProvider =

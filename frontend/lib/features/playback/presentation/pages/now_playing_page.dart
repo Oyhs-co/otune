@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart' hide RepeatMode;
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:otune/core/design_system/design_tokens.dart';
 import 'package:otune/features/lyrics/presentation/widgets/lyrics_widget.dart';
 import 'package:otune/features/playback/application/playback_controller.dart';
+import 'package:otune/features/playback/domain/entities/playback_failure.dart';
 import 'package:otune/features/playback/presentation/widgets/artwork_panel.dart';
 import 'package:otune/features/playback/presentation/widgets/playback_controls.dart';
 import 'package:otune/features/playback/presentation/widgets/playback_progress.dart';
@@ -37,8 +39,18 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final session = ref.watch(playbackControllerProvider);
+    final failureState = ref.watch(playbackFailureProvider);
     final controller = ref.read(playbackControllerProvider.notifier);
     final scale = DesignTokens.scale(MediaQuery.sizeOf(context).width);
+
+    // El error se muestra mientras el motor lo reporta y también cuando la
+    // reproducción quedó detenida por la política de fallos (DR-003 de la
+    // SPEC playback_error_policy): el motor en idle no debe ocultarlo.
+    final engineError = session.playback.hasError;
+    final stalledFailure =
+        failureState.failure != null && !session.isPlaying && !engineError
+        ? failureState.failure
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -114,6 +126,21 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
                             ),
                     ),
                   ),
+                  // Superficie de error accionable (S3-3): aparece sobre el
+                  // progreso cuando el motor reporta un fallo o cuando la
+                  // reproducción se detuvo por la política de fallos.
+                  if (engineError || stalledFailure != null) ...[
+                    _PlaybackErrorBanner(
+                      failure: engineError
+                          ? PlaybackFailure.categorize(
+                              engineMessage: session.playback.errorMessage,
+                              uri: session.currentTrack?.uri ?? '',
+                            )
+                          : stalledFailure!,
+                      onRetry: () => unawaited(controller.retryCurrentTrack()),
+                    ),
+                    SizedBox(height: DesignTokens.spaceS * scale),
+                  ],
                   // Progreso y controles: tamaño fijo, anclados abajo.
                   const PlaybackProgress(),
                   SizedBox(height: DesignTokens.spaceS * scale),
@@ -124,6 +151,52 @@ class _NowPlayingPageState extends ConsumerState<NowPlayingPage> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+/// Banner de error de reproducción con acción de reintento (S3-3).
+class _PlaybackErrorBanner extends StatelessWidget {
+  const _PlaybackErrorBanner({required this.failure, required this.onRetry});
+
+  final PlaybackFailure failure;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: DesignTokens.spaceM,
+        vertical: DesignTokens.spaceS,
+      ),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(DesignTokens.radiusM),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.error_outline_rounded,
+            color: theme.colorScheme.onErrorContainer,
+            size: 20,
+          ),
+          const SizedBox(width: DesignTokens.spaceS),
+          Expanded(
+            child: Text(
+              failure.message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onErrorContainer,
+              ),
+            ),
+          ),
+          const SizedBox(width: DesignTokens.spaceS),
+          TextButton(onPressed: onRetry, child: const Text('Reintentar')),
+        ],
       ),
     );
   }
