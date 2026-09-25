@@ -1,7 +1,7 @@
 # SPEC: Scan Library
 
 ## Status
-Proposed
+Implemented
 
 ## Context
 The user has audio and video files scattered in local directories. To play them,
@@ -74,10 +74,15 @@ And does not create duplicates
 - Extremely large libraries (10k+ songs): Ensure the scanner doesn't crash the app or exceed memory limits.
 
 ## Acceptance criteria
-- [ ] AC-LIB-001: Local folders can be selected and scanned.
-- [ ] AC-LIB-002: Audio and video files are correctly identified and filtered.
-- [ ] AC-LIB-003: Metadata is correctly extracted and persisted in Drift.
-- [ ] AC-LIB-004: No duplicate tracks are created for the same path.
+- [x] AC-LIB-001: Local folders can be selected and scanned.
+- [x] AC-LIB-002: Audio and video files are correctly identified and filtered.
+- [x] AC-LIB-003: Metadata is correctly extracted and persisted in Drift.
+- [x] AC-LIB-004: No duplicate tracks are created for the same path.
+
+> Sprint 4: cancelación, exclusión mutua de escaneos, normalización de rutas
+> y limpieza de huérfanos se contratos en la SPEC
+> `scan-robustness.md`; el artwork y el refresco reactivo en
+> `artwork-management.md`.
 
 ## Testing strategy
 - **Unit**: Test metadata parser with various file samples.
@@ -95,4 +100,4 @@ And does not create duplicates
 - Infrastructure: `Drift` as the primary persistence layer.
 
 ## Open questions
-- Should we implement "Watch Folder" (automatic scan on change)? (Recommended: Not for MVP).
+- Should we implement "Watch Folder" (automatic scan on change)? (Recommended: Not for MVP). Resuelto para esta versión: fuera de alcance (SPEC scan-robustness, Non-goals).

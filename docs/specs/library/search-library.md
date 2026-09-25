@@ -1,7 +1,7 @@
 # SPEC: Search Library
 
 ## Status
-Proposed
+Implemented
 
 ## Context
 As the local library grows, users need a fast way to find specific tracks, artists, or albums without scrolling through long lists.
@@ -63,10 +63,14 @@ Then the system displays a "No results found" message
 - Searching while a library scan is in progress: Search should reflect the current state of the database.
 
 ## Acceptance criteria
-- [ ] AC-SEARCH-001: User can search by title, artist, and album.
-- [ ] AC-SEARCH-002: Results update dynamically as the user types.
-- [ ] AC-SEARCH-003: Search is case-insensitive.
-- [ ] AC-SEARCH-004: "No results" state is handled correctly in the UI.
+- [x] AC-SEARCH-001: User can search by title, artist, and album.
+- [x] AC-SEARCH-002: Results update dynamically as the user types.
+- [x] AC-SEARCH-003: Search is case-insensitive.
+- [x] AC-SEARCH-004: "No results" state is handled correctly in the UI.
+
+> Sprint 4: la actualización en tiempo real se debouncea (300 ms) para
+> cumplir NFR-SEARCH-002, y los resultados admiten ordenación por título,
+> artista, álbum y fecha de incorporación (SPEC `library-sorting.md`).
 
 ## Testing strategy
 - **Unit**: Test the database query logic with various keywords.
